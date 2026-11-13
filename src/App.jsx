@@ -89,7 +89,7 @@ export default function App() {
     e.preventDefault(); setCheckoutError('');
     if (!supabase || !cart.length) return;
     setCheckoutBusy(true);
-    const {data,error}=await supabase.rpc('mahgold_create_order',{p_customer_name:customer.name,p_customer_phone:customer.phone,p_customer_email:customer.email,p_shipping_address:customer.address,p_customer_note:customer.note,p_items:cart.map(x=>({product_id:x.id,quantity:x.qty}))});
+    const {data,error}=await supabase.rpc('mahgold_create_order',{p_customer_name:customer.name,p_customer_phone:customer.phone.replace(/[۰-۹٠-٩]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d) >= 0 ? String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)) : String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))),p_customer_email:customer.email,p_shipping_address:customer.address,p_customer_note:customer.note,p_items:cart.map(x=>({product_id:x.id,quantity:x.qty}))});
     setCheckoutBusy(false);
     if(error){setCheckoutError(error.message || 'ثبت سفارش انجام نشد.');return;}
     setOrderResult(data);setCart([]);setCheckoutOpen(false);
