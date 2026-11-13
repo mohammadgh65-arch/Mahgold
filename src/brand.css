@@ -1,0 +1,1 @@
+.brand{gap:0}.brand>span{display:none}.brand::before{content:"";display:block;width:156px;height:76px;background:url("/mahgold-logo.webp") center/contain no-repeat}.footer-brand::before{width:138px;height:68px}@media(max-width:620px){.brand::before{width:112px;height:58px}.footer-brand::before{width:130px;height:64px}}
