@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Search, ShoppingBag, Menu, X, ArrowLeft, Sparkles, ShieldCheck, Gem, Truck, Heart, Plus, Minus } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
+import AdminPanel from './Admin.jsx';
 
 const categories = ['همه محصولات', 'طلای زینتی', 'طلای آب‌شده', 'سکه', 'شمش', 'انگشتر', 'گردنبند', 'دستبند', 'گوشواره'];
 const demoProducts = [
@@ -73,6 +74,8 @@ export default function App() {
     return found ? old.map(x => x.id === product.id ? { ...x, qty: x.qty + 1 } : x) : [...old, { ...product, qty: 1 }];
   });
   const changeQty = (id, delta) => setCart(old => old.map(x => x.id === id ? { ...x, qty: x.qty + delta } : x).filter(x => x.qty > 0));
+
+  if (window.location.pathname.startsWith('/admin')) return <AdminPanel />;
 
   return <div className="site-shell">
     <div className="announcement"><span>درخششِ ماندگار، انتخابی از جنس سلیقه</span><span>مشاوره خرید: به‌زودی</span></div>
