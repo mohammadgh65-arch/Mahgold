@@ -13,8 +13,10 @@ const money = value => new Intl.NumberFormat('fa-IR').format(Number(value || 0))
 const weight = value => `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 3 }).format(Number(value || 0))} گرم`;
 
 function ProductArt({ product }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const showImage = Boolean(product.image_url) && !imageFailed;
   return <div className={`product-art art-${product.tone || 'sand'}`} aria-label={product.name}>
-    {product.image_url ? <img className="real-product-image" src={product.image_url} alt={product.name} loading="lazy" /> : <>
+    {showImage ? <img className="real-product-image" src={product.image_url} alt={product.name} loading="lazy" onError={() => setImageFailed(true)} /> : <>
       <div className="art-orbit"></div><span className="art-symbol">{product.mark || '✧'}</span><span className="art-glint">✦</span>
     </>}
   </div>;
@@ -35,20 +37,29 @@ export default function App() {
     if (!supabase) return;
     let alive = true;
     (async () => {
-      const [productResult, quoteResult] = await Promise.all([
-        supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active').eq('is_active', true).order('created_at', { ascending: false }),
-        supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live').order('observed_at', { ascending: false }).limit(1).maybeSingle()
-      ]);
-      if (!alive) return;
-      if (productResult.error) {
+      try {
+        const [productResult, quoteResult] = await Promise.all([
+          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active').eq('is_active', true).order('created_at', { ascending: false }),
+          supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live').order('observed_at', { ascending: false }).limit(1).maybeSingle()
+        ]);
+        if (!alive) return;
+        if (productResult.error) {
+          setDataStatus('error');
+          setDataMessage('دریافت محصولات از پایگاه داده ناموفق بود؛ نمایش اطلاعات نمونه ادامه دارد.');
+        } else {
+          const rows = productResult.data || [];
+          setProducts(rows.map((p, i) => ({ ...p, mark: ['✧','◇','⌁','❋'][i % 4], tone: ['rose','sand','blue','plum'][i % 4] })));
+          setDataStatus('connected');
+          setDataMessage(rows.length
+            ? 'محصولات فعال از پایگاه داده خوانده می‌شوند؛ ثبت سفارش در این نسخه غیرفعال است.'
+            : 'اتصال به پایگاه داده برقرار است، اما محصول فعالی برای نمایش پیدا نشد.');
+        }
+        if (!quoteResult.error && quoteResult.data) setQuote(quoteResult.data);
+      } catch {
+        if (!alive) return;
         setDataStatus('error');
-        setDataMessage('دریافت محصولات از پایگاه داده ناموفق بود؛ نمایش اطلاعات نمونه ادامه دارد.');
-      } else {
-        setProducts((productResult.data || []).map((p, i) => ({ ...p, mark: ['✧','◇','⌁','❋'][i % 4], tone: ['rose','sand','blue','plum'][i % 4] })));
-        setDataStatus('connected');
-        setDataMessage('محصولات فعال از پایگاه داده خوانده می‌شوند؛ ثبت سفارش در این نسخه غیرفعال است.');
+        setDataMessage('ارتباط با پایگاه داده برقرار نشد؛ اطلاعات نمونه نمایش داده می‌شود.');
       }
-      if (!quoteResult.error && quoteResult.data) setQuote(quoteResult.data);
     })();
     return () => { alive = false; };
   }, []);
