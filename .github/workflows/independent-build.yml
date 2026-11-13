@@ -1,0 +1,26 @@
+name: Independent storefront build
+
+on:
+  push:
+    branches:
+      - mahgold-independent-react
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Install dependencies and build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout independent branch
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build Vite application
+        run: npm run build
