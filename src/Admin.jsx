@@ -9,7 +9,7 @@ const sections = [
 const money = n => new Intl.NumberFormat('fa-IR').format(Number(n||0));
 const blankProduct = {name:'',category:'طلای زینتی',description:'',image_url:'',weight_grams:0,karat:18,price_toman:0,pricing_mode:'manual',markup_percent:0,stock:0,is_active:true,tag:''};
 export default function AdminPanel(){
- const [session,setSession]=useState(null),[checking,setChecking]=useState(true),[adminOk,setAdminOk]=useState(false);
+ const [session,setSession]=useState(null),[checking,setChecking]=useState(true),[checkingAdmin,setCheckingAdmin]=useState(false),[adminOk,setAdminOk]=useState(false);
  const [section,setSection]=useState('overview'),[data,setData]=useState({products:[],orders:[],quotes:[],categories:[],customers:[],settings:null,content:null});
  const [loading,setLoading]=useState(false),[notice,setNotice]=useState(''),[email,setEmail]=useState(''),[password,setPassword]=useState('');
  const [modal,setModal]=useState(null),[saving,setSaving]=useState(false),[search,setSearch]=useState('');
@@ -19,7 +19,7 @@ export default function AdminPanel(){
  const [content,setContent]=useState('{}');
  const [uploading,setUploading]=useState(false);
  useEffect(()=>{let active=true;supabase?.auth.getSession().then(({data})=>{if(active){setSession(data.session);setChecking(false);}});const {data:listener}=supabase?.auth.onAuthStateChange((_e,s)=>{setSession(s);});return()=>{active=false;listener?.subscription.unsubscribe();};},[]);
- useEffect(()=>{(async()=>{if(!session){setAdminOk(false);return;}const {data:p,error}=await supabase.from('profiles').select('role').eq('id',session.user.id).maybeSingle();const {data:a}=await supabase.from('store_admins').select('user_id').eq('user_id',session.user.id).maybeSingle();setAdminOk(!error&&p?.role==='admin'&&!!a);})();},[session]);
+ useEffect(()=>{let active=true;(async()=>{if(!session){setAdminOk(false);setCheckingAdmin(false);return;}setCheckingAdmin(true);try{const [profileResult,adminResult]=await Promise.all([supabase.from('profiles').select('role').eq('id',session.user.id).maybeSingle(),supabase.from('store_admins').select('user_id').eq('user_id',session.user.id).maybeSingle()]);if(active)setAdminOk(!profileResult.error&&!adminResult.error&&profileResult.data?.role==='admin'&&!!adminResult.data);}catch{if(active)setAdminOk(false);}finally{if(active)setCheckingAdmin(false);}})();return()=>{active=false;};},[session]);
  async function load(){if(!supabase||!adminOk)return;setLoading(true);const jobs=await Promise.all([
   supabase.from('products').select('*').order('created_at',{ascending:false}),
   supabase.from('orders').select('*').order('created_at',{ascending:false}).limit(200),
@@ -46,6 +46,7 @@ export default function AdminPanel(){
  const filtered=(data[section]||[]).filter(x=>JSON.stringify(x).toLowerCase().includes(search.toLowerCase()));
  if(checking)return <div className="admin-gate">در حال بررسی نشست امن…</div>;
  if(!session)return <div className="admin-gate"><form className="admin-login" onSubmit={login}><img src="/mahgold-logo.webp"/><h1>ورود مدیریت مه‌گلد</h1><p>برای ورود، حساب مدیر فروشگاه را وارد کنید.</p><input type="email" required placeholder="ایمیل مدیر" value={email} onChange={e=>setEmail(e.target.value)}/><input type="password" required placeholder="رمز عبور" value={password} onChange={e=>setPassword(e.target.value)}/><button>ورود امن</button>{notice&&<small>{notice}</small>}<a href="#home">بازگشت به فروشگاه</a></form></div>;
+ if(checkingAdmin)return <div className="admin-gate">در حال بررسی مجوز مدیریت…</div>;
  if(!adminOk)return <div className="admin-gate"><div className="admin-login"><h2>دسترسی مجاز نیست</h2><p>این حساب هم‌زمان باید نقش مدیر و مجوز مدیریتی فروشگاه را داشته باشد.</p><button onClick={()=>supabase.auth.signOut()}>خروج از حساب</button></div></div>;
  const count=(key)=>money(data[key]?.length||0);
  return <div className="admin-shell" dir="rtl"><aside className="admin-side"><img src="/mahgold-logo.webp"/><small>مرکز کنترل فروشگاه</small><nav>{sections.map(([id,label])=><button className={section===id?'active':''} key={id} onClick={()=>{setSection(id);setSearch('');}}>{label}</button>)}</nav><button className="admin-logout" onClick={()=>supabase.auth.signOut()}>خروج امن</button></aside><main className="admin-main"><header><div><span>MAHGOLD CONTROL CENTER</span><h1>{sections.find(x=>x[0]===section)?.[1]}</h1></div><div className="admin-user">{session.user.email}<button onClick={load}>↻ بروزرسانی</button></div></header>{notice&&<div className="admin-notice" onClick={()=>setNotice('')}>{notice}　×</div>}
