@@ -96,7 +96,7 @@ export default function App() {
   };
   const changeQty = (id, delta) => setCart(old => old.map(x => x.id === id ? { ...x, qty: x.qty + delta } : x).filter(x => x.qty > 0));
 
-  if (window.location.pathname.startsWith('/admin')) return <AdminPanel />;
+  if (window.location.pathname.startsWith('/admin') || window.location.hash === '#admin') return <AdminPanel />;
 
   return <div className="site-shell">
     <div className="announcement"><span>درخششِ ماندگار، انتخابی از جنس سلیقه</span><span>مشاوره خرید: به‌زودی</span></div>
@@ -133,7 +133,7 @@ export default function App() {
       </section>
       <section className="story-section" id="story"><div className="story-seal">M<span>✧</span></div><div><span className="eyebrow">A LITTLE STORY, A LASTING GLOW</span><h2>زیبایی، فراتر از یک زیور</h2><p>مه‌گلد با الهام از سادگیِ لوکس شکل گرفته است؛ جایی که فرم، ظرافت و حس خوب کنار هم قرار می‌گیرند. اینجا هر انتخاب، امضای شخصی شماست.</p><a href="#featured" className="story-link">کشف مجموعه <ArrowLeft size={16}/></a></div></section>
     </main>
-    <footer className="site-footer"><a className="brand footer-brand" href="#home"><span className="brand-mark">م</span><span><strong>مه‌گلد</strong><small>MAHGOLD GALLERY</small></span></a><p>درخششِ ماندگار، انتخابی از جنس سلیقه</p><small>© مه‌گلد — کلیه حقوق محفوظ است</small></footer>
+    <footer className="site-footer"><a className="brand footer-brand" href="#home"><span className="brand-mark">م</span><span><strong>مه‌گلد</strong><small>MAHGOLD GALLERY</small></span></a><p>درخششِ ماندگار، انتخابی از جنس سلیقه</p><small>© مه‌گلد — کلیه حقوق محفوظ است</small><a className="text-link" href="#admin" onClick={e=>{e.preventDefault();window.location.hash='admin';window.location.reload();}}>ورود مدیریت</a></footer>
     <div className="demo-ribbon">{dataMessage}</div>
     {orderResult && <div className="drawer-backdrop"><section className="cart-drawer order-success"><button className="icon-btn" onClick={()=>setOrderResult(null)}><X/></button><h2>درخواست سفارش ثبت شد</h2><p>شماره سفارش: <b>{money(orderResult.order_number)}</b></p><p>مبلغ: <b>{money(orderResult.total_toman)} تومان</b></p><p>موجودی برای ۱۵ دقیقه رزرو شده است. پرداخت آنلاین هنوز به درگاه متصل نیست؛ برای نهایی‌کردن خرید با فروشگاه هماهنگ کنید.</p><button className="primary-btn" onClick={()=>setOrderResult(null)}>متوجه شدم</button></section></div>}
     {cartOpen && <div className="drawer-backdrop" onClick={()=>setCartOpen(false)}><aside className="cart-drawer" onClick={e=>e.stopPropagation()}><div className="drawer-head"><h3>سبد خرید</h3><button className="icon-btn" onClick={()=>setCartOpen(false)}><X/></button></div>{cart.length===0?<div className="cart-empty"><ShoppingBag size={32}/><p>سبد خرید شما خالی است.</p></div>:<>{cart.map(item=><div className="cart-line" key={item.id}><div><b>{item.name}</b><small>{money(item.price_toman)} تومان</small><div className="qty-control"><button onClick={()=>changeQty(item.id,-1)}><Minus size={13}/></button><span>{item.qty}</span><button onClick={()=>changeQty(item.id,1)}><Plus size={13}/></button></div></div><ProductArt product={item}/></div>)}<p className="cart-warning">مبلغ نهایی در سرور بر اساس قیمت ثبت‌شده محصول محاسبه می‌شود. موجودی هنگام ثبت سفارش ۱۵ دقیقه رزرو می‌شود.</p><button className="primary-btn checkout-button" onClick={()=>setCheckoutOpen(true)}>ادامه و ثبت سفارش</button></>}</aside></div>}
