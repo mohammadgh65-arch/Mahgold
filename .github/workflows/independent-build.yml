@@ -24,6 +24,9 @@ jobs:
       - name: Install exact locked dependencies
         run: npm ci --no-audit --no-fund
       - name: Build React application
+        env:
+          VITE_SUPABASE_URL: https://nzvvvpbwavaodhxrnkdr.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_8UgFkQuDJNNeez2O1CNv3Q_Jf44PrL9
         run: npm run build
       - name: Assemble standalone HTML
         run: node scripts/create-standalone-preview.mjs
