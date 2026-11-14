@@ -157,14 +157,14 @@ export default function App() {
   const [siteContent,setSiteContent]=useState(null);
   const [dataStatus,setDataStatus]=useState(isSupabaseConfigured?'loading':'error');
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
-  const [isAdminPage,setIsAdminPage]=useState(()=>window.location.hash==='#admin'||window.location.pathname.startsWith('/admin'));
+  const [isAdminPage,setIsAdminPage]=useState(()=>window.location.hash==='#mahgold-control');
 
   const displaySlides=useMemo(()=>{const rows=(siteContent?.slides||[]).filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
   useEffect(()=>{setActiveSlide(index=>Math.min(index,displaySlides.length-1));},[displaySlides.length]);
   useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%displaySlides.length),6000);return()=>clearInterval(timer);},[displaySlides.length]);
   useEffect(()=>{if(!supabase)return;let active=true;supabase.from('site_content').select('content').eq('id',1).maybeSingle().then(({data})=>{if(active&&data?.content)setSiteContent(data.content);});return()=>{active=false;};},[]);
   useEffect(()=>{
-    const onHash=()=>setIsAdminPage(window.location.hash==='#admin'||window.location.pathname.startsWith('/admin'));
+    const onHash=()=>setIsAdminPage(window.location.hash==='#mahgold-control');
     window.addEventListener('hashchange',onHash);
     return()=>window.removeEventListener('hashchange',onHash);
   },[]);
@@ -245,8 +245,6 @@ export default function App() {
     if(error){setCheckoutError(error.message||'ثبت سفارش انجام نشد.');return;}
     setOrderResult(data);setCart([]);setCheckoutOpen(false);setCartOpen(false);
   };
-  const openAdmin=()=>{window.location.hash='admin';setIsAdminPage(true);setMenuOpen(false);};
-
   if(isAdminPage)return <AdminPanel/>;
 
   return <div dir="rtl" className="min-h-screen bg-background text-foreground">
@@ -380,7 +378,6 @@ export default function App() {
         <span className="inline-flex items-center gap-1.5"><MapPin className="size-3.5 text-gold"/> نشانی: به‌زودی اعلام می‌شود</span>
       </div>
       <div className="mt-3 text-[11px] opacity-60">© ۱۴۰۵ فروشگاه آنلاین مه‌گلد · زیورآلات طلا</div>
-      <button className="mt-3 text-xs text-gold-light underline-offset-4 hover:underline" onClick={openAdmin}>ورود مدیریت</button>
     </footer>
 
     <nav className="ref-mobile-nav fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background/95 px-2 pt-1 backdrop-blur-xl md:hidden">
