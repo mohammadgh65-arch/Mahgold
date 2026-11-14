@@ -160,6 +160,7 @@ export default function App() {
   const [isAdminPage,setIsAdminPage]=useState(()=>window.location.hash==='#admin'||window.location.pathname.startsWith('/admin'));
 
   const displaySlides=useMemo(()=>{const rows=(siteContent?.slides||[]).filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
+  useEffect(()=>{setActiveSlide(index=>Math.min(index,displaySlides.length-1));},[displaySlides.length]);
   useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%displaySlides.length),6000);return()=>clearInterval(timer);},[displaySlides.length]);
   useEffect(()=>{if(!supabase)return;let active=true;supabase.from('site_content').select('content').eq('id',1).maybeSingle().then(({data})=>{if(active&&data?.content)setSiteContent(data.content);});return()=>{active=false;};},[]);
   useEffect(()=>{
@@ -297,13 +298,13 @@ export default function App() {
           </div>
         </div>)}
         <div className="absolute inset-x-0 bottom-7 z-20 flex justify-center gap-2">
-          {slides.map((slide,index)=><button key={slide.image} aria-label={'اسلاید '+(index+1)} aria-current={activeSlide===index} className={'relative h-1.5 overflow-hidden rounded-full bg-ink-foreground/30 transition-all duration-500 '+(activeSlide===index?'w-10':'w-4 hover:bg-ink-foreground/60')} onClick={()=>setActiveSlide(index)}>
+          {displaySlides.map((slide,index)=><button key={slide.image} aria-label={'اسلاید '+(index+1)} aria-current={activeSlide===index} className={'relative h-1.5 overflow-hidden rounded-full bg-ink-foreground/30 transition-all duration-500 '+(activeSlide===index?'w-10':'w-4 hover:bg-ink-foreground/60')} onClick={()=>setActiveSlide(index)}>
             {activeSlide===index&&<span className="absolute inset-y-0 right-0 bg-gold" style={{width:'100%'}}/>}
           </button>)}
         </div>
         <div className="absolute bottom-6 left-8 z-20 hidden gap-2 md:flex">
-          <button aria-label="اسلاید قبلی" className="flex size-11 items-center justify-center rounded-full border border-ink-foreground/30 bg-ink/30 backdrop-blur transition hover:border-gold hover:text-gold-light" onClick={()=>setActiveSlide(i=>(i+displaySlides.length-1)%slides.length)}><ChevronRight size={18}/></button>
-          <button aria-label="اسلاید بعدی" className="flex size-11 items-center justify-center rounded-full border border-ink-foreground/30 bg-ink/30 backdrop-blur transition hover:border-gold hover:text-gold-light" onClick={()=>setActiveSlide(i=>(i+1)%slides.length)}><ChevronLeft size={18}/></button>
+          <button aria-label="اسلاید قبلی" className="flex size-11 items-center justify-center rounded-full border border-ink-foreground/30 bg-ink/30 backdrop-blur transition hover:border-gold hover:text-gold-light" onClick={()=>setActiveSlide(i=>(i+displaySlides.length-1)%displaySlides.length)}><ChevronRight size={18}/></button>
+          <button aria-label="اسلاید بعدی" className="flex size-11 items-center justify-center rounded-full border border-ink-foreground/30 bg-ink/30 backdrop-blur transition hover:border-gold hover:text-gold-light" onClick={()=>setActiveSlide(i=>(i+1)%displaySlides.length)}><ChevronLeft size={18}/></button>
         </div>
       </section>
 
