@@ -127,6 +127,7 @@ export default function App() {
   };
   const submitOrder = async e => {
     e.preventDefault(); setCheckoutError('');
+    if (import.meta.env.VITE_PREVIEW_READONLY === 'true') { setCheckoutError('ثبت سفارش در پیش‌نمایش غیرفعال است؛ هیچ سفارشی در پایگاه داده ثبت نمی‌شود.'); return; }
     if (!supabase || !cart.length) return;
     setCheckoutBusy(true);
     const {data,error}=await supabase.rpc('mahgold_create_order',{p_customer_name:customer.name,p_customer_phone:customer.phone.replace(/[۰-۹٠-٩]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d) >= 0 ? String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)) : String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))),p_customer_email:customer.email,p_shipping_address:customer.address,p_customer_note:customer.note,p_items:cart.map(x=>({product_id:x.id,quantity:x.qty}))});
