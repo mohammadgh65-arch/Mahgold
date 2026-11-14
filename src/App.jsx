@@ -154,11 +154,14 @@ export default function App() {
   const [products,setProducts]=useState([]);
   const [dbCategories,setDbCategories]=useState([]);
   const [quote,setQuote]=useState(null);
+  const [siteContent,setSiteContent]=useState(null);
   const [dataStatus,setDataStatus]=useState(isSupabaseConfigured?'loading':'error');
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
   const [isAdminPage,setIsAdminPage]=useState(()=>window.location.hash==='#admin'||window.location.pathname.startsWith('/admin'));
 
-  useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%slides.length),6000);return()=>clearInterval(timer);},[]);
+  const displaySlides=useMemo(()=>{const rows=(siteContent?.slides||[]).filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
+  useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%displaySlides.length),6000);return()=>clearInterval(timer);},[displaySlides.length]);
+  useEffect(()=>{if(!supabase)return;let active=true;supabase.from('site_content').select('content').eq('id',1).maybeSingle().then(({data})=>{if(active&&data?.content)setSiteContent(data.content);});return()=>{active=false;};},[]);
   useEffect(()=>{
     const onHash=()=>setIsAdminPage(window.location.hash==='#admin'||window.location.pathname.startsWith('/admin'));
     window.addEventListener('hashchange',onHash);
@@ -250,7 +253,7 @@ export default function App() {
   if(isAdminPage)return <AdminPanel/>;
 
   return <div dir="rtl" className="min-h-screen bg-background text-foreground">
-    <div className="ref-announcement">ارسال امن و بسته‌بندی ویژه <span className="text-gold">✦</span> پشتیبانی مه‌گلد <span className="text-gold">✦</span> همراه انتخاب شما</div>
+    {siteContent?.announcement?.active!==false&&<div className="ref-announcement">{siteContent?.announcement?.text||"ارسال امن و بسته‌بندی ویژه ✦ پشتیبانی مه‌گلد ✦ همراه انتخاب شما"}</div>}
 
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-xl transition-shadow">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:h-[72px] md:px-7">
@@ -279,16 +282,16 @@ export default function App() {
 
     <main className="min-h-[60vh]" id="home">
       <section aria-label="اسلایدهای مه‌گلد" aria-roledescription="carousel" className="relative h-[560px] overflow-hidden bg-ink text-ink-foreground md:h-[640px]">
-        {slides.map((slide,index)=><div key={slide.image} aria-hidden={activeSlide!==index} className={'absolute inset-0 transition-opacity duration-1000 '+(activeSlide===index?'z-10 opacity-100':'pointer-events-none z-0 opacity-0')}>
+        {displaySlides.map((slide,index)=><div key={slide.image} aria-hidden={activeSlide!==index} className={'absolute inset-0 transition-opacity duration-1000 '+(activeSlide===index?'z-10 opacity-100':'pointer-events-none z-0 opacity-0')}>
           <img alt={slide.title} className="h-full w-full object-cover transition-transform duration-[7000ms] ease-out" src={slide.image} loading={index===0?'eager':'lazy'} style={{transform:activeSlide===index?'scale(1.05)':'scale(1)'}}/>
           <div className="slide-shade absolute inset-0"/>
           <div className="absolute inset-0 mx-auto flex max-w-7xl flex-col justify-end px-6 pb-20 md:justify-center md:px-10 md:pb-0">
             <div className="max-w-xl">
-              <div className="eyebrow animate-rise text-gold-light">{slide.eyebrow}</div>
+              <div className="eyebrow animate-rise text-gold-light">{slide.eyebrow||'MAHGOLD'}</div>
               <h1 className="animate-rise mt-3 text-[2.1rem] font-medium leading-[1.45] [animation-delay:120ms] md:text-6xl md:leading-[1.4]">{slide.title}</h1>
-              <p className="animate-rise mt-4 max-w-md text-sm leading-8 text-ink-muted [animation-delay:240ms] md:text-[15px]">{slide.description}</p>
+              <p className="animate-rise mt-4 max-w-md text-sm leading-8 text-ink-muted [animation-delay:240ms] md:text-[15px]">{slide.description||''}</p>
               <button className="mt-7 inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-gold-gradient px-7 text-sm font-bold text-ink shadow-gold transition-all hover:-translate-y-0.5 hover:brightness-110" onClick={()=>{setCategory(slide.category);document.getElementById('shop')?.scrollIntoView({behavior:'smooth'});}}>
-                {slide.button}<ArrowLeft size={16}/>
+                {slide.button||'مشاهده محصولات'}<ArrowLeft size={16}/>
               </button>
             </div>
           </div>
@@ -299,7 +302,7 @@ export default function App() {
           </button>)}
         </div>
         <div className="absolute bottom-6 left-8 z-20 hidden gap-2 md:flex">
-          <button aria-label="اسلاید قبلی" className="flex size-11 items-center justify-center rounded-full border border-ink-foreground/30 bg-ink/30 backdrop-blur transition hover:border-gold hover:text-gold-light" onClick={()=>setActiveSlide(i=>(i+slides.length-1)%slides.length)}><ChevronRight size={18}/></button>
+          <button aria-label="اسلاید قبلی" className="flex size-11 items-center justify-center rounded-full border border-ink-foreground/30 bg-ink/30 backdrop-blur transition hover:border-gold hover:text-gold-light" onClick={()=>setActiveSlide(i=>(i+displaySlides.length-1)%slides.length)}><ChevronRight size={18}/></button>
           <button aria-label="اسلاید بعدی" className="flex size-11 items-center justify-center rounded-full border border-ink-foreground/30 bg-ink/30 backdrop-blur transition hover:border-gold hover:text-gold-light" onClick={()=>setActiveSlide(i=>(i+1)%slides.length)}><ChevronLeft size={18}/></button>
         </div>
       </section>
