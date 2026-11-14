@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search, ShoppingBag, Menu, X, ArrowLeft, Sparkles, ShieldCheck, Gem, Truck, Heart, Plus, Minus } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, ArrowLeft, Sparkles, ShieldCheck, Gem, Truck, Heart, Plus, Minus, UserRound, LogOut } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 import AdminPanel from './Admin.jsx';
 
@@ -23,11 +23,51 @@ function ProductArt({ product }) {
   </div>;
 }
 
+function CustomerAccountModal({ onClose }) {
+  const [session, setSession] = useState(null);
+  const [mode, setMode] = useState('login');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (!supabase) return;
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, next) => setSession(next));
+    return () => listener.subscription.unsubscribe();
+  }, []);
+  const submit = async e => {
+    e.preventDefault();
+    if (!supabase) { setMessage('اتصال حساب کاربری در دسترس نیست.'); return; }
+    setBusy(true); setMessage('');
+    const result = mode === 'signup'
+      ? await supabase.auth.signUp({ email, password, options: { data: { full_name: name, phone } } })
+      : await supabase.auth.signInWithPassword({ email, password });
+    setBusy(false);
+    if (result.error) setMessage(result.error.message);
+    else if (mode === 'signup' && !result.data.session) setMessage('ثبت‌نام انجام شد. برای فعال‌سازی حساب، ایمیل خود را تأیید کنید.');
+    else setMessage(mode === 'signup' ? 'حساب مشتری ایجاد شد.' : 'با موفقیت وارد شدید.');
+  };
+  if (session) return <div className="account-panel"><div className="account-avatar"><UserRound size={26}/></div><h3>حساب مشتری</h3><p>{session.user.email}</p><p className="muted">ورود شما به مه‌گلد فعال است.</p><button className="primary-btn" onClick={onClose}>ادامه خرید</button><button className="account-logout" onClick={async()=>{await supabase.auth.signOut();setMessage('از حساب خارج شدید.')}}><LogOut size={16}/> خروج از حساب</button>{message&&<small>{message}</small>}</div>;
+  return <form className="account-form" onSubmit={submit}>
+    <div className="account-tabs"><button type="button" className={mode==='login'?'active':''} onClick={()=>{setMode('login');setMessage('');}}>ورود</button><button type="button" className={mode==='signup'?'active':''} onClick={()=>{setMode('signup');setMessage('');}}>ایجاد حساب</button></div>
+    {mode==='signup'&&<><label>نام و نام خانوادگی<input required minLength="2" value={name} onChange={e=>setName(e.target.value)}/></label><label>شماره موبایل<input required type="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></label></>}
+    <label>ایمیل<input required type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)}/></label>
+    <label>گذرواژه<input required minLength="6" type="password" autoComplete={mode==='login'?'current-password':'new-password'} value={password} onChange={e=>setPassword(e.target.value)}/></label>
+    {message&&<p className="account-message">{message}</p>}
+    <button className="primary-btn" disabled={busy}>{busy?'در حال بررسی…':mode==='login'?'ورود به حساب':'ایجاد حساب مشتری'}</button>
+    <small>اطلاعات حساب از طریق سرویس امن Supabase Auth مدیریت می‌شود.</small>
+  </form>;
+}
+
 export default function App() {
   const [category, setCategory] = useState('همه محصولات');
   const [query, setQuery] = useState('');
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutBusy, setCheckoutBusy] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
@@ -108,6 +148,7 @@ export default function App() {
       <a className="brand" href="#home"><span className="brand-mark">م</span><span><strong>مه‌گلد</strong><small>MAHGOLD GALLERY</small></span></a>
       <div className="header-actions">
         <label className="search-box"><Search size={17}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="جست‌وجوی محصول"/></label>
+        <button className="icon-btn account-btn" onClick={() => setAccountOpen(true)} aria-label="حساب کاربری"><UserRound size={19}/></button>
         <button className="icon-btn bag-btn" onClick={() => setCartOpen(true)} aria-label="سبد خرید"><ShoppingBag size={19}/>{count > 0 && <b>{count}</b>}</button>
       </div>
     </header>
@@ -136,6 +177,7 @@ export default function App() {
     <footer className="site-footer"><a className="brand footer-brand" href="#home"><span className="brand-mark">م</span><span><strong>مه‌گلد</strong><small>MAHGOLD GALLERY</small></span></a><p>درخششِ ماندگار، انتخابی از جنس سلیقه</p><small>© مه‌گلد — کلیه حقوق محفوظ است</small><a className="text-link" href="#admin" onClick={e=>{e.preventDefault();window.location.hash='admin';window.location.reload();}}>ورود مدیریت</a></footer>
     <div className="demo-ribbon">{dataMessage}</div>
     {orderResult && <div className="drawer-backdrop"><section className="cart-drawer order-success"><button className="icon-btn" onClick={()=>setOrderResult(null)}><X/></button><h2>درخواست سفارش ثبت شد</h2><p>شماره سفارش: <b>{money(orderResult.order_number)}</b></p><p>مبلغ: <b>{money(orderResult.total_toman)} تومان</b></p><p>موجودی برای ۱۵ دقیقه رزرو شده است. پرداخت آنلاین هنوز به درگاه متصل نیست؛ برای نهایی‌کردن خرید با فروشگاه هماهنگ کنید.</p><button className="primary-btn" onClick={()=>setOrderResult(null)}>متوجه شدم</button></section></div>}
+    {accountOpen && <div className="drawer-backdrop" onClick={() => setAccountOpen(false)}><section className="cart-drawer account-drawer" onClick={e=>e.stopPropagation()}><div className="drawer-head"><h3>حساب کاربری مه‌گلد</h3><button className="icon-btn" onClick={() => setAccountOpen(false)}><X/></button></div><CustomerAccountModal onClose={() => setAccountOpen(false)}/></section></div>}
     {cartOpen && <div className="drawer-backdrop" onClick={()=>setCartOpen(false)}><aside className="cart-drawer" onClick={e=>e.stopPropagation()}><div className="drawer-head"><h3>سبد خرید</h3><button className="icon-btn" onClick={()=>setCartOpen(false)}><X/></button></div>{cart.length===0?<div className="cart-empty"><ShoppingBag size={32}/><p>سبد خرید شما خالی است.</p></div>:<>{cart.map(item=><div className="cart-line" key={item.id}><div><b>{item.name}</b><small>{money(item.price_toman)} تومان</small><div className="qty-control"><button onClick={()=>changeQty(item.id,-1)}><Minus size={13}/></button><span>{item.qty}</span><button onClick={()=>changeQty(item.id,1)}><Plus size={13}/></button></div></div><ProductArt product={item}/></div>)}<p className="cart-warning">مبلغ نهایی در سرور بر اساس قیمت ثبت‌شده محصول محاسبه می‌شود. موجودی هنگام ثبت سفارش ۱۵ دقیقه رزرو می‌شود.</p><button className="primary-btn checkout-button" onClick={()=>setCheckoutOpen(true)}>ادامه و ثبت سفارش</button></>}</aside></div>}
     {checkoutOpen && <div className="drawer-backdrop" onClick={()=>setCheckoutOpen(false)}><form className="cart-drawer checkout-form" onClick={e=>e.stopPropagation()} onSubmit={submitOrder}><div className="drawer-head"><h3>اطلاعات سفارش</h3><button type="button" className="icon-btn" onClick={()=>setCheckoutOpen(false)}><X/></button></div><label>نام و نام خانوادگی<input required minLength="2" value={customer.name} onChange={e=>setCustomer({...customer,name:e.target.value})}/></label><label>شماره تماس<input required type="tel" minLength="8" value={customer.phone} onChange={e=>setCustomer({...customer,phone:e.target.value})}/></label><label>ایمیل (اختیاری)<input type="email" value={customer.email} onChange={e=>setCustomer({...customer,email:e.target.value})}/></label><label>نشانی ارسال<input required value={customer.address} onChange={e=>setCustomer({...customer,address:e.target.value})}/></label><label>توضیحات سفارش<textarea value={customer.note} onChange={e=>setCustomer({...customer,note:e.target.value})}/></label><p>جمع سبد: {money(cart.reduce((n,x)=>n+Number(x.price_toman)*x.qty,0))} تومان</p>{checkoutError&&<p className="cart-warning">{checkoutError}</p>}<button className="primary-btn" disabled={checkoutBusy}>{checkoutBusy?'در حال ثبت…':'ثبت سفارش و رزرو موجودی'}</button><small>ثبت سفارش به معنی پرداخت نیست. تا زمان اتصال درگاه، وضعیت سفارش «در انتظار پرداخت» باقی می‌ماند.</small></form></div>}
   </div>;
