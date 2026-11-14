@@ -30,7 +30,7 @@ jobs:
       - name: Verify standalone output
         run: |
           test -s dist/index.html
-          ! grep -Eq '<script[^>]+src=["'"'](/|\./)?assets/|<link[^>]+href=["'"'](/|\./)?assets/[^"'"']+\.css' dist/index.html
+          ! grep -Eq '<script[^>]+src=.*assets/|<link[^>]+href=.*assets/.*\.css' dist/index.html
           grep -q 'data:image/webp;base64' dist/index.html
           echo "Standalone HTML verified: $(wc -c < dist/index.html) bytes"
       - name: Upload private preview artifact
