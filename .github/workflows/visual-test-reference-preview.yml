@@ -1,0 +1,100 @@
+name: Visual test exact Mahgold reference preview
+on:
+  push:
+    branches:
+      - mahgold-reference-inspection
+jobs:
+  visual-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout exact preview branch
+        uses: actions/checkout@v4
+        with:
+          ref: mahgold-independent-react
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Build connected read-only preview
+        env:
+          VITE_SUPABASE_URL: https://nzvvvpbwavaodhxrnkdr.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_8UgFkQuDJNNeez2O1CNv3Q_Jf44PrL9
+          VITE_PREVIEW_READONLY: 'true'
+        run: |
+          npm run build
+          node scripts/create-standalone-preview.mjs
+      - name: Install browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Render and test preview without writes
+        run: |
+          mkdir -p visual-test
+          cp dist/index.html visual-test/index.html
+          python3 -m http.server 4173 -d visual-test >/tmp/preview-http.log 2>&1 &
+          cat > visual-test.cjs <<'NODE'
+          const {chromium}=require('playwright');
+          const fs=require('fs');
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            const errors=[];
+            const page=await browser.newPage({viewport:{width:1440,height:1000},deviceScaleFactor:1});
+            page.on('pageerror',e=>errors.push(String(e)));
+            page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+            await page.goto('http://127.0.0.1:4173/index.html',{waitUntil:'domcontentloaded',timeout:60000});
+            await page.waitForTimeout(8000);
+            const text=await page.locator('body').innerText();
+            const desktop={
+              title:await page.title(),
+              hero:text.includes('درخششِ طلا، امضایِ استایلِ شما'),
+              categories:text.includes('از میان مجموعه‌ها انتخاب کنید'),
+              shop:text.includes('منتخب‌های مه‌گلد'),
+              story:text.includes('زیبایی‌ای که'),
+              products:[...await page.locator('.ref-product-card').allInnerTexts()],
+              errors,
+              heroImage:await page.locator('section[aria-label="اسلایدهای مه‌گلد"] img').first().evaluate(e=>({complete:e.complete,width:e.naturalWidth})),
+              productCardCount:await page.locator('.ref-product-card').count()
+            };
+            await page.screenshot({path:'visual-test/desktop.png',fullPage:true});
+            if(await page.locator('.ref-product-card').count()>0){
+              await page.locator('.ref-add-button').first().click();
+              await page.getByRole('button',{name:'سبد خرید'}).click();
+              await page.waitForTimeout(400);
+              desktop.cartOpens=await page.getByText('جمع سبد خرید').count()>0;
+            }
+            await page.getByRole('button',{name:'ورود / ثبت‌نام'}).click();
+            await page.waitForTimeout(300);
+            desktop.loginOpens=await page.getByText('حساب کاربری مه‌گلد').count()>0;
+            await page.screenshot({path:'visual-test/account.png'});
+            const mobile=await browser.newPage({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true});
+            mobile.on('pageerror',e=>errors.push(String(e)));
+            await mobile.goto('http://127.0.0.1:4173/index.html',{waitUntil:'domcontentloaded',timeout:60000});
+            await mobile.waitForTimeout(5000);
+            await mobile.screenshot({path:'visual-test/mobile.png',fullPage:true});
+            const mobileResult={
+              viewport:390,
+              bodyScrollWidth:await mobile.locator('body').evaluate(e=>e.scrollWidth),
+              mobileNavVisible:await mobile.locator('.ref-mobile-nav').isVisible(),
+              headerVisible:await mobile.locator('header').isVisible(),
+              productCardCount:await mobile.locator('.ref-product-card').count()
+            };
+            fs.writeFileSync('visual-test/results.json',JSON.stringify({desktop,mobile:mobileResult,allErrors:errors},null,2));
+            console.log(JSON.stringify({desktop,mobile:mobileResult,allErrors:errors},null,2));
+            if(!desktop.hero||!desktop.categories||!desktop.shop||!desktop.story)throw new Error('Required page section missing');
+            if(!mobileResult.mobileNavVisible)throw new Error('Mobile bottom navigation is not visible');
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+          node visual-test.cjs
+      - name: Upload visual test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mahgold-reference-visual-test
+          path: visual-test/
+          if-no-files-found: warn
+          retention-days: 3
