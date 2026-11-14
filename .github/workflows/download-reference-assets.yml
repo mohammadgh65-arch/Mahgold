@@ -1,0 +1,60 @@
+name: Download Lovable reference assets (temporary)
+on:
+  push:
+    branches:
+      - mahgold-reference-inspection
+jobs:
+  download-assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Download reference bundle and public assets
+        run: |
+          mkdir -p reference-assets/assets
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const origin = 'https://growth-and-advancement-garden.lovable.app';
+          const files = [
+            '/assets/index-DVJt14B2.js',
+            '/assets/index-DVJt14B2.js.map',
+            '/assets/styles-LaDTnYWT.css',
+            '/assets/styles-LaDTnYWT.css.map',
+            '/assets/mahgold-mark-B9IfGU60.png',
+            '/assets/mahgold-logo-CEBRsLr5.png',
+            '/assets/slide-necklace-Bn1Ooa9V.jpg',
+            '/assets/slide-gift-CrjacK5c.jpg',
+            '/assets/slide-invest-CIEhMTDg.jpg',
+            '/assets/jewelry-CwLx7kUY.jpg',
+            '/assets/melted-nOWRYhbE.jpg',
+            '/assets/coin-CsyrnHPB.jpg',
+            '/assets/bar-B0yyIRPP.jpg'
+          ];
+          (async () => {
+            const results = [];
+            for (const item of files) {
+              try {
+                const response = await fetch(origin + item, { redirect: 'follow' });
+                const bytes = Buffer.from(await response.arrayBuffer());
+                const local = path.join('reference-assets', item.replace(/^\//, ''));
+                fs.mkdirSync(path.dirname(local), { recursive: true });
+                if (response.ok) fs.writeFileSync(local, bytes);
+                results.push({ path:item, status:response.status, type:response.headers.get('content-type'), bytes:bytes.length, saved:response.ok?local:null });
+              } catch (error) { results.push({ path:item, error:String(error) }); }
+            }
+            fs.writeFileSync('reference-assets/download-report.json', JSON.stringify(results,null,2));
+            console.log(JSON.stringify(results,null,2));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Upload reference assets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lovable-reference-assets
+          path: reference-assets/
+          if-no-files-found: warn
+          retention-days: 3
