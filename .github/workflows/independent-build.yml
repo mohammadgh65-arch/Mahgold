@@ -1,4 +1,4 @@
-name: Independent storefront build
+name: Independent storefront build and private preview artifact
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build:
-    name: Create lockfile and build
+    name: Build standalone private preview
     runs-on: ubuntu-latest
     steps:
       - name: Checkout independent branch
@@ -20,17 +20,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Generate and commit npm lockfile when missing
-        run: |
-          if [ ! -f package-lock.json ]; then
-            npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add package-lock.json
-            git commit -m "chore: add npm lockfile"
-            git push origin HEAD:mahgold-independent-react
-          fi
+          cache: npm
       - name: Install exact locked dependencies
         run: npm ci --no-audit --no-fund
-      - name: Build Vite application
+      - name: Build standalone HTML
         run: npm run build
+      - name: Verify standalone output
+        run: |
+          test -s dist/index.html
+          ! grep -Eq '<script[^>]+src=|<link[^>]+\.css' dist/index.html
+          grep -q 'data:image/webp;base64' dist/index.html
+          echo "Standalone HTML verified: $(wc -c < dist/index.html) bytes"
+      - name: Upload private preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mahgold-private-preview
+          path: dist/index.html
+          if-no-files-found: error
+          retention-days: 14
