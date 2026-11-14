@@ -1,0 +1,57 @@
+name: Fetch complete Lovable storefront bundle (temporary)
+on:
+  push:
+    branches:
+      - mahgold-reference-inspection
+jobs:
+  fetch-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Recursively fetch production assets
+        run: |
+          mkdir -p reference-bundle/assets
+          cat > fetch-assets.cjs <<'NODE'
+          const fs=require('fs'); const path=require('path');
+          const origin='https://growth-and-advancement-garden.lovable.app';
+          const queue=['/assets/index-DVJt14B2.js','/assets/styles-LaDTnYWT.css'];
+          const seen=new Set(); const report=[];
+          const maxFiles=150;
+          const normalize=(s)=>s.startsWith('/')?s:'/assets/'+s;
+          (async()=>{
+            while(queue.length && seen.size<maxFiles){
+              const url=normalize(queue.shift()); if(seen.has(url))continue; seen.add(url);
+              try{
+                const res=await fetch(origin+url); const buf=Buffer.from(await res.arrayBuffer());
+                report.push({url,status:res.status,type:res.headers.get('content-type'),bytes:buf.length});
+                if(!res.ok)continue;
+                const local=path.join('reference-bundle',url.replace(/^\//,''));
+                fs.mkdirSync(path.dirname(local),{recursive:true}); fs.writeFileSync(local,buf);
+                const text=buf.toString('utf8');
+                if(/javascript|ecmascript|text\/plain/.test(res.headers.get('content-type')||'') || /\.js$/.test(url)){
+                  for(const m of text.matchAll(/(?:from\s*|import\s*\(|["'])\.\/(assets\/[^"'()]+?\.js)(?:["'\?])/g)) queue.push('/'+m[1]);
+                  for(const m of text.matchAll(/["'](assets\/[^"'()]+?\.(?:js|css|png|jpe?g|webp|svg|woff2?))["']/g)) queue.push('/'+m[1]);
+                  for(const m of text.matchAll(/["'](\/assets\/[^"'()]+?\.(?:js|css|png|jpe?g|webp|svg|woff2?))["']/g)) queue.push(m[1]);
+                } else if(/text\/css/.test(res.headers.get('content-type')||'') || /\.css$/.test(url)){
+                  for(const m of text.matchAll(/url\((?:["']?)([^)'"]+)(?:["']?)\)/g)) if(m[1].startsWith('/assets/')) queue.push(m[1]);
+                }
+              }catch(e){report.push({url,error:String(e)});}
+            }
+            fs.writeFileSync('reference-bundle/fetch-report.json',JSON.stringify(report,null,2));
+            console.log('Fetched',seen.size,'unique URLs');
+            console.log(JSON.stringify(report,null,2));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+          node fetch-assets.cjs
+      - name: Upload complete bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lovable-complete-bundle
+          path: reference-bundle/
+          if-no-files-found: warn
+          retention-days: 3
