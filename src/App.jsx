@@ -231,10 +231,6 @@ export default function App() {
   const changeQuantity=(id,delta)=>setCart(old=>old.map(item=>item.id===id?{...item,qty:item.qty+delta}:item).filter(item=>item.qty>0&&item.qty<=Number(item.stock||0)));
   const submitOrder=async event=>{
     event.preventDefault();setCheckoutError('');
-    if(import.meta.env.VITE_PREVIEW_READONLY==='true'){
-      setCheckoutError('پیش‌نمایش به پایگاه داده متصل است، اما ثبت سفارش واقعی برای جلوگیری از تغییر اطلاعات غیرفعال شده است.');
-      return;
-    }
     if(!supabase||!cart.length)return;
     setCheckoutBusy(true);
     const {data,error}=await supabase.rpc('mahgold_create_order',{
