@@ -7,17 +7,17 @@ const logo = 'data:image/webp;base64,' + readFileSync('public/mahgold-logo.webp'
 let html = readFileSync(join(out, 'index.html'), 'utf8');
 
 html = html.replace(/<link[^>]*rel=["']modulepreload["'][^>]*>/g, '');
-html = html.replace(/<script[^>]*src=["']([^"']+\.js)["'][^>]*>\s*<\/script>/g, (_tag, src) => {
+html = html.replace(/<script[^>]*src=["']((?:\/|\.\/)?assets\/[^"']+\.js)["'][^>]*>\s*<\/script>/g, (_tag, src) => {
   const file = join(assetDir, basename(src));
   const code = readFileSync(file, 'utf8').replaceAll('/mahgold-logo.webp', logo);
   return '<script type="module">\n' + code + '\n</script>';
 });
-html = html.replace(/<link[^>]*href=["']([^"']+\.css)["'][^>]*>/g, (_tag, href) => {
+html = html.replace(/<link[^>]*href=["']((?:\/|\.\/)?assets\/[^"']+\.css)["'][^>]*>/g, (_tag, href) => {
   const file = join(assetDir, basename(href));
   return '<style>\n' + readFileSync(file, 'utf8').replaceAll('/mahgold-logo.webp', logo) + '\n</style>';
 });
 html = html.replaceAll('/mahgold-logo.webp', logo);
-if (/<script[^>]+src=|<link[^>]+\.css/.test(html)) throw new Error('External JS/CSS asset reference remains in standalone HTML.');
+if (/<script[^>]+src=["'](?:\/|\.\/)?assets\/|<link[^>]+href=["'](?:\/|\.\/)?assets\/[^"']+\.css/.test(html)) throw new Error('Local JS/CSS asset reference remains in standalone HTML.');
 if (!html.includes('data:image/webp;base64')) throw new Error('Embedded brand logo is missing.');
 writeFileSync(join(out, 'index.html'), html, 'utf8');
 console.log('Standalone preview created:', Buffer.byteLength(html), 'bytes');
