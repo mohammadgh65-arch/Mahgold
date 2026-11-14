@@ -13,3 +13,7 @@
 .admin-content-card textarea,.admin-content-card input:not([type=file]),.admin-content-card select,.admin-slide-editor textarea,.admin-slide-editor input:not([type=file]),.admin-slide-editor select{width:100%;min-width:0}
 .admin-content-card .check,.admin-slide-editor .check{display:flex;align-items:center;gap:8px}
 .admin-content-card .check input,.admin-slide-editor .check input{width:auto}
+
+.admin-image-preview{display:grid;gap:8px;justify-items:start;max-width:100%}
+.admin-image-preview img{max-width:100%}
+.admin-image-preview button{font-size:12px}
