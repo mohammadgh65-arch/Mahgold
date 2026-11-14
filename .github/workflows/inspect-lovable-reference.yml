@@ -1,0 +1,77 @@
+name: Inspect Lovable reference (temporary)
+on:
+  push:
+    branches:
+      - mahgold-reference-inspection
+  workflow_dispatch:
+jobs:
+  capture-reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install browser
+        run: |
+          npm init -y
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Capture reference website
+        run: |
+          mkdir -p reference-capture
+          cat > capture.cjs <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const errors = [];
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
+            page.on('pageerror', e => errors.push(String(e)));
+            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+            const response = await page.goto('https://growth-and-advancement-garden.lovable.app/', { waitUntil: 'domcontentloaded', timeout: 90000 });
+            await page.waitForTimeout(8000);
+            await page.screenshot({ path: 'reference-capture/desktop.png', fullPage: true });
+            const snapshot = await page.evaluate(() => {
+              const clean = s => (s || '').replace(/\\s+/g, ' ').trim();
+              const nodes = sel => [...document.querySelectorAll(sel)].map((el, i) => ({
+                index: i, tag: el.tagName.toLowerCase(), id: el.id || '', className: typeof el.className === 'string' ? el.className : '',
+                text: clean(el.innerText).slice(0, 1200),
+                rect: (() => { const r = el.getBoundingClientRect(); return { x: Math.round(r.x), y: Math.round(r.y), width: Math.round(r.width), height: Math.round(r.height) }; })(),
+                style: (() => { const c = getComputedStyle(el); return { display:c.display, position:c.position, color:c.color, backgroundColor:c.backgroundColor, fontFamily:c.fontFamily, fontSize:c.fontSize, fontWeight:c.fontWeight, borderRadius:c.borderRadius, gap:c.gap, gridTemplateColumns:c.gridTemplateColumns }; })()
+              }));
+              return {
+                title: document.title, url: location.href, lang: document.documentElement.lang, direction: getComputedStyle(document.documentElement).direction,
+                description: document.querySelector('meta[name="description"]')?.content || '',
+                bodyText: clean(document.body.innerText).slice(0, 30000),
+                headings: nodes('h1,h2,h3,h4'),
+                sections: nodes('header,nav,main,section,footer,[role="dialog"]'),
+                buttons: [...document.querySelectorAll('button')].map(b => ({ text:clean(b.innerText), aria:b.getAttribute('aria-label'), title:b.title, cls:typeof b.className==='string'?b.className:'' })).slice(0,200),
+                links: [...document.querySelectorAll('a')].map(a => ({ text:clean(a.innerText), href:a.href })).slice(0,200),
+                images: [...document.images].map(i => ({ alt:i.alt, src:i.currentSrc || i.src, width:i.naturalWidth, height:i.naturalHeight })).slice(0,250),
+                stylesheets: [...document.styleSheets].map(s => s.href).filter(Boolean),
+                scripts: [...document.scripts].map(s => s.src).filter(Boolean),
+                fonts: [...document.fonts].values ? [...document.fonts].values().map(f => ({family:f.family, status:f.status})) : []
+              };
+            });
+            snapshot.httpStatus = response?.status() ?? null;
+            snapshot.pageErrors = errors;
+            fs.writeFileSync('reference-capture/snapshot.json', JSON.stringify(snapshot, null, 2));
+            fs.writeFileSync('reference-capture/page.html', await page.content());
+            const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
+            await mobile.goto('https://growth-and-advancement-garden.lovable.app/', { waitUntil: 'domcontentloaded', timeout: 90000 });
+            await mobile.waitForTimeout(5000);
+            await mobile.screenshot({ path: 'reference-capture/mobile.png', fullPage: true });
+            await browser.close();
+          })().catch(e => { console.error(e); process.exit(1); });
+          NODE
+          node capture.cjs
+      - name: Upload capture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lovable-reference-capture
+          path: reference-capture/
+          if-no-files-found: warn
+          retention-days: 3
