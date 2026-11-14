@@ -65,6 +65,8 @@ jobs:
               await page.getByRole('button',{name:'سبد خرید'}).click();
               await page.waitForTimeout(400);
               desktop.cartOpens=await page.getByText('جمع سبد خرید').count()>0;
+              await page.locator('.ref-drawer-head .ref-close').click();
+              await page.waitForTimeout(200);
             }
             await page.getByRole('button',{name:'ورود / ثبت‌نام'}).click();
             await page.waitForTimeout(300);
