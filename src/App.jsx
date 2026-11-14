@@ -157,6 +157,7 @@ export default function App() {
   const [activeSlide,setActiveSlide]=useState(0);
   const [products,setProducts]=useState([]);
   const [dbCategories,setDbCategories]=useState([]);
+  const [quote,setQuote]=useState(null);
   const [dataStatus,setDataStatus]=useState(isSupabaseConfigured?'loading':'error');
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
   const [isAdminPage,setIsAdminPage]=useState(()=>window.location.hash==='#admin'||window.location.pathname.startsWith('/admin'));
@@ -172,11 +173,13 @@ export default function App() {
     let active=true;
     (async()=>{
       try{
-        const [productResult,categoryResult]=await Promise.all([
+        const [productResult,categoryResult,quoteResult]=await Promise.all([
           supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,created_at,tag')
             .eq('is_active',true).order('created_at',{ascending:false}),
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
-            .eq('is_active',true).order('sort_order',{ascending:true})
+            .eq('is_active',true).order('sort_order',{ascending:true}),
+          supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
+            .order('observed_at',{ascending:false}).limit(1).maybeSingle()
         ]);
         if(!active)return;
         if(productResult.error){setDataStatus('error');setProducts([]);setDataMessage('دریافت محصولات ناموفق بود؛ برای جلوگیری از نمایش قیمت نادرست، اطلاعات نمونه نمایش داده نمی‌شود.');}
@@ -186,6 +189,7 @@ export default function App() {
           setDataMessage(rows.length?'محصولات و قیمت‌ها مستقیماً از پایگاه داده مه‌گلد دریافت می‌شوند.':'اتصال برقرار است؛ هنوز محصول فعالی برای نمایش ثبت نشده است.');
         }
         if(!categoryResult.error)setDbCategories(categoryResult.data||[]);
+        if(!quoteResult.error&&quoteResult.data)setQuote(quoteResult.data);
       }catch{
         if(!active)return;
         setDataStatus('error');setProducts([]);setDataMessage('ارتباط با پایگاه داده برقرار نشد.');
@@ -197,7 +201,8 @@ export default function App() {
 
   const categories=useMemo(()=>{
     const rows=dbCategories.map(row=>row.name).filter(Boolean);
-    return ['همه محصولات',...(rows.length?[...new Set(rows)]:presetCategories.slice(1))];
+    const extras=rows.filter(name=>!presetCategories.includes(name));
+    return [...presetCategories,...extras];
   },[dbCategories]);
   const filtered=useMemo(()=>{
     const rows=products.filter(p=>
@@ -258,14 +263,14 @@ export default function App() {
           <img src={BASE+'mahgold-mark-B9IfGU60.png'} alt=""/>
           <span>مه‌گلد</span>
         </a>
-        <nav className={(menuOpen?'flex':'hidden')+' ref-mobile-links md:flex md:items-center md:gap-8 text-sm font-medium text-muted-foreground'}>
+        <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
           <a className="transition-colors hover:text-gold-deep" href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a>
           <a className="transition-colors hover:text-gold-deep" href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a>
           <a className="transition-colors hover:text-gold-deep" href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a>
         </nav>
         <div className="flex items-center gap-2">
           <button className="hidden h-10 items-center justify-center rounded-full border border-input bg-background px-5 text-xs font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground md:inline-flex" onClick={()=>setAccountOpen(true)}>ورود / ثبت‌نام</button>
-          <button aria-label="سبد خرید" className="relative inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-3 text-xs font-semibold text-ink-foreground transition-all hover:bg-gold-deep md:px-5" onClick={()=>setCartOpen(true)}>
+          <button aria-label="سبد خرید" className="relative hidden h-10 items-center justify-center gap-2 rounded-full bg-ink px-3 text-xs font-semibold text-ink-foreground transition-all hover:bg-gold-deep md:inline-flex md:px-5" onClick={()=>setCartOpen(true)}>
             <ShoppingBag size={16}/><span className="hidden md:inline">سبد خرید</span>{cartCount>0&&<span className="absolute -left-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-ink">{money(cartCount)}</span>}
           </button>
         </div>
@@ -324,7 +329,7 @@ export default function App() {
       <section className="scroll-mt-16 bg-sand-gradient py-16 md:py-24" id="shop">
         <div className="mx-auto max-w-7xl px-4 md:px-7">
           <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div><div className="eyebrow text-gold-deep">THE CURATED EDIT</div><h2 className="mt-2 text-2xl font-semibold md:text-3xl">منتخب‌های مه‌گلد</h2></div>
+            <div><div className="eyebrow text-gold-deep">THE CURATED EDIT</div><h2 className="mt-2 text-2xl font-semibold md:text-3xl">منتخب‌های مه‌گلد</h2>{quote&&<p className="mt-2 text-xs text-muted-foreground">{quote.title||'آخرین نرخ ثبت‌شده طلا'}: <b className="text-gold-deep">{money(quote.price_toman)} تومان</b> <span className="mr-1 text-[10px]">{quote.is_live?'نرخ زنده':'ثبت دستی · غیرزنده'}</span></p>}</div>
             <label className="flex h-10 w-full items-center gap-2 rounded-full border border-border bg-card px-4 text-muted-foreground md:w-72">
               <Search size={16}/><input aria-label="جست‌وجوی محصول" className="w-full bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground" value={query} onChange={e=>setQuery(e.target.value)} placeholder="نام محصول را جستجو کنید..."/>
             </label>
