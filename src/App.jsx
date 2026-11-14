@@ -90,10 +90,6 @@ function AccountContent({onClose}) {
   const submit=async event=>{
     event.preventDefault();
     if(!supabase){setMessage('اتصال حساب کاربری در دسترس نیست.');return;}
-    if(mode==='signup' && import.meta.env.VITE_PREVIEW_READONLY==='true'){
-      setMessage('ایجاد حساب جدید در پیش‌نمایش غیرفعال است؛ ورود به حساب‌های موجود فعال است.');
-      return;
-    }
     setBusy(true);setMessage('');
     const result=mode==='signup'
       ? await supabase.auth.signUp({email,password,options:{data:{full_name:name,phone}}})
