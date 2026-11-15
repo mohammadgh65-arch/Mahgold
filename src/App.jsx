@@ -57,9 +57,12 @@ const toLatinDigits = value => value.replace(/[۰-۹٠-٩]/g, d => {
 
 function ProductImage({product, className=''}) {
   const [failed,setFailed] = useState(false);
-  const src = !failed && product.image_url ? product.image_url : tiles.find(t=>t.name===product.category)?.image || tiles[0].image;
+  const primarySrc = product.image_url || '';
+  const fallbackSrc = tiles.find(t=>t.name===product.category)?.image || tiles[0].image;
+  useEffect(()=>setFailed(false),[product.id,primarySrc]);
+  const src = !failed && primarySrc ? primarySrc : fallbackSrc;
   return <div className={'ref-product-image ' + className}>
-    <img src={src} alt={product.name || 'محصول مه‌گلد'} loading="lazy" onError={()=>setFailed(true)}/>
+    <img src={src} alt={product.name || 'محصول مه‌گلد'} loading="lazy" decoding="async" onError={()=>setFailed(true)}/>
   </div>;
 }
 
