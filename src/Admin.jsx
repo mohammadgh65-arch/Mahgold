@@ -61,7 +61,8 @@ export default function AdminPanel(){
  const tileDefaults=[{name:'طلای زینتی',desc:'زیورآلات برای هر روز و هر occasion',image:'https://growth-and-advancement-garden.lovable.app/assets/jewelry-CwLx7kUY.jpg'},{name:'طلای آب‌شده',desc:'انتخابی برای نگاه سرمایه‌ای',image:'https://growth-and-advancement-garden.lovable.app/assets/melted-nOWRYhbE.jpg'},{name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:'https://growth-and-advancement-garden.lovable.app/assets/coin-CsyrnHPB.jpg'},{name:'شمش',desc:'خلوص در ساده‌ترین شکل',image:'https://growth-and-advancement-garden.lovable.app/assets/bar-B0yyIRPP.jpg'}];
  const savedTiles=Array.isArray(contentObject.tiles)?contentObject.tiles:[];
   const tileRows=tileDefaults.map(tile=>({...tile,...(savedTiles.find(item=>item&&item.name===tile.name)||{})}));
- const filtered=(data[section]||[]).filter(x=>section!=='customers'||x.role==='customer').filter(x=>JSON.stringify(x).toLowerCase().includes(search.toLowerCase()));
+ const sectionRows=Array.isArray(data[section])?data[section]:[];
+ const filtered=sectionRows.filter(x=>section!=='customers'||x.role==='customer').filter(x=>JSON.stringify(x).toLowerCase().includes(search.toLowerCase()));
  if(checking)return <div className="admin-gate">در حال بررسی نشست امن…</div>;
  if(!session)return <div className="admin-gate"><form className="admin-login" onSubmit={login}><img src={MAHGOLD_LOGO} alt="لوگوی مه‌گلد"/><h1>ورود مدیریت مه‌گلد</h1><p>برای ورود، حساب مدیر فروشگاه را وارد کنید.</p><input type="email" required placeholder="ایمیل مدیر" value={email} onChange={e=>setEmail(e.target.value)}/><input type="password" required placeholder="رمز عبور" value={password} onChange={e=>setPassword(e.target.value)}/><button disabled={saving}>{saving?"در حال ورود…":"ورود امن"}</button>{notice&&<small>{notice}</small>}<a href="#home">بازگشت به فروشگاه</a></form></div>;
  if(checkingAdmin)return <div className="admin-gate">در حال بررسی مجوز مدیریت…</div>;
