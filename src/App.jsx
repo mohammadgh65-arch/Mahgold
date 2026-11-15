@@ -283,20 +283,31 @@ export default function App() {
   };
   const changeQuantity=(id,delta)=>setCart(old=>old.map(item=>item.id===id?{...item,qty:item.qty+delta}:item).filter(item=>item.qty>0&&item.qty<=Number(item.stock||0)));
   const submitOrder=async event=>{
-    event.preventDefault();setCheckoutError('');
+    event.preventDefault();
+    if(checkoutBusy)return;
+    setCheckoutError('');
     if(!supabase||!cart.length)return;
     setCheckoutBusy(true);
-    const {data,error}=await supabase.rpc('mahgold_create_order',{
-      p_customer_name:customer.name,
-      p_customer_phone:toLatinDigits(customer.phone),
-      p_customer_email:customer.email||null,
-      p_shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
-      p_customer_note:customer.note||'',
-      p_items:cart.map(item=>({product_id:item.id,quantity:item.qty,expected_price_toman:item.price_toman}))
-    });
-    setCheckoutBusy(false);
-    if(error){setCheckoutError(error.message||'ثبت سفارش انجام نشد.');return;}
-    setOrderResult(data);setCart([]);setCheckoutOpen(false);setCartOpen(false);
+    try{
+      const {data,error}=await supabase.rpc('mahgold_create_order',{
+        p_customer_name:customer.name,
+        p_customer_phone:toLatinDigits(customer.phone),
+        p_customer_email:customer.email||null,
+        p_shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
+        p_customer_note:customer.note||'',
+        p_items:cart.map(item=>({product_id:item.id,quantity:item.qty,expected_price_toman:item.price_toman}))
+      });
+      if(error)throw error;
+      if(!data)throw new Error('پاسخ معتبری از سرور دریافت نشد؛ وضعیت سفارش را بررسی کنید.');
+      setOrderResult(data);
+      setCart([]);
+      setCheckoutOpen(false);
+      setCartOpen(false);
+    }catch(error){
+      setCheckoutError(error?.message||'ارتباط با سرور برقرار نشد. سفارش ثبت‌شده تلقی نمی‌شود؛ پیش از تلاش مجدد، وضعیت سفارش را بررسی کنید.');
+    }finally{
+      setCheckoutBusy(false);
+    }
   };
   if(isAdminPage)return <AdminErrorBoundary><AdminPanel/></AdminErrorBoundary>;
 
