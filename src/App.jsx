@@ -7,6 +7,7 @@ import {
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 import AdminPanel from './Admin.jsx';
 
+const forceAdminPreview = import.meta.env.VITE_ADMIN_PREVIEW === 'true';
 const BASE = 'https://growth-and-advancement-garden.lovable.app/assets/';
 const slides = [
   {
@@ -157,18 +158,21 @@ export default function App() {
   const [siteContent,setSiteContent]=useState(null);
   const [dataStatus,setDataStatus]=useState(isSupabaseConfigured?'loading':'error');
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
-  const [isAdminPage,setIsAdminPage]=useState(()=>window.location.pathname==='/admin'||window.location.pathname==='/admin/'||window.location.hash==='#mahgold-control');
+  const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||window.location.pathname==='/admin'||window.location.pathname==='/admin/'||window.location.hash==='#mahgold-control');
 
   const displaySlides=useMemo(()=>{const rows=(siteContent?.slides||[]).filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
   useEffect(()=>{setActiveSlide(index=>Math.min(index,displaySlides.length-1));},[displaySlides.length]);
   useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%displaySlides.length),6000);return()=>clearInterval(timer);},[displaySlides.length]);
   useEffect(()=>{if(!supabase)return;let active=true;supabase.from('site_content').select('content').eq('id',1).maybeSingle().then(({data})=>{if(active&&data?.content)setSiteContent(data.content);});return()=>{active=false;};},[]);
   useEffect(()=>{
-    const syncAdminRoute=()=>setIsAdminPage(
+    const syncAdminRoute=()=>{
+      if(forceAdminPreview){setIsAdminPage(true);return;}
+      setIsAdminPage(
       window.location.pathname==='/admin'||
       window.location.pathname==='/admin/'||
       window.location.hash==='#mahgold-control'
     );
+    };
     window.addEventListener('hashchange',syncAdminRoute);
     window.addEventListener('popstate',syncAdminRoute);
     syncAdminRoute();
