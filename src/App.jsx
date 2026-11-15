@@ -292,7 +292,7 @@ export default function App() {
       p_customer_email:customer.email||null,
       p_shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
       p_customer_note:customer.note||'',
-      p_items:cart.map(item=>({product_id:item.id,quantity:item.qty}))
+      p_items:cart.map(item=>({product_id:item.id,quantity:item.qty,expected_price_toman:item.price_toman}))
     });
     setCheckoutBusy(false);
     if(error){setCheckoutError(error.message||'ثبت سفارش انجام نشد.');return;}
@@ -454,7 +454,7 @@ export default function App() {
           <>
             <div>{cart.map(item=><div className="ref-cart-line" key={item.id}>
               <ProductImage product={item}/>
-              <div><h4>{item.name}</h4><strong>{money(item.price_toman)} تومان</strong><div className="ref-qty">
+              <div><h4>{item.name}</h4><strong>{money(item.price_toman)} تومان</strong>{item.pricing_mode==='auto'&&quote&&<details className="mt-2 text-[10px] leading-6 text-muted-foreground"><summary className="cursor-pointer">ریز محاسبات قیمت</summary>{(()=>{const x=priceBreakdown(item,quote);return <div className="grid gap-1 pt-1"><span>اصل طلا: {money(x.base)} تومان</span><span>اجرت: {money(x.labor)} تومان</span><span>سود فروشنده: {money(x.profit)} تومان</span>{x.commission>0&&<span>حق‌العمل: {money(x.commission)} تومان</span>}<span>مالیات: {money(x.tax)} تومان</span></div>;})()}</details>}<div className="ref-qty">
                 <button aria-label="کاهش تعداد" onClick={()=>changeQuantity(item.id,-1)}><Minus size={13}/></button><span className="text-xs">{money(item.qty)}</span><button aria-label="افزایش تعداد" onClick={()=>changeQuantity(item.id,1)}><Plus size={13}/></button>
               </div></div>
               <button className="ref-remove" aria-label="حذف محصول" onClick={()=>setCart(old=>old.filter(p=>p.id!==item.id))}><X size={15}/></button>
