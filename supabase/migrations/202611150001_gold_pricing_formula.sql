@@ -85,7 +85,7 @@ set search_path = public, pg_catalog
 as $$
 begin
   update public.products
-  set price_toman = price_toman,
+  set labor_value = labor_value,
       updated_at = now()
   where pricing_mode = 'auto';
   return null;
