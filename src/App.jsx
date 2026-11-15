@@ -518,7 +518,8 @@ export default function App() {
         <PackageCheck size={46} className="mx-auto text-gold-deep"/>
         <h2 className="my-4 text-xl font-semibold">درخواست سفارش ثبت شد</h2>
         <p className="mb-2 text-sm">شماره سفارش: <b>{money(orderResult.order_number)}</b></p>
-        <p className="mb-6 text-sm">مبلغ: <b>{money(orderResult.total_toman)} تومان</b></p>
+        <p className="mb-3 text-sm">مبلغ: <b>{money(orderResult.total_toman)} تومان</b></p>
+        {Array.isArray(orderResult.items)&&orderResult.items.length>0&&<div className="mb-5 max-h-64 overflow-y-auto rounded-xl border border-gold/20 p-3 text-right text-xs"><b className="mb-2 block">ریز فاکتور سفارش</b>{orderResult.items.map((item,index)=><div key={index} className="mb-3 border-b border-gold/10 pb-3 last:mb-0 last:border-0"><strong className="mb-1 block">{item.product_name} × {money(item.quantity)}</strong>{item.pricing_mode==='auto'?<><span className="block">اصل طلا: {money(item.gold_value_toman)} تومان</span><span className="block">اجرت ساخت: {money(item.labor_toman)} تومان</span><span className="block">سود فروشنده: {money(item.seller_profit_toman)} تومان</span><span className="block">حق‌العمل: {money(item.commission_toman)} تومان</span><span className="block">مالیات: {money(item.vat_toman)} تومان</span></>:<span className="block">قیمت‌گذاری دستی</span>}<b className="mt-1 block">جمع ردیف: {money(item.line_total_toman)} تومان</b></div>)}</div>}
         <button className="h-11 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" onClick={()=>setOrderResult(null)}>متوجه شدم</button>
       </section>
     </div>}
