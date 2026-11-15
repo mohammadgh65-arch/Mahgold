@@ -164,9 +164,18 @@ export default function App() {
   useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%displaySlides.length),6000);return()=>clearInterval(timer);},[displaySlides.length]);
   useEffect(()=>{if(!supabase)return;let active=true;supabase.from('site_content').select('content').eq('id',1).maybeSingle().then(({data})=>{if(active&&data?.content)setSiteContent(data.content);});return()=>{active=false;};},[]);
   useEffect(()=>{
-    const onHash=()=>setIsAdminPage(window.location.hash==='#mahgold-control');
-    window.addEventListener('hashchange',onHash);
-    return()=>window.removeEventListener('hashchange',onHash);
+    const syncAdminRoute=()=>setIsAdminPage(
+      window.location.pathname==='/admin'||
+      window.location.pathname==='/admin/'||
+      window.location.hash==='#mahgold-control'
+    );
+    window.addEventListener('hashchange',syncAdminRoute);
+    window.addEventListener('popstate',syncAdminRoute);
+    syncAdminRoute();
+    return()=>{
+      window.removeEventListener('hashchange',syncAdminRoute);
+      window.removeEventListener('popstate',syncAdminRoute);
+    };
   },[]);
   useEffect(()=>{
     if(!supabase){setDataStatus('error');setDataMessage('اتصال فروشگاه پیکربندی نشده است.');return;}
