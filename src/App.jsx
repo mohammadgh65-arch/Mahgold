@@ -385,7 +385,7 @@ export default function App() {
     </main>
 
     <footer className="bg-ink px-6 pb-28 pt-14 text-center text-xs leading-8 text-ink-muted md:pb-14">
-      <img alt="مه‌گلد" className="mx-auto mb-4 h-36 w-auto" height="630" loading="lazy" src={siteContent?.logo_url||'/mahgold-app-icon.svg'} width="525"/>
+      <img alt="مه‌گلد" className="mx-auto mb-4 h-36 w-auto" height="630" loading="lazy" src={siteContent?.logo_url||MAHGOLD_LOGO} width="525"/>
       <div>طلایی به زیباییِ لحظه‌های تو</div>
       <div className="mt-3 flex flex-col items-center gap-1 md:flex-row md:justify-center md:gap-6">
         <span className="inline-flex items-center gap-1.5"><Phone className="size-3.5 text-gold"/> شماره تماس: به‌زودی</span>
