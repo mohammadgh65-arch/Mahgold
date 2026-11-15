@@ -42,6 +42,7 @@ const tiles = [
   {name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:BASE+'coin-CsyrnHPB.jpg'},
   {name:'شمش',desc:'خلوص در ساده‌ترین شکل',image:BASE+'bar-B0yyIRPP.jpg'}
 ];
+const displayTileDefaults = tiles;
 const presetCategories = [
   'همه محصولات','طلای زینتی','طلای آب‌شده','سکه','شمش','انگشتر','گردنبند',
   'دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'
@@ -162,6 +163,7 @@ export default function App() {
   const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||window.location.pathname==='/admin'||window.location.pathname==='/admin/'||window.location.hash==='#mahgold-control');
 
   const displaySlides=useMemo(()=>{const rows=(siteContent?.slides||[]).filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
+  const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})),[siteContent]);
   useEffect(()=>{setActiveSlide(index=>Math.min(index,displaySlides.length-1));},[displaySlides.length]);
   useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%displaySlides.length),6000);return()=>clearInterval(timer);},[displaySlides.length]);
   useEffect(()=>{if(!supabase)return;let active=true;supabase.from('site_content').select('content').eq('id',1).maybeSingle().then(({data})=>{if(active&&data?.content)setSiteContent(data.content);});return()=>{active=false;};},[]);
@@ -322,7 +324,7 @@ export default function App() {
           <p className="hidden text-xs text-muted-foreground md:block">جزئیاتی برای سلیقه‌های خاص</p>
         </div>
         <div className="ref-category-grid">
-          {tiles.map(tile=><button key={tile.name} className="ref-category-card" onClick={()=>{setCategory(tile.name);document.getElementById('shop')?.scrollIntoView({behavior:'smooth'});}}>
+          {displayTiles.map(tile=><button key={tile.name} className="ref-category-card" onClick={()=>{setCategory(tile.name);document.getElementById('shop')?.scrollIntoView({behavior:'smooth'});}}>
             <img src={tile.image} alt={tile.name} loading="lazy"/><span className="ref-category-shade"/>
             <span className="ref-category-text"><b>{tile.name}</b><small>{tile.desc}</small><em>مشاهده <ArrowLeft size={12}/></em></span>
           </button>)}
@@ -374,7 +376,7 @@ export default function App() {
       </section>
 
       <section className="grid scroll-mt-16 bg-ink text-ink-foreground md:min-h-[440px] md:grid-cols-2" id="story">
-        <div className="h-64 overflow-hidden md:h-auto"><img alt="جزئیات زیورآلات مه‌گلد" className="h-full w-full object-cover" loading="lazy" src={storyImage}/></div>
+        <div className="h-64 overflow-hidden md:h-auto"><img alt="جزئیات زیورآلات مه‌گلد" className="h-full w-full object-cover" loading="lazy" src={siteContent?.story_image||storyImage}/></div>
         <div className="flex flex-col justify-center px-6 py-14 md:px-[10%]">
           <div className="eyebrow text-gold-light">A Story of Elegance</div>
           <h2 className="mt-3 text-3xl font-normal leading-[1.5] md:text-4xl">زیبایی‌ای که<br/>از مد عبور می‌کند.</h2>
