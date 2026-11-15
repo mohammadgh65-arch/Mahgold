@@ -267,7 +267,7 @@ export default function App() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:h-[72px] md:px-7">
         <button aria-label="منو" className="ref-mobile-menu md:hidden" onClick={()=>setMenuOpen(v=>!v)}><Menu size={20}/></button>
         <a aria-label="مه‌گلد - صفحه اصلی" className="ref-brand" href="#home">
-          <img src={siteContent?.logo_url||'/mahgold-app-icon.svg'} alt=""/>
+          <img src={siteContent?.logo_url||MAHGOLD_LOGO} alt=""/>
           <span>مه‌گلد</span>
         </a>
         <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
