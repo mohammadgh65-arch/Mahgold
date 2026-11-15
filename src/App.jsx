@@ -48,7 +48,8 @@ const presetCategories = [
   'دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'
 ];
 const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85';
-const money = value => new Intl.NumberFormat('fa-IR').format(Number(value || 0));
+const money = value => new Intl.NumberFormat('fa-IR').format(Math.round(Number(value || 0)));
+const priceBreakdown = (p,q) => {const base=Number(p.weight_grams||0)*Number(q?.price_toman||0)*(Number(p.karat||18)/18);const mode=p.labor_mode||'percent',v=Number(p.labor_value||0);const labor=mode==='per_gram'?Number(p.weight_grams||0)*v:mode==='fixed'?v:base*v/100;const profit=(base+labor)*Number(p.seller_profit_percent??7)/100;const commission=(base+labor+profit)*Number(p.commission_percent||0)/100;const tax=(labor+profit+commission)*Number(p.vat_percent??10)/100;return {base,labor,profit,commission,tax,total:Math.round(base+labor+profit+commission+tax)};};
 const gram = value => new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(Number(value || 0)) + ' گرم';
 const toLatinDigits = value => value.replace(/[۰-۹٠-٩]/g, d => {
   const fa='۰۱۲۳۴۵۶۷۸۹', ar='٠١٢٣٤٥٦٧٨٩';
@@ -193,7 +194,7 @@ export default function App() {
     (async()=>{
       try{
         const [productResult,categoryResult,quoteResult]=await Promise.all([
-          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,created_at,tag')
+          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active,created_at,tag')
             .eq('is_active',true).order('created_at',{ascending:false}),
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
             .eq('is_active',true).order('sort_order',{ascending:true}),
@@ -459,7 +460,7 @@ export default function App() {
             <h2>{selectedProduct.name}</h2>
             <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
             <div className="grid gap-2 text-xs text-muted-foreground"><span>وزن: {gram(selectedProduct.weight_grams)}</span><span>عیار: {money(selectedProduct.karat||18)}</span><span>موجودی: {money(selectedProduct.stock||0)}</span></div>
-            <strong className="ref-detail-price">{money(selectedProduct.price_toman)} تومان</strong>
+            {selectedProduct.pricing_mode==='auto'&&<div className="ref-price-breakdown"><b>جزئیات محاسبه قیمت</b>{(()=>{const x=priceBreakdown(selectedProduct,quote);return <><span>اصل طلا: {money(x.base)} تومان</span><span>اجرت ساخت: {money(x.labor)} تومان</span><span>سود فروشنده: {money(x.profit)} تومان</span>{x.commission>0&&<span>حق‌العمل: {money(x.commission)} تومان</span>}<span>مالیات: {money(x.tax)} تومان</span></>;})()}<small>مبنای نرخ: {quote?.is_live?'نرخ زنده':'آخرین نرخ ثبت‌شده به‌صورت دستی'} طلای ۱۸ عیار</small></div>}<strong className="ref-detail-price">{money(selectedProduct.price_toman)} تومان</strong>
             <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
           </div>
         </div>
