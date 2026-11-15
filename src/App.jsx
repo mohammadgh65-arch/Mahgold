@@ -149,6 +149,7 @@ export default function App() {
   const [sortMode,setSortMode]=useState('newest');
   const [cart,setCart]=useState(()=>{try{return JSON.parse(localStorage.getItem('mahgold_cart')||'[]');}catch{return [];}});
   const [cartOpen,setCartOpen]=useState(false);
+  const [cartRefreshing,setCartRefreshing]=useState(false);
   const [accountOpen,setAccountOpen]=useState(false);
   const [checkoutOpen,setCheckoutOpen]=useState(false);
   const [checkoutBusy,setCheckoutBusy]=useState(false);
@@ -237,6 +238,38 @@ export default function App() {
   },[products,category,query,sortMode]);
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const cartTotal=cart.reduce((sum,item)=>sum+Number(item.price_toman||0)*Number(item.qty||0),0);
+
+  const refreshCartPrices=async()=>{
+    if(!cart.length)return true;
+    if(!supabase){setCheckoutError('اتصال فروشگاه برقرار نیست؛ قیمت‌ها قابل به‌روزرسانی نیستند.');return false;}
+    setCartRefreshing(true);
+    try{
+      const ids=cart.map(item=>item.id);
+      const [productResult,quoteResult]=await Promise.all([
+        supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active').in('id',ids),
+        supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live').eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle()
+      ]);
+      if(productResult.error)throw productResult.error;
+      const rows=productResult.data||[];
+      const byId=new Map(rows.map(row=>[row.id,row]));
+      for(const item of cart){
+        const latest=byId.get(item.id);
+        if(!latest||!latest.is_active)throw new Error('محصول «'+item.name+'» دیگر برای فروش موجود نیست.');
+        if(Number(latest.stock||0)<Number(item.qty||0))throw new Error('موجودی محصول «'+item.name+'» برای تعداد انتخاب‌شده کافی نیست.');
+        if(Number(latest.price_toman||0)<=0)throw new Error('قیمت محصول «'+item.name+'» معتبر نیست.');
+      }
+      if(cart.some(item=>byId.get(item.id)?.pricing_mode==='auto')&&(!quoteResult.data||quoteResult.error)){
+        throw new Error('نرخ طلای ۱۸ عیار در دسترس نیست؛ امکان تأیید قیمت محصول وجود ندارد.');
+      }
+      setCart(old=>old.map(item=>({...item,...byId.get(item.id),qty:item.qty})));
+      if(quoteResult.data)setQuote(quoteResult.data);
+      setCheckoutError('');
+      return true;
+    }catch(error){
+      setCheckoutError(error?.message||'به‌روزرسانی قیمت سبد خرید ناموفق بود.');
+      return false;
+    }finally{setCartRefreshing(false);}
+  };
 
   const addToCart=product=>{
     if(!supabase||dataStatus!=='connected'||!product.id){setCheckoutError('اتصال فروشگاه برقرار نیست.');return;}
@@ -427,8 +460,8 @@ export default function App() {
               <button className="ref-remove" aria-label="حذف محصول" onClick={()=>setCart(old=>old.filter(p=>p.id!==item.id))}><X size={15}/></button>
             </div>)}</div>
             <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{money(cartTotal)} تومان</b></div>
-            <p className="mb-4 text-[11px] leading-7 text-muted-foreground">مبلغ نهایی و موجودی هنگام ثبت سفارش در سرور دوباره بررسی می‌شود.</p>
-            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" onClick={()=>setCheckoutOpen(true)}>ادامه و ثبت سفارش <ArrowLeft className="mr-2 inline" size={16}/></button>
+            <p className="mb-4 text-[11px] leading-7 text-muted-foreground">پیش از ادامه، قیمت و موجودی از پایگاه داده تازه‌سازی می‌شود؛ هنگام ثبت سفارش نیز مبلغ نهایی دوباره در سرور کنترل خواهد شد.</p>
+            <button type="button" className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={cartRefreshing} onClick={async()=>{const ready=await refreshCartPrices();if(ready)setCheckoutOpen(true);}}>{cartRefreshing?'در حال به‌روزرسانی قیمت‌ها…':'ادامه و ثبت سفارش'} <ArrowLeft className="mr-2 inline" size={16}/></button>
           </>}
       </aside>
     </div>}
