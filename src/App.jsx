@@ -1,3 +1,4 @@
+import { MAHGOLD_LOGO } from './mahgold-brand';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight,
