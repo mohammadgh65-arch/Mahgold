@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
 import './admin.css';
 import { MAHGOLD_LOGO } from './mahgold-brand';
@@ -18,7 +18,6 @@ export class AdminErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
-import React from 'react';
 export default function AdminPanel(){
  const [session,setSession]=useState(null),[checking,setChecking]=useState(true),[checkingAdmin,setCheckingAdmin]=useState(false),[adminOk,setAdminOk]=useState(false);
  const [section,setSection]=useState('overview'),[data,setData]=useState({products:[],orders:[],quotes:[],categories:[],customers:[],settings:null,content:null});
