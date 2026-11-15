@@ -267,7 +267,7 @@ export default function App() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:h-[72px] md:px-7">
         <button aria-label="منو" className="ref-mobile-menu md:hidden" onClick={()=>setMenuOpen(v=>!v)}><Menu size={20}/></button>
         <a aria-label="مه‌گلد - صفحه اصلی" className="ref-brand" href="#home">
-          <img src={siteContent?.logo_url||BASE+'mahgold-mark-B9IfGU60.png'} alt=""/>
+          <img src={siteContent?.logo_url||'/mahgold-app-icon.svg'} alt=""/>
           <span>مه‌گلد</span>
         </a>
         <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
@@ -384,7 +384,7 @@ export default function App() {
     </main>
 
     <footer className="bg-ink px-6 pb-28 pt-14 text-center text-xs leading-8 text-ink-muted md:pb-14">
-      <img alt="مه‌گلد" className="mx-auto mb-4 h-36 w-auto" height="630" loading="lazy" src={BASE+'mahgold-logo-CEBRsLr5.png'} width="525"/>
+      <img alt="مه‌گلد" className="mx-auto mb-4 h-36 w-auto" height="630" loading="lazy" src={siteContent?.logo_url||'/mahgold-app-icon.svg'} width="525"/>
       <div>طلایی به زیباییِ لحظه‌های تو</div>
       <div className="mt-3 flex flex-col items-center gap-1 md:flex-row md:justify-center md:gap-6">
         <span className="inline-flex items-center gap-1.5"><Phone className="size-3.5 text-gold"/> شماره تماس: به‌زودی</span>
