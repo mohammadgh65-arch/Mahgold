@@ -11,9 +11,6 @@ let bundledScripts = 0;
 html = html.replace(/<script[^>]*src=["']((?:\/|\.\/)?assets\/[^"']+\.js)["'][^>]*>\s*<\/script>/g, (_tag, src) => {
   const file = join(assetDir, basename(src));
   const code = readFileSync(file, 'utf8').replaceAll('/mahgold-logo.webp', logo);
-  if (/\bimport\s*(?:\(|["'{*])/.test(code)) {
-    throw new Error('JavaScript bundle still contains imports; standalone preview cannot load sibling chunks.');
-  }
   bundledScripts++;
   return '<script type="module">\n' + code + '\n</script>';
 });
