@@ -157,7 +157,7 @@ export default function App() {
   const [siteContent,setSiteContent]=useState(null);
   const [dataStatus,setDataStatus]=useState(isSupabaseConfigured?'loading':'error');
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
-  const [isAdminPage,setIsAdminPage]=useState(()=>window.location.hash==='#mahgold-control');
+  const [isAdminPage,setIsAdminPage]=useState(()=>window.location.pathname.replace(/\\/+$/,'')==='/admin'||window.location.hash==='#mahgold-control');
 
   const displaySlides=useMemo(()=>{const rows=(siteContent?.slides||[]).filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
   useEffect(()=>{setActiveSlide(index=>Math.min(index,displaySlides.length-1));},[displaySlides.length]);
