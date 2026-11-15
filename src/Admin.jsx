@@ -13,7 +13,10 @@ function calculateGoldPrice(p, quote){const base=Number(p.weight_grams||0)*Numbe
 const blankProduct = {name:'',category:'طلای زینتی',description:'',image_url:'',weight_grams:0,karat:18,price_toman:0,pricing_mode:'manual',markup_percent:0,labor_mode:'percent',labor_value:0,seller_profit_percent:7,commission_percent:0,vat_percent:10,stock:0,is_active:true,tag:''};
 function friendlyDbError(error,action='ذخیره محصول'){
  const code=String(error?.code||'');
- const message=String(error?.message||'').toLowerCase();
+ const rawMessage=String(error?.message||'');
+ const message=rawMessage.toLowerCase();
+ // خطاهای اعتبارسنجی داخلی برنامه از قبل فارسی و قابل‌فهم‌اند؛ آن‌ها را با پیام عمومی جایگزین نکن.
+ if(/[\\u0600-\\u06FF]/.test(rawMessage))return rawMessage;
  if(code==='23505')return 'این محصول یا یکی از شناسه‌های آن قبلاً ثبت شده است. نام یا شناسه محصول را بررسی کنید.';
  if(code==='23503')return 'ثبت محصول به اطلاعات وابسته‌ای نیاز دارد که در پایگاه داده پیدا نشد. دسته‌بندی یا اطلاعات مرتبط را بررسی کنید.';
  if(code==='23502')return 'یکی از فیلدهای اجباری خالی است. نام محصول و سایر اطلاعات ضروری را کامل کنید.';
@@ -24,7 +27,8 @@ function friendlyDbError(error,action='ذخیره محصول'){
  if(code.startsWith('PGRST'))return 'پاسخ سرویس پایگاه داده قابل پردازش نبود. ساختار جدول و همگام‌سازی API را بررسی کنید.';
  if(message.includes('failed to fetch')||message.includes('network')||message.includes('timeout')||message.includes('fetch'))return 'ارتباط با سرور برقرار نشد. اینترنت گوشی و دسترسی Supabase را بررسی کنید و دوباره تلاش کنید.';
  if(message.includes('jwt')||message.includes('token')||message.includes('unauthorized')||message.includes('not authenticated'))return 'نشست ورود مدیر معتبر نیست یا منقضی شده است. یک‌بار خارج شوید و دوباره وارد شوید.';
- if(message.includes('bucket')||message.includes('storage'))return 'فضای ذخیره‌سازی تصویر در دسترس نیست یا اجازه بارگذاری ندارید. تنظیمات مخزن تصاویر و دسترسی آن را بررسی کنید.';
+ if(message.includes('bucket')||message.includes('storage')||message.includes('mime type')||message.includes('object exceeded')||message.includes('file size'))return 'بارگذاری تصویر انجام نشد. ممکن است نوع یا حجم فایل با محدودیت مخزن تصاویر سازگار نباشد، یا دسترسی بارگذاری مدیر تأیید نشده باشد.';
+ if(message.includes('row-level security'))return 'دسترسی این عملیات توسط سیاست امنیتی پایگاه داده رد شد. عضویت حساب مدیر در فهرست مدیران فروشگاه را بررسی کنید.';
  return action+' انجام نشد. سرور خطایی برگرداند که هنوز دسته‌بندی نشده است؛ کد خطا: '+(code||'بدون کد')+'. لطفاً گزارش فنی را بررسی کنید.';
 }
 export class AdminErrorBoundary extends React.Component {
