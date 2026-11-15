@@ -162,8 +162,8 @@ export default function App() {
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
   const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||window.location.pathname==='/admin'||window.location.pathname==='/admin/'||window.location.hash==='#mahgold-control');
 
-  const displaySlides=useMemo(()=>{const rows=(siteContent?.slides||[]).filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
-  const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})),[siteContent]);
+  const displaySlides=useMemo(()=>{const source=Array.isArray(siteContent?.slides)?siteContent.slides:(Array.isArray(siteContent?.specials)?siteContent.specials.map(s=>({active:true,eyebrow:s?.kicker||'',title:s?.title||'',description:s?.sub||'',button:'مشاهده محصولات',image:s?.image||'',category:s?.category||'طلای زینتی'})):[]);const rows=source.filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
+  const displayTiles=useMemo(()=>{const saved=Array.isArray(siteContent?.tiles)?siteContent.tiles:[];return displayTileDefaults.map(tile=>({...tile,...(saved.find(item=>item&&item.name===tile.name)||{})}));},[siteContent]);
   useEffect(()=>{setActiveSlide(index=>Math.min(index,displaySlides.length-1));},[displaySlides.length]);
   useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%displaySlides.length),6000);return()=>clearInterval(timer);},[displaySlides.length]);
   useEffect(()=>{if(!supabase)return;let active=true;supabase.from('site_content').select('content').eq('id',1).maybeSingle().then(({data})=>{if(active&&data?.content)setSiteContent(data.content);});return()=>{active=false;};},[]);
