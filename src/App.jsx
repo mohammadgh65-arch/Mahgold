@@ -199,7 +199,7 @@ export default function App() {
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
             .eq('is_active',true).order('sort_order',{ascending:true}),
           supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
-            .order('observed_at',{ascending:false}).limit(1).maybeSingle()
+            .eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle()
         ]);
         if(!active)return;
         if(productResult.error){setDataStatus('error');setProducts([]);setDataMessage('دریافت محصولات ناموفق بود؛ برای جلوگیری از نمایش قیمت نادرست، اطلاعات نمونه نمایش داده نمی‌شود.');}
