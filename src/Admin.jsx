@@ -43,7 +43,50 @@ export default function AdminPanel(){
  ]);const names=['محصولات','سفارش‌ها','نرخ‌ها','دسته‌بندی‌ها','مشتریان','تنظیمات','محتوای سایت'];const next={};jobs.forEach((r,i)=>{if(i<5)next[['products','orders','quotes','categories','customers'][i]]=r.data||[];});setData(d=>({...d,...next,settings:jobs[5].data||d.settings,content:jobs[6].data||d.content}));if(jobs[5].data&&typeof jobs[5].data==='object'&&!Array.isArray(jobs[5].data))setSettings({...{store_name:'مه‌گلد',currency:'تومان',default_markup_percent:0,price_provider_status:'not_configured'},...jobs[5].data});
    if(jobs[6].data){const raw=jobs[6].data.content;setContent(JSON.stringify(raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{},null,2));}const errors=jobs.map((r,i)=>r.error?names[i]+': '+r.error.message:null).filter(Boolean);if(errors.length){setConnectionState('warning');setNotice('بخشی از اطلاعات دریافت نشد: '+errors.join(' | '));}else{setConnectionState('ok');setNotice('اطلاعات پنل با موفقیت به‌روزرسانی شد.');}}catch(error){setConnectionState('error');setNotice('دریافت اطلاعات پنل ناموفق بود: '+(error?.message||'خطای ناشناخته'));}finally{setLoading(false);}}
  useEffect(()=>{load();},[adminOk]);
- async function uploadImage(file,folder='products'){if(!file)return '';if(!supabase){setNotice('اتصال پایگاه داده در دسترس نیست.');return '';}if(!['image/jpeg','image/png','image/webp','image/avif'].includes(file.type)){setNotice('فقط تصویر JPG، PNG، WebP یا AVIF مجاز است.');return '';}if(file.size>8*1024*1024){setNotice('حداکثر حجم هر تصویر ۸ مگابایت است.');return '';}setUploading(true);try{const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';const path=folder+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;const {error}=await supabase.storage.from('product-images').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type});if(error)throw error;const {data}=supabase.storage.from('product-images').getPublicUrl(path);if(!data?.publicUrl)throw new Error('نشانی عمومی تصویر ساخته نشد.');setNotice('تصویر بارگذاری شد؛ برای ثبت نهایی تغییرات، دکمه ذخیره را بزنید.');return data.publicUrl;}catch(error){setNotice('بارگذاری تصویر ناموفق بود: '+(error?.message||'خطای ناشناخته'));return '';}finally{setUploading(false);}}
+ async function compressImage(file){
+  if(!['image/jpeg','image/png','image/webp','image/avif'].includes(file.type))throw new Error('فقط تصویر JPG، PNG، WebP یا AVIF مجاز است.');
+  if(file.size>25*1024*1024)throw new Error('حجم عکس انتخابی نباید بیشتر از ۲۵ مگابایت باشد.');
+  let bitmap;
+  try{bitmap=await createImageBitmap(file);}catch{throw new Error('بازکردن تصویر ممکن نشد؛ لطفاً یک عکس معمولی JPG یا PNG انتخاب کنید.');}
+  try{
+   let width=bitmap.width,height=bitmap.height;
+   if(!width||!height)throw new Error('ابعاد تصویر معتبر نیست.');
+   const maxSide=1600,scale=Math.min(1,maxSide/Math.max(width,height));
+   width=Math.max(1,Math.round(width*scale));height=Math.max(1,Math.round(height*scale));
+   const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d',{alpha:true});
+   if(!ctx)throw new Error('مرورگر امکان فشرده‌سازی تصویر را فراهم نکرد.');
+   let blob=null;
+   for(const factor of [1,0.88,0.76]){
+    canvas.width=Math.max(1,Math.round(width*factor));canvas.height=Math.max(1,Math.round(height*factor));
+    ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);
+    for(const quality of [0.82,0.76,0.70]){
+     blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',quality));
+     if(blob&&blob.type==='image/webp'&&blob.size<=1200*1024)break;
+    }
+    if(blob&&blob.type==='image/webp'&&blob.size<=1200*1024)break;
+   }
+   if(!blob||blob.type!=='image/webp')throw new Error('تبدیل تصویر به WebP در این مرورگر پشتیبانی نمی‌شود.');
+   const safeName=(file.name||'image').replace(/\.[^.]+$/,'').replace(/[^a-zA-Z0-9_-]/g,'_')||'image';
+   return new File([blob],safeName+'.webp',{type:'image/webp',lastModified:Date.now()});
+  }finally{bitmap.close?.();}
+ }
+ async function uploadImage(file,folder='products'){
+  if(!file)return '';
+  if(!supabase){setNotice('اتصال پایگاه داده در دسترس نیست.');return '';}
+  setUploading(true);
+  try{
+   const compressed=await compressImage(file);
+   const path=folder+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.webp';
+   const {error}=await supabase.storage.from('product-images').upload(path,compressed,{cacheControl:'31536000',upsert:false,contentType:'image/webp'});
+   if(error)throw error;
+   const {data}=supabase.storage.from('product-images').getPublicUrl(path);
+   if(!data?.publicUrl)throw new Error('نشانی عمومی تصویر ساخته نشد.');
+   const before=(file.size/1024).toFixed(0),after=(compressed.size/1024).toFixed(0);
+   setNotice('تصویر فشرده و بارگذاری شد: '+before+' کیلوبایت ← '+after+' کیلوبایت. برای ثبت نهایی تغییرات، دکمه ذخیره را بزنید.');
+   return data.publicUrl;
+  }catch(error){setNotice('فشرده‌سازی یا بارگذاری تصویر ناموفق بود: '+(error?.message||'خطای ناشناخته'));return '';}
+  finally{setUploading(false);}
+ }
  async function handleProductImage(file){const url=await uploadImage(file);if(url)setProduct(p=>({...p,image_url:url}));}
  async function saveProduct(){if(uploading){setNotice('تا پایان بارگذاری تصویر صبر کنید.');return;}if(!product.name?.trim()){setNotice('نام محصول را وارد کنید.');return;}const payload={...product,name:product.name.trim(),weight_grams:Number(product.weight_grams),karat:Number(product.karat),price_toman:Number(product.price_toman),stock:Number(product.stock),markup_percent:Number(product.markup_percent),labor_value:Number(product.labor_value||0),seller_profit_percent:Number(product.seller_profit_percent??7),commission_percent:Number(product.commission_percent||0),vat_percent:10};if(payload.pricing_mode==='auto'&&!isJewelryCategory(payload.category)){setNotice('قیمت‌گذاری خودکار فعلاً فقط برای مصنوعات طلای زینتی فعال است؛ آب‌شده، سکه و شمش باید دستی قیمت‌گذاری شوند.');return;}if(payload.weight_grams<0||payload.karat<=0||payload.karat>24||payload.price_toman<0||payload.stock<0||payload.markup_percent<0||payload.labor_value<0||payload.seller_profit_percent<0||payload.commission_percent<0||payload.vat_percent<0){setNotice('مقادیر عددی محصول معتبر نیستند.');return;}setSaving(true);try{const q=product.id?supabase.from('products').update(payload).eq('id',product.id):supabase.from('products').insert(payload);const {error}=await q;if(error)throw error;setModal(null);setNotice('محصول با موفقیت ذخیره شد.');await load();}catch(error){setNotice('ذخیره محصول ناموفق بود: '+(error?.message||'خطای ناشناخته'));}finally{setSaving(false);}}
  async function removeProduct(id){if(!confirm('این محصول از فروشگاه غیرفعال شود؟ سوابق سفارش‌ها و اطلاعات آن حفظ می‌شود.'))return;try{const {error}=await supabase.from('products').update({is_active:false,updated_at:new Date().toISOString()}).eq('id',id);if(error)throw error;setNotice('محصول غیرفعال شد؛ سوابق آن حفظ شده است.');await load();}catch(error){setNotice('غیرفعال‌سازی محصول ناموفق بود: '+(error?.message||'خطای ناشناخته'));}}
