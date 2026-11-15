@@ -7,17 +7,26 @@ const logo = 'data:image/webp;base64,' + readFileSync('public/mahgold-logo.webp'
 let html = readFileSync(join(out, 'index.html'), 'utf8');
 
 html = html.replace(/<link[^>]*rel=["']modulepreload["'][^>]*>/g, '');
+let bundledScripts = 0;
 html = html.replace(/<script[^>]*src=["']((?:\/|\.\/)?assets\/[^"']+\.js)["'][^>]*>\s*<\/script>/g, (_tag, src) => {
   const file = join(assetDir, basename(src));
-  const code = readFileSync(file, 'utf8').replaceAll('/mahgold-logo.webp', logo);
-  return '<script type="module">\n' + code + '\n</script>';
+  let code = readFileSync(file, 'utf8').replaceAll('/mahgold-logo.webp', logo);
+  // A local HTML preview cannot depend on sibling JS chunks. Vite is configured
+  // for inlineDynamicImports; reject any remaining relative chunk imports.
+  if (/\bimport\s*(?:\(|["'{*])/.test(code)) {
+    throw new Error('JavaScript bundle still contains imports; standalone file would fail when opened locally.');
+  }
+  bundledScripts++;
+  return '<script type="module">\\n' + code + '\\n</script>';
 });
+if (bundledScripts !== 1) throw new Error('Expected exactly one standalone JavaScript bundle; found ' + bundledScripts);
 html = html.replace(/<link[^>]*href=["']((?:\/|\.\/)?assets\/[^"']+\.css)["'][^>]*>/g, (_tag, href) => {
   const file = join(assetDir, basename(href));
-  return '<style>\n' + readFileSync(file, 'utf8').replaceAll('/mahgold-logo.webp', logo) + '\n</style>';
+  return '<style>\\n' + readFileSync(file, 'utf8').replaceAll('/mahgold-logo.webp', logo) + '\\n</style>';
 });
 html = html.replaceAll('/mahgold-logo.webp', logo);
 if (/<script[^>]+src=["'](?:\/|\.\/)?assets\/|<link[^>]+href=["'](?:\/|\.\/)?assets\/[^"']+\.css/.test(html)) throw new Error('Local JS/CSS asset reference remains in standalone HTML.');
 if (!html.includes('data:image/webp;base64')) throw new Error('Embedded brand logo is missing.');
+if (!html.includes('ورود مدیریت مه‌گلد')) throw new Error('Admin login screen was not bundled.');
 writeFileSync(join(out, 'index.html'), html, 'utf8');
-console.log('Standalone preview created:', Buffer.byteLength(html), 'bytes');
+console.log('Standalone admin preview created:', Buffer.byteLength(html), 'bytes');
