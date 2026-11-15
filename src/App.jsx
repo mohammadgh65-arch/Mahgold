@@ -6,7 +6,7 @@ import {
   House, LayoutGrid, Phone, MapPin, PackageCheck
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
-import AdminPanel from './Admin.jsx';
+import AdminPanel, { AdminErrorBoundary } from './Admin.jsx';
 
 const forceAdminPreview = import.meta.env.VITE_ADMIN_PREVIEW === 'true';
 const BASE = 'https://growth-and-advancement-garden.lovable.app/assets/';
@@ -261,7 +261,7 @@ export default function App() {
     if(error){setCheckoutError(error.message||'ثبت سفارش انجام نشد.');return;}
     setOrderResult(data);setCart([]);setCheckoutOpen(false);setCartOpen(false);
   };
-  if(isAdminPage)return <AdminPanel/>;
+  if(isAdminPage)return <AdminErrorBoundary><AdminPanel/></AdminErrorBoundary>;
 
   return <div dir="rtl" className="min-h-screen bg-background text-foreground">
     {siteContent?.announcement?.active!==false&&<div className="ref-announcement">{siteContent?.announcement?.text||"ارسال امن و بسته‌بندی ویژه ✦ پشتیبانی مه‌گلد ✦ همراه انتخاب شما"}</div>}
