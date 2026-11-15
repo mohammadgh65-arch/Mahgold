@@ -57,10 +57,11 @@ export default function AdminPanel(){
  async function addSlideImage(index,file){const url=await uploadImage(file,'slides');if(url)changeSiteContent(next=>{const rows=[...(next.slides||[])];rows[index]={...(rows[index]||{}),image:url};next.slides=rows;});}
  async function uploadSiteLogo(file){const url=await uploadImage(file,'brand');if(url)changeSiteContent(next=>{next.logo_url=url;});}
  async function uploadStoryImage(file){const url=await uploadImage(file,'story');if(url)changeSiteContent(next=>{next.story_image=url;});}
- async function uploadTileImage(index,file){const url=await uploadImage(file,'tiles');if(url)changeSiteContent(next=>{const rows=[...(next.tiles||[])];rows[index]={...(rows[index]||{}),image:url};next.tiles=rows;});}
+ async function uploadTileImage(index,file){const url=await uploadImage(file,'tiles');if(url)changeSiteContent(next=>{const rows=[...(next.tiles||[])];rows[index]={...(rows[index]||{}),image:url};next.tiles=rows;next.categoryImages={...(next.categoryImages||{}),[rows[index].name||tileDefaults[index].name]:url};});}
  const tileDefaults=[{name:'طلای زینتی',desc:'زیورآلات برای هر روز و هر occasion',image:'https://growth-and-advancement-garden.lovable.app/assets/jewelry-CwLx7kUY.jpg'},{name:'طلای آب‌شده',desc:'انتخابی برای نگاه سرمایه‌ای',image:'https://growth-and-advancement-garden.lovable.app/assets/melted-nOWRYhbE.jpg'},{name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:'https://growth-and-advancement-garden.lovable.app/assets/coin-CsyrnHPB.jpg'},{name:'شمش',desc:'خلوص در ساده‌ترین شکل',image:'https://growth-and-advancement-garden.lovable.app/assets/bar-B0yyIRPP.jpg'}];
  const savedTiles=Array.isArray(contentObject.tiles)?contentObject.tiles:[];
-  const tileRows=tileDefaults.map(tile=>({...tile,...(savedTiles.find(item=>item&&item.name===tile.name)||{})}));
+  const legacyCategoryImages=contentObject.categoryImages&&typeof contentObject.categoryImages==='object'&&!Array.isArray(contentObject.categoryImages)?contentObject.categoryImages:{};
+  const tileRows=tileDefaults.map(tile=>{const savedTile=savedTiles.find(item=>item&&item.name===tile.name)||{};return {...tile,...savedTile,image:savedTile.image||legacyCategoryImages[tile.name]||tile.image};});
  const sectionRows=Array.isArray(data[section])?data[section]:[];
  const filtered=sectionRows.filter(x=>section!=='customers'||x.role==='customer').filter(x=>JSON.stringify(x).toLowerCase().includes(search.toLowerCase()));
  if(checking)return <div className="admin-gate">در حال بررسی نشست امن…</div>;
