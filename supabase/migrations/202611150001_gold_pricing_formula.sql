@@ -72,8 +72,7 @@ $$;
 
 drop trigger if exists trg_mahgold_product_price on public.products;
 create trigger trg_mahgold_product_price
-before insert or update of pricing_mode, weight_grams, karat, labor_mode, labor_value,
-  seller_profit_percent, commission_percent, vat_percent
+before insert or update
 on public.products
 for each row execute function public.mahgold_set_calculated_product_price();
 
