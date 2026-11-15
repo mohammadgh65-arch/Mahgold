@@ -56,7 +56,7 @@ export default function AdminPanel(){
    const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d',{alpha:true});
    if(!ctx)throw new Error('مرورگر امکان فشرده‌سازی تصویر را فراهم نکرد.');
    let blob=null;
-   for(const factor of [1,0.88,0.76]){
+   for(const factor of [1,0.88,0.76,0.64]){
     canvas.width=Math.max(1,Math.round(width*factor));canvas.height=Math.max(1,Math.round(height*factor));
     ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);
     for(const quality of [0.82,0.76,0.70]){
@@ -66,6 +66,7 @@ export default function AdminPanel(){
     if(blob&&blob.type==='image/webp'&&blob.size<=1200*1024)break;
    }
    if(!blob||blob.type!=='image/webp')throw new Error('تبدیل تصویر به WebP در این مرورگر پشتیبانی نمی‌شود.');
+   if(blob.size>1200*1024)throw new Error('حجم تصویر پس از فشرده‌سازی هنوز زیاد است؛ لطفاً عکس دیگری انتخاب کنید.');
    const safeName=(file.name||'image').replace(/\.[^.]+$/,'').replace(/[^a-zA-Z0-9_-]/g,'_')||'image';
    return new File([blob],safeName+'.webp',{type:'image/webp',lastModified:Date.now()});
   }finally{bitmap.close?.();}
