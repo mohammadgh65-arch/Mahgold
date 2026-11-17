@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - mahgold-admin-repair-2026-11-15
+      - mahgold-product-variants-shared-images-2026-11-18
   pull_request:
     branches:
       - mahgold-admin-repair-2026-11-15
