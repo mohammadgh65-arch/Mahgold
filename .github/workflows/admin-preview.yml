@@ -5,6 +5,7 @@ on:
     branches:
       - mahgold-independent-react
       - mahgold-admin-repair-2026-11-15
+      - mahgold-product-variants-shared-images-2026-11-18
   workflow_dispatch:
 
 permissions:
