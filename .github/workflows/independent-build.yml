@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - mahgold-independent-react
+      - mahgold-product-variants-shared-images-2026-11-18
   workflow_dispatch:
 
 permissions:
