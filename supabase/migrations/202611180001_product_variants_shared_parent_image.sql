@@ -49,3 +49,22 @@ set image_url = null,
     updated_at = now()
 where parent_product_id is not null
   and image_url is not null;
+
+-- Storage list() requires SELECT on storage.objects. Limit listing to store administrators.
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'storage'
+      and tablename = 'objects'
+      and policyname = 'Mahgold admins list product images'
+  ) then
+    execute $policy$
+      create policy "Mahgold admins list product images"
+      on storage.objects
+      for select
+      to authenticated
+      using (bucket_id = 'product-images' and public.zarin_is_admin())
+    $policy$;
+  end if;
+end $$;
