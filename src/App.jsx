@@ -507,7 +507,7 @@ export default function App() {
 
     {selectedProduct&&<div className="ref-overlay" onClick={()=>{setSelectedProduct(null);setSelectedVariant(null);}}>
       <section className="ref-dialog ref-dialog-wide" onClick={e=>e.stopPropagation()}>
-        <div className="ref-dialog-head"><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span><button className="ref-close" aria-label="بستن" onClick={()=>setSelectedProduct(null)}><X/></button></div>
+        <div className="ref-dialog-head"><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span><button className="ref-close" aria-label="بستن" onClick={()=>{setSelectedProduct(null);setSelectedVariant(null);}}><X/></button></div>
         <div className="grid gap-6 md:grid-cols-2">
           <ProductImage product={activeProduct} className="ref-product-modal-image"/>
           <div className="ref-product-modal-copy">
