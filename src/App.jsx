@@ -157,6 +157,7 @@ export default function App() {
   const [checkoutError,setCheckoutError]=useState('');
   const [orderResult,setOrderResult]=useState(null);
   const [selectedProduct,setSelectedProduct]=useState(null);
+  const [selectedVariant,setSelectedVariant]=useState(null);
   const [customer,setCustomer]=useState({name:'',phone:'',email:'',address:'',city:'',postalCode:'',note:''});
   const [menuOpen,setMenuOpen]=useState(false);
   const [activeSlide,setActiveSlide]=useState(0);
@@ -196,7 +197,7 @@ export default function App() {
     (async()=>{
       try{
         const [productResult,categoryResult,quoteResult]=await Promise.all([
-          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active,created_at,tag')
+          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active,created_at,tag,parent_product_id,attributes,markup_percent')
             .eq('is_active',true).order('created_at',{ascending:false}),
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
             .eq('is_active',true).order('sort_order',{ascending:true}),
@@ -207,8 +208,11 @@ export default function App() {
         if(productResult.error){setDataStatus('error');setProducts([]);setDataMessage('دریافت محصولات ناموفق بود؛ برای جلوگیری از نمایش قیمت نادرست، اطلاعات نمونه نمایش داده نمی‌شود.');}
         else{
           const rows=productResult.data||[];
-          setProducts(rows);setDataStatus('connected');
-          setDataMessage(rows.length?'محصولات و قیمت‌ها مستقیماً از پایگاه داده مه‌گلد دریافت می‌شوند.':'اتصال برقرار است؛ هنوز محصول فعالی برای نمایش ثبت نشده است.');
+          const childrenByParent=new Map();
+          rows.filter(row=>row.parent_product_id).forEach(row=>{const list=childrenByParent.get(row.parent_product_id)||[];list.push(row);childrenByParent.set(row.parent_product_id,list);});
+          const parents=rows.filter(row=>!row.parent_product_id).map(parent=>({...parent,variants:(childrenByParent.get(parent.id)||[]).filter(child=>child.is_active!==false).map(child=>({...child,image_url:parent.image_url||null}))}));
+          setProducts(parents);setDataStatus('connected');
+          setDataMessage(parents.length?'محصولات اصلی و تنوع‌های فعال از پایگاه داده مه‌گلد دریافت شدند.':'اتصال برقرار است؛ هنوز محصول فعالی برای نمایش ثبت نشده است.');
         }
         if(!categoryResult.error)setDbCategories(categoryResult.data||[]);
         if(!quoteResult.error&&quoteResult.data)setQuote(quoteResult.data);
@@ -247,22 +251,26 @@ export default function App() {
     try{
       const ids=cart.map(item=>item.id);
       const [productResult,quoteResult]=await Promise.all([
-        supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active').in('id',ids),
+        supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active,parent_product_id').in('id',ids),
         supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live').eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle()
       ]);
       if(productResult.error)throw productResult.error;
       const rows=productResult.data||[];
       const byId=new Map(rows.map(row=>[row.id,row]));
+      const parentIds=[...new Set(rows.map(row=>row.parent_product_id).filter(Boolean))];
+      let parentById=new Map();
+      if(parentIds.length){const parentResult=await supabase.from('products').select('id,image_url,is_active').in('id',parentIds);if(parentResult.error)throw parentResult.error;parentById=new Map((parentResult.data||[]).map(row=>[row.id,row]));}
       for(const item of cart){
         const latest=byId.get(item.id);
-        if(!latest||!latest.is_active)throw new Error('محصول «'+item.name+'» دیگر برای فروش موجود نیست.');
+        const parent=latest?.parent_product_id?parentById.get(latest.parent_product_id):null;
+        if(!latest||!latest.is_active||(latest.parent_product_id&&(!parent||!parent.is_active)))throw new Error('محصول «'+item.name+'» دیگر برای فروش موجود نیست.');
         if(Number(latest.stock||0)<Number(item.qty||0))throw new Error('موجودی محصول «'+item.name+'» برای تعداد انتخاب‌شده کافی نیست.');
         if(Number(latest.price_toman||0)<=0)throw new Error('قیمت محصول «'+item.name+'» معتبر نیست.');
       }
       if(cart.some(item=>byId.get(item.id)?.pricing_mode==='auto')&&(!quoteResult.data||quoteResult.error)){
         throw new Error('نرخ طلای ۱۸ عیار در دسترس نیست؛ امکان تأیید قیمت محصول وجود ندارد.');
       }
-      setCart(old=>old.map(item=>({...item,...byId.get(item.id),qty:item.qty})));
+      setCart(old=>old.map(item=>{const latest=byId.get(item.id);const parent=latest?.parent_product_id?parentById.get(latest.parent_product_id):null;return {...item,...latest,image_url:latest?.image_url||parent?.image_url||item.image_url,qty:item.qty};}));
       if(quoteResult.data)setQuote(quoteResult.data);
       setCheckoutError('');
       return true;
@@ -272,6 +280,7 @@ export default function App() {
     }finally{setCartRefreshing(false);}
   };
 
+  const openProduct=product=>{setSelectedProduct(product);setSelectedVariant(product.variants?.[0]||null);};
   const addToCart=product=>{
     if(!supabase||dataStatus!=='connected'||!product.id){setCheckoutError('اتصال فروشگاه برقرار نیست.');return;}
     setCart(old=>{
@@ -310,6 +319,7 @@ export default function App() {
       setCheckoutBusy(false);
     }
   };
+  const activeProduct=selectedProduct?(selectedVariant?{...selectedVariant,image_url:selectedProduct.image_url||null}:selectedProduct):null;
   if(isAdminPage)return <AdminErrorBoundary><AdminPanel/></AdminErrorBoundary>;
 
   return <div dir="rtl" className="min-h-screen bg-background text-foreground">
@@ -402,20 +412,20 @@ export default function App() {
             </select></label>
           </div>
           <div className="ref-product-grid">
-            {filtered.map(product=><article className="ref-product-card group" key={product.id}>
-              <button className="block w-full overflow-hidden text-right" onClick={()=>setSelectedProduct(product)} aria-label={'مشاهده '+product.name}>
+            {filtered.map(product=>{const variantPrices=(product.variants||[]).filter(v=>v.is_active!==false).map(v=>Number(v.price_toman||0)).filter(v=>v>0);const cardPrice=variantPrices.length?Math.min(...variantPrices):Number(product.price_toman||0);return <article className="ref-product-card group" key={product.id}>
+              <button className="block w-full overflow-hidden text-right" onClick={()=>openProduct(product)} aria-label={'مشاهده '+product.name}>
                 <ProductImage product={product}/>
               </button>
               <div className="ref-product-body">
                 <span className="text-[10px] text-muted-foreground md:text-[11px]">{product.category}</span>
-                <button className="ref-product-name line-clamp-1 text-right" onClick={()=>setSelectedProduct(product)}>{product.name}</button>
-                <div className="mt-0.5 text-[11px] text-muted-foreground">{[product.weight_grams?gram(product.weight_grams):null,product.karat?money(product.karat)+' عیار':null].filter(Boolean).join(' · ')}</div>
+                <button className="ref-product-name line-clamp-1 text-right" onClick={()=>openProduct(product)}>{product.name}</button>
+                <div className="mt-0.5 text-[11px] text-muted-foreground">{product.variants?.length?money(product.variants.length)+' تنوع':[product.weight_grams?gram(product.weight_grams):null,product.karat?money(product.karat)+' عیار':null].filter(Boolean).join(' · ')}</div>
                 <div className="ref-product-bottom">
-                  <strong>{money(product.price_toman)} <small>تومان</small></strong>
-                  <button aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'} onClick={()=>addToCart(product)}><Plus size={17}/></button>
+                  <strong>{product.variants?.length?'از ':''}{money(cardPrice)} <small>تومان</small></strong>
+                  <button aria-label={product.variants?.length?'انتخاب تنوع '+product.name:'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={product.variants?.length?false:Number(product.stock||0)<1||dataStatus!=='connected'} onClick={()=>product.variants?.length?openProduct(product):addToCart(product)}><Plus size={17}/></button>
                 </div>
               </div>
-            </article>)}
+            </article>;})}
           </div>
           {dataStatus==='loading'&&<div className="ref-state">در حال دریافت محصولات مه‌گلد…</div>}
           {dataStatus==='error'&&<div className="ref-state">{dataMessage}</div>}
@@ -495,18 +505,19 @@ export default function App() {
       </form>
     </div>}
 
-    {selectedProduct&&<div className="ref-overlay" onClick={()=>setSelectedProduct(null)}>
+    {selectedProduct&&<div className="ref-overlay" onClick={()=>{setSelectedProduct(null);setSelectedVariant(null);}}>
       <section className="ref-dialog ref-dialog-wide" onClick={e=>e.stopPropagation()}>
         <div className="ref-dialog-head"><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span><button className="ref-close" aria-label="بستن" onClick={()=>setSelectedProduct(null)}><X/></button></div>
         <div className="grid gap-6 md:grid-cols-2">
-          <ProductImage product={selectedProduct} className="ref-product-modal-image"/>
+          <ProductImage product={activeProduct} className="ref-product-modal-image"/>
           <div className="ref-product-modal-copy">
             <span className="text-xs text-muted-foreground">{selectedProduct.category}</span>
             <h2>{selectedProduct.name}</h2>
             <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
-            <div className="grid gap-2 text-xs text-muted-foreground"><span>وزن: {gram(selectedProduct.weight_grams)}</span><span>عیار: {money(selectedProduct.karat||18)}</span><span>موجودی: {money(selectedProduct.stock||0)}</span></div>
-            {selectedProduct.pricing_mode==='auto'&&<div className="ref-price-breakdown"><b>جزئیات محاسبه قیمت</b>{(()=>{const x=priceBreakdown(selectedProduct,quote);return <><span>اصل طلا: {money(x.base)} تومان</span><span>اجرت ساخت: {money(x.labor)} تومان</span><span>سود فروشنده: {money(x.profit)} تومان</span>{x.commission>0&&<span>حق‌العمل: {money(x.commission)} تومان</span>}<span>مالیات: {money(x.tax)} تومان</span></>;})()}<small>مبنای نرخ: {quote?.is_live?'نرخ زنده':'آخرین نرخ ثبت‌شده به‌صورت دستی'} طلای ۱۸ عیار</small></div>}<strong className="ref-detail-price">{money(selectedProduct.price_toman)} تومان</strong>
-            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
+            {selectedProduct.variants?.length>0&&<div className="ref-variant-picker"><b>انتخاب مدل و سایز</b><div>{selectedProduct.variants.map(v=><button type="button" key={v.id} className={selectedVariant?.id===v.id?'active':''} onClick={()=>setSelectedVariant(v)}>{[v.attributes?.variant_model_name||'مدل',v.attributes?.variant_size?'سایز '+v.attributes.variant_size:''].filter(Boolean).join(' · ')}</button>)}</div></div>}
+            <div className="grid gap-2 text-xs text-muted-foreground"><span>وزن: {gram(activeProduct.weight_grams)}</span><span>عیار: {money(activeProduct.karat||18)}</span><span>موجودی: {money(activeProduct.stock||0)}</span></div>
+            {activeProduct.pricing_mode==='auto'&&<div className="ref-price-breakdown"><b>جزئیات محاسبه قیمت</b>{(()=>{const x=priceBreakdown(activeProduct,quote);return <><span>اصل طلا: {money(x.base)} تومان</span><span>اجرت ساخت: {money(x.labor)} تومان</span><span>سود فروشنده: {money(x.profit)} تومان</span>{x.commission>0&&<span>حق‌العمل: {money(x.commission)} تومان</span>}<span>مالیات: {money(x.tax)} تومان</span></>;})()}<small>مبنای نرخ: {quote?.is_live?'نرخ زنده':'آخرین نرخ ثبت‌شده به‌صورت دستی'} طلای ۱۸ عیار</small></div>}<strong className="ref-detail-price">{money(activeProduct.price_toman)} تومان</strong>
+            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(activeProduct.stock||0)<1} onClick={()=>{addToCart({...activeProduct,image_url:selectedProduct.image_url||null});setSelectedProduct(null);setSelectedVariant(null);setCartOpen(true);}}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
           </div>
         </div>
       </section>
