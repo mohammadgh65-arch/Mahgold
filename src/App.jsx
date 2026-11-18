@@ -362,7 +362,6 @@ export default function App() {
         <button aria-label="منو" className="ref-mobile-menu md:hidden" onClick={()=>setMenuOpen(v=>!v)}><Menu size={20}/></button>
         <a aria-label="مه‌گلد - صفحه اصلی" className="ref-brand" href="#home">
           <img src={siteContent?.logo_url||MAHGOLD_LOGO} alt=""/>
-          <span>مه‌گلد</span>
         </a>
         <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
           <a className="transition-colors hover:text-gold-deep" href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a>
