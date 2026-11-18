@@ -58,6 +58,30 @@ const toLatinDigits = value => value.replace(/[۰-۹٠-٩]/g, d => {
   return String(fa.indexOf(d)>=0 ? fa.indexOf(d) : ar.indexOf(d));
 });
 
+
+function getProductSpecRows(product){
+  const category=String(product?.category||'').toLowerCase();
+  const name=String(product?.name||'').toLowerCase();
+  const has=(...terms)=>terms.some(term=>category.includes(term)||name.includes(term));
+  const rows=[];
+  if(has('انگشتر')) rows.push(['نوع محصول','انگشتر']);
+  else if(has('گردنبند')) rows.push(['نوع محصول','گردنبند']);
+  else if(has('دستبند')) rows.push(['نوع محصول','دستبند']);
+  else if(has('النگو')) rows.push(['نوع محصول','النگو']);
+  else if(has('گوشواره')) rows.push(['نوع محصول','گوشواره']);
+  else if(has('زنجیر')) rows.push(['نوع محصول','زنجیر']);
+  else if(has('پابند')) rows.push(['نوع محصول','پابند']);
+  else if(has('سرویس')) rows.push(['نوع محصول','سرویس طلا']);
+  else if(has('سکه')) rows.push(['نوع محصول','سکه']);
+  else if(has('شمش')) rows.push(['نوع محصول','شمش']);
+  else if(has('آب‌شده','آبشده')) rows.push(['نوع محصول','طلای آب‌شده']);
+  if(Number(product?.weight_grams)>0) rows.push([has('سکه')?'وزن سکه':'وزن',gram(product.weight_grams)]);
+  if(Number(product?.karat)>0) rows.push([has('سکه')?'عیار سکه':'عیار',money(product.karat)]);
+  if(product?.tag?.trim()) rows.push(['ویژگی',product.tag.trim()]);
+  if(Number(product?.stock)>=0) rows.push(['وضعیت موجودی',Number(product.stock)>0?'موجود':'ناموجود']);
+  return rows;
+}
+
 function ProductImage({product, className=''}) {
   const [failed,setFailed] = useState(false);
   const primarySrc = product.image_url || '';
@@ -172,7 +196,27 @@ export default function App() {
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
   const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||window.location.pathname==='/admin'||window.location.pathname==='/admin/'||window.location.hash==='#mahgold-control');
 
-  useEffect(()=>{if(!selectedProduct)return;const previousOverflow=document.body.style.overflow;document.body.style.overflow='hidden';const onKeyDown=event=>{if(event.key==='Escape')setSelectedProduct(null);};window.addEventListener('keydown',onKeyDown);return()=>{document.body.style.overflow=previousOverflow;window.removeEventListener('keydown',onKeyDown);};},[selectedProduct]);
+  const openProduct=(product)=>{
+    if(!product?.id)return;
+    const params=new URLSearchParams(window.location.search);
+    params.set('product',String(product.id));
+    window.history.pushState({...(window.history.state||{}),mahgoldProductId:String(product.id)},'','?'+params.toString());
+    openProduct(product);
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+  const closeProduct=()=>{
+    if(new URLSearchParams(window.location.search).has('product')) window.history.back();
+    else closeProduct();
+  };
+  useEffect(()=>{
+    const syncProductRoute=()=>{
+      const id=new URLSearchParams(window.location.search).get('product');
+      setSelectedProduct(id?products.find(item=>String(item.id)===id)||null:null);
+    };
+    window.addEventListener('popstate',syncProductRoute);
+    syncProductRoute();
+    return()=>window.removeEventListener('popstate',syncProductRoute);
+  },[products]);
 
   const displaySlides=useMemo(()=>{const source=Array.isArray(siteContent?.slides)?siteContent.slides:(Array.isArray(siteContent?.specials)?siteContent.specials.map(s=>({active:true,eyebrow:s?.kicker||'',title:s?.title||'',description:s?.sub||'',button:'مشاهده محصولات',image:s?.image||'',category:s?.category||'طلای زینتی'})):[]);const rows=source.filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
   const displayTiles=useMemo(()=>{const saved=Array.isArray(siteContent?.tiles)?siteContent.tiles:[];const legacyImages=siteContent?.categoryImages&&typeof siteContent.categoryImages==='object'&&!Array.isArray(siteContent.categoryImages)?siteContent.categoryImages:{};return displayTileDefaults.map(tile=>{const savedTile=saved.find(item=>item&&item.name===tile.name)||{};return {...tile,...savedTile,image:savedTile.image||legacyImages[tile.name]||tile.image};});},[siteContent]);
@@ -476,8 +520,8 @@ export default function App() {
           </div>
           {dataStatus==='loading'?<div className="mahgold-arrivals-empty">در حال دریافت محصولات…</div>:newArrivals.length>0?<div className="mahgold-arrivals-grid">
             {newArrivals.map(product=><article className="mahgold-arrival-card" key={product.id}>
-              <button className="mahgold-arrival-image" onClick={()=>setSelectedProduct(product)} aria-label={'مشاهده '+product.name}><ProductImage product={product}/></button>
-              <div className="mahgold-arrival-info"><span>{product.category}</span><button onClick={()=>setSelectedProduct(product)}>{product.name}</button><small>{product.weight_grams?gram(product.weight_grams):'جزئیات محصول'}</small><div><strong>{product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'نیازمند نرخ معتبر':<>{money(product.price_toman)} <small>تومان</small></>}</strong><button aria-label={'افزودن '+product.name+' به سبد'} disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}><Plus size={16}/></button></div></div>
+              <button className="mahgold-arrival-image" onClick={()=>openProduct(product)} aria-label={'مشاهده '+product.name}><ProductImage product={product}/></button>
+              <div className="mahgold-arrival-info"><span>{product.category}</span><button onClick={()=>openProduct(product)}>{product.name}</button><small>{product.weight_grams?gram(product.weight_grams):'جزئیات محصول'}</small><div><strong>{product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'نیازمند نرخ معتبر':<>{money(product.price_toman)} <small>تومان</small></>}</strong><button aria-label={'افزودن '+product.name+' به سبد'} disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}><Plus size={16}/></button></div></div>
             </article>)}
           </div>:<div className="mahgold-arrivals-empty">{dataStatus==='error'?'برای نمایش محصولات، اتصال فروشگاه را بررسی کنید.':'محصول تازه‌ای برای نمایش ثبت نشده است.'}</div>}
         </div>
@@ -501,7 +545,7 @@ export default function App() {
           </div>
           <div className="ref-product-grid">
             {filtered.map((product,index)=><article className="ref-product-card ref-product-select-card group" key={product.id} style={{'--card-order':index}}>
-              <button className="ref-product-card-visual" onClick={()=>setSelectedProduct(product)} aria-label={'مشاهده '+product.name}>
+              <button className="ref-product-card-visual" onClick={()=>openProduct(product)} aria-label={'مشاهده '+product.name}>
                 <ProductImage product={product}/>
                 <span className="ref-product-visual-shade"/>
                 <span className="ref-product-quickview">مشاهده جزئیات <ArrowLeft size={13}/></span>
@@ -510,7 +554,7 @@ export default function App() {
               </button>
               <div className="ref-product-body ref-product-select-body">
                 <div className="ref-product-card-meta"><span>{product.category||'مجموعه مه‌گلد'}</span><span className="ref-product-weight">{product.weight_grams?gram(product.weight_grams):'طلای منتخب'}</span></div>
-                <button className="ref-product-name line-clamp-1 text-right" onClick={()=>setSelectedProduct(product)}>{product.name}</button>
+                <button className="ref-product-name line-clamp-1 text-right" onClick={()=>openProduct(product)}>{product.name}</button>
                 <div className="ref-product-karat">{product.karat?money(product.karat)+' عیار':'جزئیات و مشخصات محصول'}</div>
                 <div className="ref-product-bottom ref-product-select-bottom">
                   <div className="ref-product-price-wrap"><small>قیمت محصول</small><strong>{product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'در انتظار نرخ':<>{money(product.price_toman)} <small>تومان</small></>}</strong></div>
@@ -597,33 +641,42 @@ export default function App() {
       </form>
     </div>}
 
-    {selectedProduct&&<div className="ref-overlay ref-product-overlay" onClick={()=>setSelectedProduct(null)}>
-      <section className="ref-dialog ref-dialog-wide ref-product-dialog" role="dialog" aria-modal="true" aria-labelledby="mahgold-product-detail-title" onClick={e=>e.stopPropagation()}>
-        <div className="ref-dialog-head"><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span><button className="ref-close" aria-label="بستن جزئیات محصول" onClick={()=>setSelectedProduct(null)}><X/></button></div>
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="ref-product-visual"><ProductImage product={selectedProduct} className="ref-product-modal-image"/><span className={'ref-stock-pill '+(Number(selectedProduct.stock||0)>0?'available':'unavailable')}>{Number(selectedProduct.stock||0)>0?'موجود در انبار':'ناموجود'}</span></div>
-          <div className="ref-product-modal-copy">
-            <span className="ref-product-category">{selectedProduct.category||'محصول مه‌گلد'}</span>
-            <h2 id="mahgold-product-detail-title">{selectedProduct.name}</h2>
-            <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
-            <div className="ref-product-specs"><div><small>وزن</small><b>{gram(selectedProduct.weight_grams)}</b></div><div><small>عیار</small><b>{money(selectedProduct.karat||18)}</b></div><div><small>موجودی</small><b>{money(selectedProduct.stock||0)} عدد</b></div></div>
-            <div className="ref-detail-price">{selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'قیمت روز در حال به‌روزرسانی است':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</div><p className="ref-manual-price-note">قیمت نهایی پیش از ثبت سفارش بررسی می‌شود.</p>
-            <div className="mahgold-selection-table-wrap mahgold-detail-table-wrap">
-              <table className="mahgold-selection-table mahgold-detail-table" aria-label="مشخصات و انتخاب این محصول">
-                <thead><tr><th>خرید</th><th>قیمت</th><th>وزن</th><th>وضعیت</th><th>محصول</th></tr></thead>
-                <tbody><tr>
-                  <td><button className="mahgold-select-row-button mahgold-gold-shine" disabled={Number(selectedProduct.stock||0)<1||dataStatus!=='connected'||(selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>انتخاب</button></td>
-                  <td className="mahgold-table-price">{selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'در انتظار نرخ':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</td>
-                  <td>{gram(selectedProduct.weight_grams)}</td>
-                  <td><span className={Number(selectedProduct.stock||0)>0?'mahgold-stock-yes':'mahgold-stock-no'}>{Number(selectedProduct.stock||0)>0?'موجود':'ناموجود'}</span></td>
-                  <td><b className="mahgold-table-product">{selectedProduct.name}</b></td>
-                </tr></tbody>
-              </table>
-            </div>
+    {selectedProduct&&<main className="mahgold-product-page" dir="rtl" aria-labelledby="mahgold-product-detail-title">
+      <div className="mahgold-product-page-glow" aria-hidden="true"/>
+      <header className="mahgold-product-page-head">
+        <button type="button" className="mahgold-page-back" onClick={closeProduct}><ArrowLeft size={19}/> بازگشت به فروشگاه</button>
+        <span className="mahgold-product-brand">MAHGOLD <i>✦</i></span>
+        <button type="button" className="mahgold-page-cart" onClick={()=>setCartOpen(true)}><ShoppingBag size={18}/> سبد خرید {cart.length>0&&<b>{money(cart.reduce((n,item)=>n+Number(item.quantity||0),0))}</b>}</button>
+      </header>
+      <section className="mahgold-product-page-content">
+        <div className="mahgold-product-page-gallery">
+          <div className="mahgold-product-page-image"><ProductImage product={selectedProduct} className="mahgold-product-page-photo"/></div>
+          <span className={'ref-stock-pill '+(Number(selectedProduct.stock||0)>0?'available':'unavailable')}>{Number(selectedProduct.stock||0)>0?'موجود در انبار':'ناموجود'}</span>
+        </div>
+        <div className="mahgold-product-page-info">
+          <span className="ref-product-category">{selectedProduct.category||'محصول مه‌گلد'}</span>
+          <h1 id="mahgold-product-detail-title">{selectedProduct.name}</h1>
+          {selectedProduct.description&&<p className="mahgold-product-description">{selectedProduct.description}</p>}
+          <div className="mahgold-product-price-panel">
+            <small>قیمت محصول</small>
+            <strong>{selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'قیمت روز در حال به‌روزرسانی است':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</strong>
+            <span>قیمت نهایی پیش از ثبت سفارش بررسی می‌شود.</span>
+          </div>
+          <div className="mahgold-product-spec-panel">
+            <div className="mahgold-spec-heading"><h2>مشخصات محصول</h2><span>جزئیات همین کالا</span></div>
+            <table className="mahgold-product-spec-table"><tbody>
+              {getProductSpecRows(selectedProduct).map(([label,value])=><tr key={label}><th>{label}</th><td>{value}</td></tr>)}
+            </tbody></table>
+          </div>
+          <div className="mahgold-product-page-actions">
+            <button type="button" className="mahgold-premium-action mahgold-finalize-action" disabled={Number(selectedProduct.stock||0)<1||dataStatus!=='connected'||(selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>{addToCart(selectedProduct);closeProduct();setCartOpen(true);}}>
+              <ShoppingBag size={19}/> افزودن به سبد خرید
+            </button>
+            <span><ShieldCheck size={15}/> ثبت سفارش با بررسی قیمت و موجودی</span>
           </div>
         </div>
       </section>
-    </div>}
+    </main>}
 
     {orderResult&&<div className="ref-overlay">
       <section className="ref-dialog text-center">
