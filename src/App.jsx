@@ -374,30 +374,7 @@ export default function App() {
       </nav>}
     </header>
 
-    <section aria-label="تابلو نرخ آنلاین طلا" className="mahgold-market-board" id="market-rates">
-      <div className="mahgold-market-inner">
-        <div className="mahgold-market-heading">
-          <span className="mahgold-market-pulse" aria-hidden="true"/>
-          <div><b>تابلو نرخ آنلاین</b><small>بازار طلا · مه‌گلد</small></div>
-        </div>
-        <div className="mahgold-market-main">
-          <span className="mahgold-market-label">هر گرم طلای ۱۸ عیار</span>
-          <strong className="mahgold-market-price" aria-live="polite">
-            {quote?.price_toman&&Number(quote.price_toman)>0?money(quote.price_toman):'—'}
-            <small>تومان</small>
-          </strong>
-        </div>
-        <div className="mahgold-market-meta">
-          <span className={isFreshLiveQuote(quote)?'mahgold-market-status is-live':'mahgold-market-status is-stale'}>
-            <i aria-hidden="true"/>{isFreshLiveQuote(quote)?'نرخ زنده و معتبر':quote?'آخرین نرخ ثبت‌شده · غیرزنده':'در انتظار دریافت نرخ'}
-          </span>
-          <span className="mahgold-market-updated">
-            {quote?.observed_at?('آخرین دریافت: '+new Date(quote.observed_at).toLocaleString('fa-IR',{timeZone:'Asia/Tehran',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'long'})):'زمان دریافت ثبت نشده'}
-          </span>
-          <span className="mahgold-market-source">{quote?.source==='arzhaam'?'منبع: ارزهاام':'منبع: '+(quote?.source||'—')}</span>
-        </div>
-      </div>
-    </section>
+
 
     <main className="min-h-[60vh]" id="home">
       <section aria-label="اسلایدهای مه‌گلد" aria-roledescription="carousel" className="relative h-[560px] overflow-hidden bg-ink text-ink-foreground md:h-[640px]">
@@ -425,6 +402,31 @@ export default function App() {
           <button aria-label="اسلاید بعدی" className="flex size-11 items-center justify-center rounded-full border border-ink-foreground/30 bg-ink/30 backdrop-blur transition hover:border-gold hover:text-gold-light" onClick={()=>setActiveSlide(i=>(i+1)%displaySlides.length)}><ChevronLeft size={18}/></button>
         </div>
       </section>
+
+    <section aria-label="تابلو نرخ آنلاین طلا" className="mahgold-market-board" id="market-rates">
+      <div className="mahgold-market-inner">
+        <div className="mahgold-market-heading">
+          <span className="mahgold-market-pulse" aria-hidden="true"/>
+          <div><b>تابلو نرخ آنلاین</b><small>بازار طلا · مه‌گلد</small></div>
+        </div>
+        <div className="mahgold-market-main">
+          <span className="mahgold-market-label">هر گرم طلای ۱۸ عیار</span>
+          <strong className="mahgold-market-price" aria-live="polite">
+            {quote?.price_toman&&Number(quote.price_toman)>0?money(quote.price_toman):'—'}
+            <small>تومان</small>
+          </strong>
+        </div>
+        <div className="mahgold-market-meta">
+          <span className={isFreshLiveQuote(quote)?'mahgold-market-status is-live':'mahgold-market-status is-stale'}>
+            <i aria-hidden="true"/>{isFreshLiveQuote(quote)?'نرخ زنده و معتبر':quote?'آخرین نرخ ثبت‌شده · غیرزنده':'در انتظار دریافت نرخ'}
+          </span>
+          <span className="mahgold-market-updated">
+            {quote?.observed_at?('آخرین دریافت: '+new Date(quote.observed_at).toLocaleString('fa-IR',{timeZone:'Asia/Tehran',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'long'})):'زمان دریافت ثبت نشده'}
+          </span>
+          <span className="mahgold-market-source">{quote?.source==='arzhaam'?'منبع: ارزهاام':'منبع: '+(quote?.source||'—')}</span>
+        </div>
+      </div>
+    </section>
 
       <section className="mx-auto max-w-7xl scroll-mt-20 px-4 py-16 md:px-7 md:py-24" id="categories">
         <div className="mb-8 flex items-end justify-between gap-5">
