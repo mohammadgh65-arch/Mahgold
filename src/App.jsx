@@ -572,7 +572,7 @@ export default function App() {
             </div>)}</div>
             <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{money(cartTotal)} تومان</b></div>
             <p className="mb-4 text-[11px] leading-7 text-muted-foreground">پیش از ادامه، قیمت و موجودی از پایگاه داده تازه‌سازی می‌شود؛ هنگام ثبت سفارش نیز مبلغ نهایی دوباره در سرور کنترل خواهد شد.</p>
-            <button type="button" className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={cartRefreshing} onClick={async()=>{const ready=await refreshCartPrices();if(ready)setCheckoutOpen(true);}}>{cartRefreshing?'در حال به‌روزرسانی قیمت‌ها…':'ادامه و ثبت سفارش'} <ArrowLeft className="mr-2 inline" size={16}/></button>
+            <button type="button" className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full mahgold-premium-action" disabled={cartRefreshing} onClick={async()=>{const ready=await refreshCartPrices();if(ready)setCheckoutOpen(true);}}>{cartRefreshing?'در حال به‌روزرسانی قیمت‌ها…':'ادامه و ثبت سفارش'} <ArrowLeft className="mr-2 inline" size={16}/></button>
           </>}
       </aside>
     </div>}
@@ -589,7 +589,7 @@ export default function App() {
         <label>توضیحات سفارش<textarea rows="2" value={customer.note} onChange={e=>setCustomer({...customer,note:e.target.value})}/></label>
         <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{money(cartTotal)} تومان</b></div>
         {checkoutError&&<p className="ref-message">{checkoutError}</p>}
-        <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={checkoutBusy}>{checkoutBusy?'در حال ثبت…':'ثبت سفارش و رزرو موجودی'}</button>
+        <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full mahgold-premium-action mahgold-finalize-action" disabled={checkoutBusy}>{checkoutBusy?'در حال ثبت…':'ثبت سفارش و رزرو موجودی'}</button>
         <small className="ref-note">ثبت سفارش به معنی پرداخت نیست. پرداخت آنلاین تا اتصال درگاه فعال نخواهد بود.</small>
       </form>
     </div>}
@@ -609,7 +609,7 @@ export default function App() {
               <table className="mahgold-selection-table mahgold-detail-table" aria-label="مشخصات و انتخاب این محصول">
                 <thead><tr><th>خرید</th><th>قیمت</th><th>اجرت</th><th>ویژگی</th><th>وزن</th><th>موجودی</th><th>محصول</th></tr></thead>
                 <tbody><tr>
-                  <td><button className="mahgold-select-row-button" disabled={Number(selectedProduct.stock||0)<1||dataStatus!=='connected'||(selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>انتخاب</button></td>
+                  <td><button className="mahgold-select-row-button mahgold-gold-shine" disabled={Number(selectedProduct.stock||0)<1||dataStatus!=='connected'||(selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>انتخاب</button></td>
                   <td className="mahgold-table-price">{selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'در انتظار نرخ':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</td>
                   <td>{selectedProduct.pricing_mode==='auto'&&isFreshLiveQuote(quote)?money(priceBreakdown(selectedProduct,quote).labor)+' تومان':'طبق قیمت ثبت‌شده'}</td>
                   <td>{selectedProduct.description||selectedProduct.category||'طلای منتخب'}</td>
