@@ -383,3 +383,34 @@ button,input,select,textarea{font:inherit}
 .mahgold-cart-toast>button{margin-right:5px;padding:7px 11px;border-radius:9px;background:linear-gradient(110deg,#98713a,#e6ce94);color:#382711;font-size:10px;font-weight:800;white-space:nowrap}
 @keyframes mahgold-toast-in{from{opacity:0;transform:translate(-50%,-9px)}to{opacity:1;transform:translate(-50%,0)}}
 @media(prefers-reduced-motion:reduce){.mahgold-cart-toast{animation:none}}
+
+
+/* Dedicated product purchase route */
+.mahgold-product-page{position:fixed;inset:0;z-index:85;overflow-y:auto;overscroll-behavior:contain;background:radial-gradient(ellipse at 80% 5%,rgba(211,176,103,.16),transparent 38%),linear-gradient(145deg,#fffdf8 0%,#f7f1e5 52%,#fffdfa 100%);color:#302719;animation:mahgold-product-page-in .48s cubic-bezier(.2,.8,.2,1) both}
+.mahgold-product-page:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.24;background-image:radial-gradient(rgba(171,132,66,.24) .7px,transparent .7px);background-size:19px 19px;mask-image:linear-gradient(to bottom,black,transparent 75%)}
+.mahgold-product-page-glow{position:absolute;top:-170px;right:8%;width:360px;height:360px;border-radius:50%;background:rgba(219,183,112,.2);filter:blur(85px);pointer-events:none}
+.mahgold-product-page-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px clamp(16px,4vw,52px);border-bottom:1px solid rgba(164,126,62,.18);background:rgba(255,253,248,.86);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.mahgold-page-back,.mahgold-page-cart{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:8px 13px;border:1px solid rgba(166,128,62,.25);border-radius:12px;background:rgba(255,255,255,.7);color:#604a2a;font-size:12px;font-weight:750;transition:all .22s ease}
+.mahgold-page-back:hover,.mahgold-page-cart:hover{border-color:#c7a35e;box-shadow:0 5px 18px rgba(151,111,43,.14);transform:translateY(-1px)}
+.mahgold-product-brand{color:#6b512b;font-size:13px;font-weight:900;letter-spacing:2px}.mahgold-product-brand i{color:#c49b50;font-style:normal}
+.mahgold-page-cart b{display:grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:20px;background:linear-gradient(130deg,#d9bc7c,#a77d3b);color:#fff;font-size:10px}
+.mahgold-product-page-content{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(26px,5vw,72px);width:min(1160px,calc(100% - 40px));margin:clamp(24px,5vh,58px) auto 70px;align-items:start}
+.mahgold-product-page-gallery{position:sticky;top:94px;overflow:hidden;border:1px solid rgba(183,146,78,.22);border-radius:28px;background:linear-gradient(145deg,#fff,#f4ead7);box-shadow:0 24px 65px rgba(80,57,22,.12)}
+.mahgold-product-page-image{display:grid;place-items:center;min-height:460px;padding:24px;background:radial-gradient(ellipse,rgba(229,205,157,.45),transparent 68%)}
+.mahgold-product-page-photo{width:100%;height:100%;min-height:410px;background:transparent!important}
+.mahgold-product-page-photo img{width:100%;height:100%;min-height:410px;max-height:580px;object-fit:contain}
+.mahgold-product-page-gallery>.ref-stock-pill{position:absolute;top:18px;right:18px}
+.mahgold-product-page-info{position:relative;padding:8px 0 0;animation:mahgold-product-copy-in .58s .08s both}
+.mahgold-product-page-info h1{margin:10px 0 12px;color:#342718;font-size:clamp(25px,3vw,38px);font-weight:850;line-height:1.55}
+.mahgold-product-description{color:#796b56;font-size:13px;line-height:2.1}
+.mahgold-product-price-panel{display:flex;flex-direction:column;gap:8px;margin:24px 0;padding:19px 20px;border:1px solid rgba(190,151,81,.32);border-radius:18px;background:linear-gradient(115deg,rgba(255,255,255,.94),rgba(246,235,211,.8));box-shadow:inset 0 1px rgba(255,255,255,.9),0 10px 28px rgba(133,98,43,.08)}
+.mahgold-product-price-panel>small{color:#927343;font-size:11px;font-weight:750}.mahgold-product-price-panel>strong{color:#8a642b;font-size:clamp(22px,3vw,30px);font-weight:900;font-variant-numeric:tabular-nums}.mahgold-product-price-panel>strong small{font-size:12px}.mahgold-product-price-panel>span{color:#8b806e;font-size:10px}
+.mahgold-product-spec-panel{overflow:hidden;margin-top:22px;border:1px solid rgba(173,137,76,.22);border-radius:18px;background:rgba(255,255,255,.78)}
+.mahgold-spec-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 17px;border-bottom:1px solid rgba(173,137,76,.16);background:linear-gradient(100deg,#fffaf0,#f4ead6)}
+.mahgold-spec-heading h2{margin:0;color:#5c4525;font-size:14px;font-weight:850}.mahgold-spec-heading span{color:#a0875d;font-size:10px}
+.mahgold-product-spec-table{width:100%;border-collapse:collapse;font-size:12px}.mahgold-product-spec-table tr+tr{border-top:1px solid rgba(173,137,76,.12)}.mahgold-product-spec-table th,.mahgold-product-spec-table td{padding:13px 17px;text-align:right}.mahgold-product-spec-table th{width:42%;color:#88765b;font-weight:600}.mahgold-product-spec-table td{color:#463821;font-weight:800}
+.mahgold-product-page-actions{display:grid;gap:12px;margin-top:24px}.mahgold-product-page-actions>button{display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;width:100%;border-radius:15px;font-size:14px}.mahgold-product-page-actions>span{display:flex;align-items:center;justify-content:center;gap:6px;color:#8b7a5e;font-size:10px}
+@keyframes mahgold-product-page-in{from{opacity:0;transform:translateY(22px) scale(.985);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@keyframes mahgold-product-copy-in{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
+@media(max-width:760px){.mahgold-product-page-head{padding:10px 12px}.mahgold-page-back,.mahgold-page-cart{min-height:39px;padding:7px 9px;font-size:10px}.mahgold-product-brand{font-size:11px}.mahgold-product-page-content{grid-template-columns:1fr;gap:22px;width:calc(100% - 26px);margin:18px auto 42px}.mahgold-product-page-gallery{position:relative;top:auto;border-radius:22px}.mahgold-product-page-image{min-height:270px;padding:12px}.mahgold-product-page-photo,.mahgold-product-page-photo img{min-height:250px;max-height:360px}.mahgold-product-page-info{padding:0 2px}.mahgold-product-page-info h1{font-size:25px}.mahgold-product-price-panel{margin:18px 0;padding:16px}.mahgold-product-spec-panel{margin-top:18px}}
+@media(prefers-reduced-motion:reduce){.mahgold-product-page,.mahgold-product-page-info{animation:none}.mahgold-page-back,.mahgold-page-cart{transition:none}}
