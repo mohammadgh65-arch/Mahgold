@@ -497,17 +497,21 @@ export default function App() {
             </select></label>
           </div>
           <div className="ref-product-grid">
-            {filtered.map(product=><article className="ref-product-card group" key={product.id}>
-              <button className="block w-full overflow-hidden text-right" onClick={()=>setSelectedProduct(product)} aria-label={'مشاهده '+product.name}>
+            {filtered.map((product,index)=><article className="ref-product-card ref-product-select-card group" key={product.id} style={{'--card-order':index}}>
+              <button className="ref-product-card-visual" onClick={()=>setSelectedProduct(product)} aria-label={'مشاهده '+product.name}>
                 <ProductImage product={product}/>
+                <span className="ref-product-visual-shade"/>
+                <span className="ref-product-quickview">مشاهده جزئیات <ArrowLeft size={13}/></span>
+                <span className="ref-product-stock-tag">{Number(product.stock||0)>0?'موجود':'ناموجود'}</span>
+                <span className="ref-product-image-sparkle" aria-hidden="true">✦</span>
               </button>
-              <div className="ref-product-body">
-                <span className="text-[10px] text-muted-foreground md:text-[11px]">{product.category}</span>
+              <div className="ref-product-body ref-product-select-body">
+                <div className="ref-product-card-meta"><span>{product.category||'مجموعه مه‌گلد'}</span><span className="ref-product-weight">{product.weight_grams?gram(product.weight_grams):'طلای منتخب'}</span></div>
                 <button className="ref-product-name line-clamp-1 text-right" onClick={()=>setSelectedProduct(product)}>{product.name}</button>
-                <div className="mt-0.5 text-[11px] text-muted-foreground">{[product.weight_grams?gram(product.weight_grams):null,product.karat?money(product.karat)+' عیار':null].filter(Boolean).join(' · ')}</div>
-                <div className="ref-product-bottom">
-                  <strong>{product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'قیمت موقتاً نامعتبر':<>{money(product.price_toman)} <small>تومان</small></>}</strong>
-                  <button aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}><Plus size={17}/></button>
+                <div className="ref-product-karat">{product.karat?money(product.karat)+' عیار':'جزئیات و مشخصات محصول'}</div>
+                <div className="ref-product-bottom ref-product-select-bottom">
+                  <div className="ref-product-price-wrap"><small>قیمت محصول</small><strong>{product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'در انتظار نرخ':<>{money(product.price_toman)} <small>تومان</small></>}</strong></div>
+                  <button aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button ref-product-add-glow" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}><Plus size={18}/></button>
                 </div>
               </div>
             </article>)}
