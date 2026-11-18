@@ -1,5 +1,5 @@
 import { MAHGOLD_LOGO } from './mahgold-brand';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight,
   ShieldCheck, Gift, Headphones, Plus, Minus, UserRound, LogOut,
@@ -154,6 +154,7 @@ export default function App() {
   const [accountOpen,setAccountOpen]=useState(false);
   const [checkoutOpen,setCheckoutOpen]=useState(false);
   const [checkoutBusy,setCheckoutBusy]=useState(false);
+  const orderIdempotencyKeyRef=useRef(null);
   const [checkoutError,setCheckoutError]=useState('');
   const [orderResult,setOrderResult]=useState(null);
   const [selectedProduct,setSelectedProduct]=useState(null);
@@ -259,8 +260,12 @@ export default function App() {
         if(Number(latest.stock||0)<Number(item.qty||0))throw new Error('موجودی محصول «'+item.name+'» برای تعداد انتخاب‌شده کافی نیست.');
         if(Number(latest.price_toman||0)<=0)throw new Error('قیمت محصول «'+item.name+'» معتبر نیست.');
       }
-      if(cart.some(item=>byId.get(item.id)?.pricing_mode==='auto')&&(!quoteResult.data||quoteResult.error)){
-        throw new Error('نرخ طلای ۱۸ عیار در دسترس نیست؛ امکان تأیید قیمت محصول وجود ندارد.');
+      if(cart.some(item=>byId.get(item.id)?.pricing_mode==='auto')){
+        const quote=quoteResult.data;
+        const observedAt=quote?.observed_at?Date.parse(quote.observed_at):NaN;
+        if(quoteResult.error||!quote||quote.is_live!==true||!Number.isFinite(observedAt)||Date.now()-observedAt>5*60*1000||observedAt>Date.now()+60*1000){
+          throw new Error('نرخ زنده و تازه طلای ۱۸ عیار در دسترس نیست؛ تا دریافت نرخ معتبر، سفارش طلای قیمت‌گذاری خودکار پذیرفته نمی‌شود.');
+        }
       }
       setCart(old=>old.map(item=>({...item,...byId.get(item.id),qty:item.qty})));
       if(quoteResult.data)setQuote(quoteResult.data);
@@ -290,17 +295,25 @@ export default function App() {
     if(!supabase||!cart.length)return;
     setCheckoutBusy(true);
     try{
-      const {data,error}=await supabase.rpc('mahgold_create_order',{
-        p_customer_name:customer.name,
-        p_customer_phone:toLatinDigits(customer.phone),
-        p_customer_email:customer.email||null,
-        p_shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
-        p_customer_note:customer.note||'',
-        p_items:cart.map(item=>({product_id:item.id,quantity:item.qty,expected_price_toman:item.price_toman}))
+      if(!orderIdempotencyKeyRef.current){
+        if(!globalThis.crypto?.randomUUID)throw new Error('مرورگر شما از ثبت امن سفارش پشتیبانی نمی‌کند؛ صفحه را در مرورگر به‌روز باز کنید.');
+        orderIdempotencyKeyRef.current=globalThis.crypto.randomUUID();
+      }
+      const {data,error}=await supabase.functions.invoke('mahgold-create-order',{
+        body:{
+          customer_name:customer.name,
+          customer_phone:toLatinDigits(customer.phone),
+          customer_email:customer.email||null,
+          shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
+          customer_note:customer.note||'',
+          idempotency_key:orderIdempotencyKeyRef.current,
+          items:cart.map(item=>({product_id:item.id,quantity:item.qty,expected_price_toman:item.price_toman}))
+        }
       });
       if(error)throw error;
-      if(!data)throw new Error('پاسخ معتبری از سرور دریافت نشد؛ وضعیت سفارش را بررسی کنید.');
-      setOrderResult(data);
+      if(!data?.data)throw new Error(data?.error||'پاسخ معتبری از سرور دریافت نشد؛ وضعیت سفارش را بررسی کنید.');
+      setOrderResult(data.data);
+      orderIdempotencyKeyRef.current=null;
       setCart([]);
       setCheckoutOpen(false);
       setCartOpen(false);
