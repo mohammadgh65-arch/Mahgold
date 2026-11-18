@@ -221,6 +221,23 @@ export default function App() {
     })();
     return()=>{active=false;};
   },[]);
+  useEffect(()=>{
+    if(!supabase)return;
+    let active=true;
+    const refreshMarketData=async()=>{
+      const [quoteResult,productResult]=await Promise.all([
+        supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
+          .eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle(),
+        supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active,created_at,tag')
+          .eq('is_active',true).order('created_at',{ascending:false})
+      ]);
+      if(!active)return;
+      setQuote(quoteResult.error?null:quoteResult.data||null);
+      if(!productResult.error)setProducts(productResult.data||[]);
+    };
+    const timer=setInterval(refreshMarketData,60000);
+    return()=>{active=false;clearInterval(timer);};
+  },[]);
   useEffect(()=>{try{localStorage.setItem('mahgold_cart',JSON.stringify(cart));}catch{}},[cart]);
 
   const categories=useMemo(()=>{
