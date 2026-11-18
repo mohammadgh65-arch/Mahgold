@@ -343,3 +343,23 @@ button,input,select,textarea{font:inherit}
 @media(prefers-reduced-motion:reduce){
  .ref-product-select-card,.ref-product-card-visual .ref-product-image img,.ref-product-quickview{animation:none!important;transition:none!important}
 }
+
+/* Mavi-inspired compact product selection table */
+.mahgold-selection-table-wrap{width:100%;overflow-x:auto;border:1px solid rgba(164,133,83,.25);border-radius:22px;background:#fffdf9;box-shadow:0 12px 35px rgba(76,54,26,.08);scrollbar-width:thin;scrollbar-color:#c4a978 #f5efe5}
+.mahgold-selection-table{width:100%;min-width:650px;border-collapse:separate;border-spacing:0;text-align:center;font-size:14px;color:#51483c}
+.mahgold-selection-table thead th{padding:17px 12px;background:linear-gradient(180deg,#e7d4b4,#c4a77d);color:#59472e;font-weight:800;white-space:nowrap;border-left:1px solid rgba(104,78,42,.14)}
+.mahgold-selection-table thead th:first-child{border-radius:0 20px 0 0}.mahgold-selection-table thead th:last-child{border-radius:20px 0 0 0}
+.mahgold-selection-table tbody td{padding:13px 11px;border-bottom:1px solid #eee7dc;white-space:nowrap;background:#fffdf9}
+.mahgold-selection-table tbody tr:nth-child(even) td{background:#faf7f1}
+.mahgold-selection-table tbody tr:last-child td{border-bottom:0}
+.mahgold-selection-table tbody tr:hover td{background:#f6efdf}
+.mahgold-select-row-button{border:1px solid #b99b6b;border-radius:999px;padding:8px 19px;background:linear-gradient(145deg,#e1cfad,#b69768);color:#59452a;font-weight:800;box-shadow:0 4px 10px rgba(113,83,42,.16);transition:transform .2s,box-shadow .2s}
+.mahgold-select-row-button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 7px 15px rgba(113,83,42,.24)}
+.mahgold-select-row-button:disabled{opacity:.38;filter:grayscale(.7)}
+.mahgold-table-price{font-weight:900;color:#6b2635;font-variant-numeric:tabular-nums}
+.mahgold-table-price small{font-size:10px;color:#917b72;font-weight:500}
+.mahgold-table-product{font-weight:800;color:#51483c;max-width:130px;overflow:hidden;text-overflow:ellipsis}
+.mahgold-table-product:hover{color:#9b763e;text-decoration:underline;text-underline-offset:4px}
+.mahgold-stock-yes{color:#557b4b;font-weight:700}.mahgold-stock-no{color:#a45d58;font-weight:700}
+.mahgold-selection-table button:focus-visible{outline:3px solid #b99051;outline-offset:3px}
+@media(max-width:700px){.mahgold-selection-table-wrap{border-radius:16px}.mahgold-selection-table{min-width:620px;font-size:12px}.mahgold-selection-table thead th{padding:13px 9px}.mahgold-selection-table tbody td{padding:11px 8px}.mahgold-select-row-button{padding:7px 14px;font-size:11px}.mahgold-table-price{font-size:11px}}
