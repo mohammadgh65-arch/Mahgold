@@ -141,7 +141,6 @@ function AccountContent({onClose}) {
     <label>گذرواژه<input required minLength="6" type="password" autoComplete={mode==='login'?'current-password':'new-password'} value={password} onChange={e=>setPassword(e.target.value)}/></label>
     {message&&<p className="ref-message">{message}</p>}
     <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={busy}>{busy?'در حال بررسی…':mode==='login'?'ورود به حساب':'ایجاد حساب مشتری'}</button>
-    <small className="ref-note">اطلاعات حساب از طریق سرویس امن Supabase مدیریت می‌شود.</small>
   </form>;
 }
 
@@ -151,6 +150,7 @@ export default function App() {
   const [sortMode,setSortMode]=useState('newest');
   const [cart,setCart]=useState(()=>{try{return JSON.parse(localStorage.getItem('mahgold_cart')||'[]');}catch{return [];}});
   const [cartOpen,setCartOpen]=useState(false);
+  const [cartNotice,setCartNotice]=useState('');
   const [cartRefreshing,setCartRefreshing]=useState(false);
   const [accountOpen,setAccountOpen]=useState(false);
   const [checkoutOpen,setCheckoutOpen]=useState(false);
@@ -215,7 +215,7 @@ export default function App() {
         else{
           const rows=productResult.data||[];
           setProducts(rows);setDataStatus('connected');
-          setDataMessage(rows.length?'محصولات و قیمت‌ها مستقیماً از پایگاه داده مه‌گلد دریافت می‌شوند.':'اتصال برقرار است؛ هنوز محصول فعالی برای نمایش ثبت نشده است.');
+          setDataMessage(rows.length?'محصولات مه‌گلد آماده مشاهده و خرید هستند.':'در حال حاضر محصولی برای نمایش وجود ندارد.');
         }
         if(!categoryResult.error)setDbCategories(categoryResult.data||[]);
         if(!quoteResult.error){
@@ -225,7 +225,7 @@ export default function App() {
         }
       }catch{
         if(!active)return;
-        setDataStatus('error');setProducts([]);setDataMessage('ارتباط با پایگاه داده برقرار نشد.');
+        setDataStatus('error');setProducts([]);setDataMessage('بارگذاری فروشگاه با مشکل روبه‌رو شد. لطفاً دوباره تلاش کنید.');
       }
     })();
     return()=>{active=false;};
@@ -250,6 +250,7 @@ export default function App() {
     return()=>{active=false;clearInterval(timer);};
   },[]);
   useEffect(()=>{try{localStorage.setItem('mahgold_cart',JSON.stringify(cart));}catch{}},[cart]);
+  useEffect(()=>{if(!cartNotice)return;const timer=setTimeout(()=>setCartNotice(''),2600);return()=>clearTimeout(timer);},[cartNotice]);
 
   const categories=useMemo(()=>{
     const rows=dbCategories.map(row=>row.name).filter(Boolean);
@@ -317,6 +318,7 @@ export default function App() {
       return previous?old.map(item=>item.id===product.id?{...item,qty:nextQty}:item):[...old,{...product,qty:1}];
     });
     setCheckoutError('');
+    setCartNotice('«'+product.name+'» به سبد خرید اضافه شد.');
   };
   const changeQuantity=(id,delta)=>setCart(old=>old.map(item=>item.id===id?{...item,qty:item.qty+delta}:item).filter(item=>item.qty>0&&item.qty<=Number(item.stock||0)));
   const submitOrder=async event=>{
@@ -358,6 +360,7 @@ export default function App() {
   if(isAdminPage)return <AdminErrorBoundary><AdminPanel/></AdminErrorBoundary>;
 
   return <div dir="rtl" className="min-h-screen bg-background text-foreground">
+    {cartNotice&&<div className="mahgold-cart-toast" role="status"><span>✓</span>{cartNotice}<button onClick={()=>{setCartNotice('');setCartOpen(true);}}>مشاهده سبد</button></div>}
     {siteContent?.announcement?.active!==false&&<div className="ref-announcement">{siteContent?.announcement?.text||"ارسال امن و بسته‌بندی ویژه ✦ پشتیبانی مه‌گلد ✦ همراه انتخاب شما"}</div>}
 
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-xl transition-shadow">
@@ -565,13 +568,13 @@ export default function App() {
           <>
             <div>{cart.map(item=><div className="ref-cart-line" key={item.id}>
               <ProductImage product={item}/>
-              <div><h4>{item.name}</h4><strong>{item.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'نیازمند نرخ معتبر':<>{money(item.price_toman)} تومان</>}</strong>{item.pricing_mode==='auto'&&quote&&isFreshLiveQuote(quote)&&<details className="mt-2 text-[10px] leading-6 text-muted-foreground"><summary className="cursor-pointer">ریز محاسبات قیمت</summary>{(()=>{const x=priceBreakdown(item,quote);return <div className="grid gap-1 pt-1"><span>اصل طلا: {money(x.base)} تومان</span><span>اجرت: {money(x.labor)} تومان</span><span>سود فروشنده: {money(x.profit)} تومان</span>{x.commission>0&&<span>حق‌العمل: {money(x.commission)} تومان</span>}<span>مالیات: {money(x.tax)} تومان</span></div>;})()}</details>}<div className="ref-qty">
+              <div><h4>{item.name}</h4><strong>{item.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'نیازمند نرخ معتبر':<>{money(item.price_toman)} تومان</>}</strong><div className="ref-qty">
                 <button aria-label="کاهش تعداد" onClick={()=>changeQuantity(item.id,-1)}><Minus size={13}/></button><span className="text-xs">{money(item.qty)}</span><button aria-label="افزایش تعداد" onClick={()=>changeQuantity(item.id,1)}><Plus size={13}/></button>
               </div></div>
               <button className="ref-remove" aria-label="حذف محصول" onClick={()=>setCart(old=>old.filter(p=>p.id!==item.id))}><X size={15}/></button>
             </div>)}</div>
             <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{money(cartTotal)} تومان</b></div>
-            <p className="mb-4 text-[11px] leading-7 text-muted-foreground">پیش از ادامه، قیمت و موجودی از پایگاه داده تازه‌سازی می‌شود؛ هنگام ثبت سفارش نیز مبلغ نهایی دوباره در سرور کنترل خواهد شد.</p>
+            <p className="mb-4 text-[11px] leading-7 text-muted-foreground">قیمت نهایی پیش از ثبت سفارش بررسی می‌شود.</p>
             <button type="button" className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full mahgold-premium-action" disabled={cartRefreshing} onClick={async()=>{const ready=await refreshCartPrices();if(ready)setCheckoutOpen(true);}}>{cartRefreshing?'در حال به‌روزرسانی قیمت‌ها…':'ادامه و ثبت سفارش'} <ArrowLeft className="mr-2 inline" size={16}/></button>
           </>}
       </aside>
@@ -604,15 +607,13 @@ export default function App() {
             <h2 id="mahgold-product-detail-title">{selectedProduct.name}</h2>
             <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
             <div className="ref-product-specs"><div><small>وزن</small><b>{gram(selectedProduct.weight_grams)}</b></div><div><small>عیار</small><b>{money(selectedProduct.karat||18)}</b></div><div><small>موجودی</small><b>{money(selectedProduct.stock||0)} عدد</b></div></div>
-            {selectedProduct.pricing_mode==='auto'?<div className="ref-price-breakdown"><b>ریز محاسبه قیمت</b>{!isFreshLiveQuote(quote)?<span className="ref-price-warning">نرخ زنده و تازه در دسترس نیست؛ قیمت نهایی تا دریافت نرخ معتبر قابل تأیید نیست.</span>:<>{(()=>{const x=priceBreakdown(selectedProduct,quote);return <><span><i>اصل طلا</i><b>{money(x.base)} تومان</b></span><span><i>اجرت ساخت</i><b>{money(x.labor)} تومان</b></span><span><i>سود فروشنده</i><b>{money(x.profit)} تومان</b></span>{x.commission>0&&<span><i>حق‌العمل</i><b>{money(x.commission)} تومان</b></span>}<span><i>مالیات</i><b>{money(x.tax)} تومان</b></span></>;})()}<small>مبنای محاسبه: نرخ زنده طلای ۱۸ عیار · مالیات بر اجرت و سود و حق‌العمل</small></>}</div>:<div className="ref-manual-price-note">قیمت این محصول به‌صورت ثابت توسط فروشگاه تعیین شده است.</div>}
+            <div className="ref-detail-price">{selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'قیمت روز در حال به‌روزرسانی است':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</div><p className="ref-manual-price-note">قیمت نهایی پیش از ثبت سفارش بررسی می‌شود.</p>
             <div className="mahgold-selection-table-wrap mahgold-detail-table-wrap">
               <table className="mahgold-selection-table mahgold-detail-table" aria-label="مشخصات و انتخاب این محصول">
-                <thead><tr><th>خرید</th><th>قیمت</th><th>اجرت</th><th>ویژگی</th><th>وزن</th><th>موجودی</th><th>محصول</th></tr></thead>
+                <thead><tr><th>خرید</th><th>قیمت</th><th>وزن</th><th>وضعیت</th><th>محصول</th></tr></thead>
                 <tbody><tr>
                   <td><button className="mahgold-select-row-button mahgold-gold-shine" disabled={Number(selectedProduct.stock||0)<1||dataStatus!=='connected'||(selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>انتخاب</button></td>
                   <td className="mahgold-table-price">{selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'در انتظار نرخ':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</td>
-                  <td>{selectedProduct.pricing_mode==='auto'&&isFreshLiveQuote(quote)?money(priceBreakdown(selectedProduct,quote).labor)+' تومان':'طبق قیمت ثبت‌شده'}</td>
-                  <td>{selectedProduct.description||selectedProduct.category||'طلای منتخب'}</td>
                   <td>{gram(selectedProduct.weight_grams)}</td>
                   <td><span className={Number(selectedProduct.stock||0)>0?'mahgold-stock-yes':'mahgold-stock-no'}>{Number(selectedProduct.stock||0)>0?'موجود':'ناموجود'}</span></td>
                   <td><b className="mahgold-table-product">{selectedProduct.name}</b></td>
@@ -631,7 +632,7 @@ export default function App() {
         <h2 className="my-4 text-xl font-semibold">درخواست سفارش ثبت شد</h2>
         <p className="mb-2 text-sm">شماره سفارش: <b>{money(orderResult.order_number)}</b></p>
         <p className="mb-3 text-sm">مبلغ: <b>{money(orderResult.total_toman)} تومان</b></p>
-        {Array.isArray(orderResult.items)&&orderResult.items.length>0&&<div className="mb-5 max-h-64 overflow-y-auto rounded-xl border border-gold/20 p-3 text-right text-xs"><b className="mb-2 block">ریز فاکتور سفارش</b>{orderResult.items.map((item,index)=><div key={index} className="mb-3 border-b border-gold/10 pb-3 last:mb-0 last:border-0"><strong className="mb-1 block">{item.product_name} × {money(item.quantity)}</strong>{item.pricing_mode==='auto'?<><span className="block">اصل طلا: {money(item.gold_value_toman)} تومان</span><span className="block">اجرت ساخت: {money(item.labor_toman)} تومان</span><span className="block">سود فروشنده: {money(item.seller_profit_toman)} تومان</span><span className="block">حق‌العمل: {money(item.commission_toman)} تومان</span><span className="block">مالیات: {money(item.vat_toman)} تومان</span></>:<span className="block">قیمت‌گذاری دستی</span>}<b className="mt-1 block">جمع ردیف: {money(item.line_total_toman)} تومان</b></div>)}</div>}
+        {Array.isArray(orderResult.items)&&orderResult.items.length>0&&<div className="mb-5 max-h-64 overflow-y-auto rounded-xl border border-gold/20 p-3 text-right text-xs"><b className="mb-2 block">خلاصه سفارش</b>{orderResult.items.map((item,index)=><div key={index} className="mb-3 flex items-center justify-between gap-3 border-b border-gold/10 pb-3 last:mb-0 last:border-0"><strong>{item.product_name} × {money(item.quantity)}</strong><b>{money(item.line_total_toman)} تومان</b></div>)</div>}
         <button className="h-11 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" onClick={()=>setOrderResult(null)}>متوجه شدم</button>
       </section>
     </div>}
