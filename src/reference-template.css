@@ -444,3 +444,45 @@ button,input,select,textarea{font:inherit}
 @media(prefers-reduced-motion:reduce){
   .mahgold-product-page,.mahgold-product-page-info,.mahgold-product-page-gallery{animation:none!important;transform:none!important}
 }
+
+
+/* Mahgold calm luxury product-page reveal */
+.mahgold-product-page{
+  animation:mahgold-calm-reveal .24s ease-out both!important;
+  transform:none!important;
+  filter:none!important;
+  will-change:opacity;
+}
+.mahgold-product-page-info,
+.mahgold-product-page-gallery{
+  animation:none!important;
+  transform:none!important;
+  filter:none!important;
+}
+.mahgold-product-page-head{
+  position:relative;
+  overflow:hidden;
+}
+.mahgold-product-page-head:after{
+  content:"";
+  position:absolute;
+  top:0;
+  right:-35%;
+  width:24%;
+  height:1px;
+  pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(204,166,95,.8),transparent);
+  animation:mahgold-gold-glint .85s .08s ease-out both;
+}
+@keyframes mahgold-calm-reveal{
+  from{opacity:0}
+  to{opacity:1}
+}
+@keyframes mahgold-gold-glint{
+  from{right:-35%;opacity:0}
+  25%{opacity:.8}
+  to{right:110%;opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .mahgold-product-page,.mahgold-product-page-head:after{animation:none!important}
+}
