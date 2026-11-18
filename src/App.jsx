@@ -172,6 +172,8 @@ export default function App() {
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
   const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||window.location.pathname==='/admin'||window.location.pathname==='/admin/'||window.location.hash==='#mahgold-control');
 
+  useEffect(()=>{if(!selectedProduct)return;const previousOverflow=document.body.style.overflow;document.body.style.overflow='hidden';const onKeyDown=event=>{if(event.key==='Escape')setSelectedProduct(null);};window.addEventListener('keydown',onKeyDown);return()=>{document.body.style.overflow=previousOverflow;window.removeEventListener('keydown',onKeyDown);};},[selectedProduct]);
+
   const displaySlides=useMemo(()=>{const source=Array.isArray(siteContent?.slides)?siteContent.slides:(Array.isArray(siteContent?.specials)?siteContent.specials.map(s=>({active:true,eyebrow:s?.kicker||'',title:s?.title||'',description:s?.sub||'',button:'مشاهده محصولات',image:s?.image||'',category:s?.category||'طلای زینتی'})):[]);const rows=source.filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
   const displayTiles=useMemo(()=>{const saved=Array.isArray(siteContent?.tiles)?siteContent.tiles:[];const legacyImages=siteContent?.categoryImages&&typeof siteContent.categoryImages==='object'&&!Array.isArray(siteContent.categoryImages)?siteContent.categoryImages:{};return displayTileDefaults.map(tile=>{const savedTile=saved.find(item=>item&&item.name===tile.name)||{};return {...tile,...savedTile,image:savedTile.image||legacyImages[tile.name]||tile.image};});},[siteContent]);
   useEffect(()=>{setActiveSlide(index=>Math.min(index,displaySlides.length-1));},[displaySlides.length]);
@@ -588,18 +590,20 @@ export default function App() {
       </form>
     </div>}
 
-    {selectedProduct&&<div className="ref-overlay" onClick={()=>setSelectedProduct(null)}>
-      <section className="ref-dialog ref-dialog-wide" onClick={e=>e.stopPropagation()}>
-        <div className="ref-dialog-head"><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span><button className="ref-close" aria-label="بستن" onClick={()=>setSelectedProduct(null)}><X/></button></div>
+    {selectedProduct&&<div className="ref-overlay ref-product-overlay" onClick={()=>setSelectedProduct(null)}>
+      <section className="ref-dialog ref-dialog-wide ref-product-dialog" role="dialog" aria-modal="true" aria-labelledby="mahgold-product-detail-title" onClick={e=>e.stopPropagation()}>
+        <div className="ref-dialog-head"><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span><button className="ref-close" aria-label="بستن جزئیات محصول" onClick={()=>setSelectedProduct(null)}><X/></button></div>
         <div className="grid gap-6 md:grid-cols-2">
-          <ProductImage product={selectedProduct} className="ref-product-modal-image"/>
+          <div className="ref-product-visual"><ProductImage product={selectedProduct} className="ref-product-modal-image"/><span className={'ref-stock-pill '+(Number(selectedProduct.stock||0)>0?'available':'unavailable')}>{Number(selectedProduct.stock||0)>0?'موجود در انبار':'ناموجود'}</span></div>
           <div className="ref-product-modal-copy">
-            <span className="text-xs text-muted-foreground">{selectedProduct.category}</span>
-            <h2>{selectedProduct.name}</h2>
+            <span className="ref-product-category">{selectedProduct.category||'محصول مه‌گلد'}</span>
+            <h2 id="mahgold-product-detail-title">{selectedProduct.name}</h2>
             <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
-            <div className="grid gap-2 text-xs text-muted-foreground"><span>وزن: {gram(selectedProduct.weight_grams)}</span><span>عیار: {money(selectedProduct.karat||18)}</span><span>موجودی: {money(selectedProduct.stock||0)}</span></div>
-            {selectedProduct.pricing_mode==='auto'&&<div className="ref-price-breakdown"><b>جزئیات محاسبه قیمت</b>{!isFreshLiveQuote(quote)?<span>نرخ زنده و تازه در دسترس نیست؛ قیمت نهایی تا دریافت نرخ معتبر قابل تأیید نیست.</span>:<>{(()=>{const x=priceBreakdown(selectedProduct,quote);return <><span>اصل طلا: {money(x.base)} تومان</span><span>اجرت ساخت: {money(x.labor)} تومان</span><span>سود فروشنده: {money(x.profit)} تومان</span>{x.commission>0&&<span>حق‌العمل: {money(x.commission)} تومان</span>}<span>مالیات: {money(x.tax)} تومان</span></>;})()}<small>مبنای نرخ: نرخ زنده طلای ۱۸ عیار</small></>}</div>}<strong className="ref-detail-price">{selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'قیمت تا دریافت نرخ زنده قابل تأیید نیست':<>{money(selectedProduct.price_toman)} تومان</>}</strong>
-            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1||(selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
+            <div className="ref-product-specs"><div><small>وزن</small><b>{gram(selectedProduct.weight_grams)}</b></div><div><small>عیار</small><b>{money(selectedProduct.karat||18)}</b></div><div><small>موجودی</small><b>{money(selectedProduct.stock||0)} عدد</b></div></div>
+            {selectedProduct.pricing_mode==='auto'?<div className="ref-price-breakdown"><b>ریز محاسبه قیمت</b>{!isFreshLiveQuote(quote)?<span className="ref-price-warning">نرخ زنده و تازه در دسترس نیست؛ قیمت نهایی تا دریافت نرخ معتبر قابل تأیید نیست.</span>:<>{(()=>{const x=priceBreakdown(selectedProduct,quote);return <><span><i>اصل طلا</i><b>{money(x.base)} تومان</b></span><span><i>اجرت ساخت</i><b>{money(x.labor)} تومان</b></span><span><i>سود فروشنده</i><b>{money(x.profit)} تومان</b></span>{x.commission>0&&<span><i>حق‌العمل</i><b>{money(x.commission)} تومان</b></span>}<span><i>مالیات</i><b>{money(x.tax)} تومان</b></span></>;})()}<small>مبنای محاسبه: نرخ زنده طلای ۱۸ عیار · مالیات بر اجرت و سود و حق‌العمل</small></>}</div>:<div className="ref-manual-price-note">قیمت این محصول به‌صورت ثابت توسط فروشگاه تعیین شده است.</div>}
+            <div className="ref-product-purchase"><strong className="ref-detail-price">{selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'قیمت در انتظار نرخ معتبر':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</strong>
+              <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1||dataStatus!=='connected'||(selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>{Number(selectedProduct.stock||0)>0?'افزودن به سبد خرید':'فعلاً ناموجود'} <ShoppingBag className="mr-2 inline" size={16}/></button>
+            </div>
           </div>
         </div>
       </section>
