@@ -414,3 +414,33 @@ button,input,select,textarea{font:inherit}
 @keyframes mahgold-product-copy-in{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
 @media(max-width:760px){.mahgold-product-page-head{padding:10px 12px}.mahgold-page-back,.mahgold-page-cart{min-height:39px;padding:7px 9px;font-size:10px}.mahgold-product-brand{font-size:11px}.mahgold-product-page-content{grid-template-columns:1fr;gap:22px;width:calc(100% - 26px);margin:18px auto 42px}.mahgold-product-page-gallery{position:relative;top:auto;border-radius:22px}.mahgold-product-page-image{min-height:270px;padding:12px}.mahgold-product-page-photo,.mahgold-product-page-photo img{min-height:250px;max-height:360px}.mahgold-product-page-info{padding:0 2px}.mahgold-product-page-info h1{font-size:25px}.mahgold-product-price-panel{margin:18px 0;padding:16px}.mahgold-product-spec-panel{margin-top:18px}}
 @media(prefers-reduced-motion:reduce){.mahgold-product-page,.mahgold-product-page-info{animation:none}.mahgold-page-back,.mahgold-page-cart{transition:none}}
+
+
+/* Mahgold refined product-page entrance */
+.mahgold-product-page{
+  animation:mahgold-refined-page-in .34s cubic-bezier(.22,.7,.25,1) both!important;
+  transform-origin:50% 42%;
+  will-change:opacity,transform;
+}
+.mahgold-product-page-info{
+  animation:mahgold-refined-content-in .42s .04s cubic-bezier(.22,.7,.25,1) both!important;
+}
+.mahgold-product-page-gallery{
+  animation:mahgold-refined-image-in .46s .02s cubic-bezier(.22,.7,.25,1) both;
+}
+.mahgold-product-page-glow{opacity:.62}
+@keyframes mahgold-refined-page-in{
+  from{opacity:0;transform:scale(.992)}
+  to{opacity:1;transform:scale(1)}
+}
+@keyframes mahgold-refined-content-in{
+  from{opacity:0;transform:translateY(7px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes mahgold-refined-image-in{
+  from{opacity:.55;transform:scale(.985)}
+  to{opacity:1;transform:scale(1)}
+}
+@media(prefers-reduced-motion:reduce){
+  .mahgold-product-page,.mahgold-product-page-info,.mahgold-product-page-gallery{animation:none!important;transform:none!important}
+}
