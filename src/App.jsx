@@ -496,19 +496,25 @@ export default function App() {
               <option value="newest">جدیدترین</option><option value="cheap">ارزان‌ترین</option><option value="expensive">گران‌ترین</option>
             </select></label>
           </div>
-          <div className="mahgold-selection-table-wrap">
-            <table className="mahgold-selection-table" aria-label="فهرست انتخاب محصولات مه‌گلد">
-              <thead><tr><th>خرید</th><th>قیمت</th><th>اجرت</th><th>ویژگی</th><th>وزن</th><th>موجودی</th><th>محصول</th></tr></thead>
-              <tbody>{filtered.map(product=><tr key={product.id}>
-                <td><button className="mahgold-select-row-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}>انتخاب</button></td>
-                <td className="mahgold-table-price">{product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'در انتظار نرخ':<>{money(product.price_toman)} <small>تومان</small></>}</td>
-                <td>{product.labor_mode==='fixed'?money(product.labor_value)+' تومان':product.labor_mode==='per_gram'?money(product.labor_value)+' / گرم':(Number(product.labor_value||0).toLocaleString('fa-IR')+'٪')}</td>
-                <td>{product.tag||((product.karat?money(product.karat)+' عیار':'')||'—')}</td>
-                <td>{product.weight_grams?gram(product.weight_grams):'—'}</td>
-                <td><span className={Number(product.stock||0)>0?'mahgold-stock-yes':'mahgold-stock-no'}>{Number(product.stock||0)>0?'موجود':'ناموجود'}</span></td>
-                <td><button className="mahgold-table-product" onClick={()=>setSelectedProduct(product)}>{product.name}</button></td>
-              </tr>)}</tbody>
-            </table>
+          <div className="ref-product-grid">
+            {filtered.map((product,index)=><article className="ref-product-card ref-product-select-card group" key={product.id} style={{'--card-order':index}}>
+              <button className="ref-product-card-visual" onClick={()=>setSelectedProduct(product)} aria-label={'مشاهده '+product.name}>
+                <ProductImage product={product}/>
+                <span className="ref-product-visual-shade"/>
+                <span className="ref-product-quickview">مشاهده جزئیات <ArrowLeft size={13}/></span>
+                <span className="ref-product-stock-tag">{Number(product.stock||0)>0?'موجود':'ناموجود'}</span>
+                <span className="ref-product-image-sparkle" aria-hidden="true">✦</span>
+              </button>
+              <div className="ref-product-body ref-product-select-body">
+                <div className="ref-product-card-meta"><span>{product.category||'مجموعه مه‌گلد'}</span><span className="ref-product-weight">{product.weight_grams?gram(product.weight_grams):'طلای منتخب'}</span></div>
+                <button className="ref-product-name line-clamp-1 text-right" onClick={()=>setSelectedProduct(product)}>{product.name}</button>
+                <div className="ref-product-karat">{product.karat?money(product.karat)+' عیار':'جزئیات و مشخصات محصول'}</div>
+                <div className="ref-product-bottom ref-product-select-bottom">
+                  <div className="ref-product-price-wrap"><small>قیمت محصول</small><strong>{product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'در انتظار نرخ':<>{money(product.price_toman)} <small>تومان</small></>}</strong></div>
+                  <button aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button ref-product-add-glow" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}><Plus size={18}/></button>
+                </div>
+              </div>
+            </article>)}
           </div>
           {dataStatus==='loading'&&<div className="ref-state">در حال دریافت محصولات مه‌گلد…</div>}
           {dataStatus==='error'&&<div className="ref-state">{dataMessage}</div>}
@@ -599,8 +605,19 @@ export default function App() {
             <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
             <div className="ref-product-specs"><div><small>وزن</small><b>{gram(selectedProduct.weight_grams)}</b></div><div><small>عیار</small><b>{money(selectedProduct.karat||18)}</b></div><div><small>موجودی</small><b>{money(selectedProduct.stock||0)} عدد</b></div></div>
             {selectedProduct.pricing_mode==='auto'?<div className="ref-price-breakdown"><b>ریز محاسبه قیمت</b>{!isFreshLiveQuote(quote)?<span className="ref-price-warning">نرخ زنده و تازه در دسترس نیست؛ قیمت نهایی تا دریافت نرخ معتبر قابل تأیید نیست.</span>:<>{(()=>{const x=priceBreakdown(selectedProduct,quote);return <><span><i>اصل طلا</i><b>{money(x.base)} تومان</b></span><span><i>اجرت ساخت</i><b>{money(x.labor)} تومان</b></span><span><i>سود فروشنده</i><b>{money(x.profit)} تومان</b></span>{x.commission>0&&<span><i>حق‌العمل</i><b>{money(x.commission)} تومان</b></span>}<span><i>مالیات</i><b>{money(x.tax)} تومان</b></span></>;})()}<small>مبنای محاسبه: نرخ زنده طلای ۱۸ عیار · مالیات بر اجرت و سود و حق‌العمل</small></>}</div>:<div className="ref-manual-price-note">قیمت این محصول به‌صورت ثابت توسط فروشگاه تعیین شده است.</div>}
-            <div className="ref-product-purchase"><strong className="ref-detail-price">{selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'قیمت در انتظار نرخ معتبر':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</strong>
-              <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1||dataStatus!=='connected'||(selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>{Number(selectedProduct.stock||0)>0?'افزودن به سبد خرید':'فعلاً ناموجود'} <ShoppingBag className="mr-2 inline" size={16}/></button>
+            <div className="mahgold-selection-table-wrap mahgold-detail-table-wrap">
+              <table className="mahgold-selection-table mahgold-detail-table" aria-label="مشخصات و انتخاب این محصول">
+                <thead><tr><th>خرید</th><th>قیمت</th><th>اجرت</th><th>ویژگی</th><th>وزن</th><th>موجودی</th><th>محصول</th></tr></thead>
+                <tbody><tr>
+                  <td><button className="mahgold-select-row-button" disabled={Number(selectedProduct.stock||0)<1||dataStatus!=='connected'||(selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>انتخاب</button></td>
+                  <td className="mahgold-table-price">{selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'در انتظار نرخ':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</td>
+                  <td>{selectedProduct.pricing_mode==='auto'&&isFreshLiveQuote(quote)?money(priceBreakdown(selectedProduct,quote).labor)+' تومان':'طبق قیمت ثبت‌شده'}</td>
+                  <td>{selectedProduct.description||selectedProduct.category||'طلای منتخب'}</td>
+                  <td>{gram(selectedProduct.weight_grams)}</td>
+                  <td><span className={Number(selectedProduct.stock||0)>0?'mahgold-stock-yes':'mahgold-stock-no'}>{Number(selectedProduct.stock||0)>0?'موجود':'ناموجود'}</span></td>
+                  <td><b className="mahgold-table-product">{selectedProduct.name}</b></td>
+                </tr></tbody>
+              </table>
             </div>
           </div>
         </div>
