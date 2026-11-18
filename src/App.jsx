@@ -295,20 +295,21 @@ export default function App() {
     if(!supabase||!cart.length)return;
     setCheckoutBusy(true);
     try{
-      if(!orderIdempotencyKeyRef.current){
+      const orderPayload={
+        customer_name:customer.name,
+        customer_phone:toLatinDigits(customer.phone),
+        customer_email:customer.email||null,
+        shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
+        customer_note:customer.note||'',
+        items:cart.map(item=>({product_id:item.id,quantity:item.qty,expected_price_toman:item.price_toman}))
+      };
+      const payloadFingerprint=JSON.stringify(orderPayload);
+      if(!orderIdempotencyKeyRef.current||orderIdempotencyKeyRef.current.fingerprint!==payloadFingerprint){
         if(!globalThis.crypto?.randomUUID)throw new Error('مرورگر شما از ثبت امن سفارش پشتیبانی نمی‌کند؛ صفحه را در مرورگر به‌روز باز کنید.');
-        orderIdempotencyKeyRef.current=globalThis.crypto.randomUUID();
+        orderIdempotencyKeyRef.current={fingerprint:payloadFingerprint,key:globalThis.crypto.randomUUID()};
       }
       const {data,error}=await supabase.functions.invoke('mahgold-create-order',{
-        body:{
-          customer_name:customer.name,
-          customer_phone:toLatinDigits(customer.phone),
-          customer_email:customer.email||null,
-          shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
-          customer_note:customer.note||'',
-          idempotency_key:orderIdempotencyKeyRef.current,
-          items:cart.map(item=>({product_id:item.id,quantity:item.qty,expected_price_toman:item.price_toman}))
-        }
+        body:{...orderPayload,idempotency_key:orderIdempotencyKeyRef.current.key}
       });
       if(error)throw error;
       if(!data?.data)throw new Error(data?.error||'پاسخ معتبری از سرور دریافت نشد؛ وضعیت سفارش را بررسی کنید.');
