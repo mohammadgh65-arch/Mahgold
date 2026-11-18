@@ -1,7 +1,7 @@
 import { MAHGOLD_LOGO } from './mahgold-brand';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight,
+  Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight, ChevronDown,
   ShieldCheck, Gift, Headphones, Plus, Minus, UserRound, LogOut,
   House, LayoutGrid, Phone, MapPin, PackageCheck
 } from 'lucide-react';
@@ -165,6 +165,8 @@ export default function App() {
   const [products,setProducts]=useState([]);
   const [dbCategories,setDbCategories]=useState([]);
   const [quote,setQuote]=useState(null);
+  const [coinQuotes,setCoinQuotes]=useState([]);
+  const [coinsOpen,setCoinsOpen]=useState(false);
   const [siteContent,setSiteContent]=useState(null);
   const [dataStatus,setDataStatus]=useState(isSupabaseConfigured?'loading':'error');
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
@@ -203,7 +205,8 @@ export default function App() {
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
             .eq('is_active',true).order('sort_order',{ascending:true}),
           supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
-            .eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle()
+            .in('symbol',['gold_18k','coin_emami','coin_bahar','coin_nim','coin_rob','coin_gerami'])
+            .order('observed_at',{ascending:false})
         ]);
         if(!active)return;
         if(productResult.error){setDataStatus('error');setProducts([]);setDataMessage('دریافت محصولات ناموفق بود؛ برای جلوگیری از نمایش قیمت نادرست، اطلاعات نمونه نمایش داده نمی‌شود.');}
@@ -213,7 +216,11 @@ export default function App() {
           setDataMessage(rows.length?'محصولات و قیمت‌ها مستقیماً از پایگاه داده مه‌گلد دریافت می‌شوند.':'اتصال برقرار است؛ هنوز محصول فعالی برای نمایش ثبت نشده است.');
         }
         if(!categoryResult.error)setDbCategories(categoryResult.data||[]);
-        if(!quoteResult.error&&quoteResult.data)setQuote(quoteResult.data);
+        if(!quoteResult.error){
+          const marketRows=quoteResult.data||[];
+          setQuote(marketRows.find(row=>row.symbol==='gold_18k')||null);
+          setCoinQuotes(marketRows.filter(row=>row.symbol!=='gold_18k'));
+        }
       }catch{
         if(!active)return;
         setDataStatus('error');setProducts([]);setDataMessage('ارتباط با پایگاه داده برقرار نشد.');
@@ -227,12 +234,14 @@ export default function App() {
     const refreshMarketData=async()=>{
       const [quoteResult,productResult]=await Promise.all([
         supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
-          .eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle(),
+          .in('symbol',['gold_18k','coin_emami','coin_bahar','coin_nim','coin_rob','coin_gerami']).order('observed_at',{ascending:false}),
         supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active,created_at,tag')
           .eq('is_active',true).order('created_at',{ascending:false})
       ]);
       if(!active)return;
-      setQuote(quoteResult.error?null:quoteResult.data||null);
+      const marketRows=quoteResult.error?[]:quoteResult.data||[];
+      setQuote(marketRows.find(row=>row.symbol==='gold_18k')||null);
+      setCoinQuotes(marketRows.filter(row=>row.symbol!=='gold_18k'));
       if(!productResult.error)setProducts(productResult.data||[]);
     };
     const timer=setInterval(refreshMarketData,60000);
@@ -372,6 +381,37 @@ export default function App() {
         <a href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a><a href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a><a href="#market-rates" onClick={()=>setMenuOpen(false)}>تابلو نرخ آنلاین</a><a href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a>
         <button className="text-right" onClick={()=>{setAccountOpen(true);setMenuOpen(false);}}>ورود / ثبت‌نام</button>
       </nav>}
+      <section aria-label="تابلو نرخ آنلاین طلا و سکه" className="mahgold-glass-market" id="market-rates">
+        <div className="mahgold-glass-inner">
+          <div className="mahgold-glass-gold">
+            <span className="mahgold-glass-live" aria-hidden="true"/>
+            <span className="mahgold-glass-label">طلای ۱۸ عیار</span>
+            <strong>{quote?.price_toman&&Number(quote.price_toman)>0?money(quote.price_toman):'—'} <small>تومان</small></strong>
+            <span className={isFreshLiveQuote(quote)?'mahgold-glass-state live':'mahgold-glass-state'}>{isFreshLiveQuote(quote)?'زنده':'آخرین نرخ'}</span>
+          </div>
+          <button type="button" className={'mahgold-coins-toggle '+(coinsOpen?'is-open':'')} aria-expanded={coinsOpen} aria-controls="mahgold-coins-panel" onClick={()=>setCoinsOpen(v=>!v)}>
+            <span>قیمت سکه‌ها</span><ChevronDown size={15}/>
+          </button>
+        </div>
+        {coinsOpen&&<div className="mahgold-coins-panel" id="mahgold-coins-panel">
+          {[
+            ['coin_emami','سکه امامی'],
+            ['coin_bahar','سکه بهار آزادی'],
+            ['coin_nim','نیم‌سکه'],
+            ['coin_rob','ربع‌سکه'],
+            ['coin_gerami','سکه گرمی']
+          ].map(([symbol,label])=>{
+            const item=coinQuotes.find(row=>row.symbol===symbol);
+            const fresh=isFreshLiveQuote(item);
+            return <div className="mahgold-coin-item" key={symbol}>
+              <span>{label}</span>
+              <strong>{item?.price_toman&&Number(item.price_toman)>0?money(item.price_toman):'—'} <small>تومان</small></strong>
+              <em className={fresh?'live':''}>{fresh?'زنده':item?'آخرین نرخ':'دریافت نشده'}</em>
+            </div>;
+          })}
+          <div className="mahgold-coins-foot">نرخ‌ها به تومان · منبع: ارزهاام · به‌روزرسانی خودکار</div>
+        </div>}
+      </section>
     </header>
 
 
@@ -403,30 +443,7 @@ export default function App() {
         </div>
       </section>
 
-    <section aria-label="تابلو نرخ آنلاین طلا" className="mahgold-market-board" id="market-rates">
-      <div className="mahgold-market-inner">
-        <div className="mahgold-market-heading">
-          <span className="mahgold-market-pulse" aria-hidden="true"/>
-          <div><b>تابلو نرخ آنلاین</b><small>بازار طلا · مه‌گلد</small></div>
-        </div>
-        <div className="mahgold-market-main">
-          <span className="mahgold-market-label">هر گرم طلای ۱۸ عیار</span>
-          <strong className="mahgold-market-price" aria-live="polite">
-            {quote?.price_toman&&Number(quote.price_toman)>0?money(quote.price_toman):'—'}
-            <small>تومان</small>
-          </strong>
-        </div>
-        <div className="mahgold-market-meta">
-          <span className={isFreshLiveQuote(quote)?'mahgold-market-status is-live':'mahgold-market-status is-stale'}>
-            <i aria-hidden="true"/>{isFreshLiveQuote(quote)?'نرخ زنده و معتبر':quote?'آخرین نرخ ثبت‌شده · غیرزنده':'در انتظار دریافت نرخ'}
-          </span>
-          <span className="mahgold-market-updated">
-            {quote?.observed_at?('آخرین دریافت: '+new Date(quote.observed_at).toLocaleString('fa-IR',{timeZone:'Asia/Tehran',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'long'})):'زمان دریافت ثبت نشده'}
-          </span>
-          <span className="mahgold-market-source">{quote?.source==='arzhaam'?'منبع: ارزهاام':'منبع: '+(quote?.source||'—')}</span>
-        </div>
-      </div>
-    </section>
+
 
       <section className="mx-auto max-w-7xl scroll-mt-20 px-4 py-16 md:px-7 md:py-24" id="categories">
         <div className="mb-8 flex items-end justify-between gap-5">
