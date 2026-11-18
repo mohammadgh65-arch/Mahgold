@@ -1,0 +1,46 @@
+name: Mahgold storefront private preview
+
+on:
+  push:
+    branches:
+      - mahgold-admin-repair-2026-11-15
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build standalone storefront preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install exact locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Build storefront
+        env:
+          VITE_SUPABASE_URL: https://nzvvvpbwavaodhxrnkdr.supabase.co
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || 'sb_publishable_8UgFkQuDJNNeez2O1CNv3Q_Jf44PrL9' }}
+        run: npm run build
+      - name: Assemble standalone storefront HTML
+        run: node scripts/create-storefront-preview.mjs
+      - name: Verify standalone output
+        run: |
+          test -s dist/index.html
+          ! grep -Eq '<script[^>]+src=.*assets/|<link[^>]+href=.*assets/.*\\.css' dist/index.html
+          grep -q 'مه‌گلد' dist/index.html
+          echo "Standalone storefront verified: $(wc -c < dist/index.html) bytes"
+      - name: Upload private storefront preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: mahgold-storefront-private-preview
+          path: dist/index.html
+          if-no-files-found: error
+          retention-days: 14
