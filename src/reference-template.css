@@ -201,3 +201,19 @@ button,input,select,textarea{font:inherit}
   .mahgold-glass-state{display:none}
   .mahgold-coins-toggle{padding-inline:8px}
 }
+
+
+/* Keep the same logo aspect ratio in header and footer */
+.ref-brand img{
+  width:104px;
+  height:36px;
+  object-fit:contain;
+  object-position:center;
+  flex:none;
+}
+@media(max-width:700px){
+  .ref-brand img{
+    width:92px;
+    height:32px;
+  }
+}
