@@ -265,6 +265,7 @@ export default function App() {
       return new Date(b.created_at||0)-new Date(a.created_at||0);
     });
   },[products,category,query,sortMode]);
+  const newArrivals=useMemo(()=>products.slice(0,4),[products]);
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const cartTotal=cart.reduce((sum,item)=>sum+Number(item.price_toman||0)*Number(item.qty||0),0);
 
@@ -459,6 +460,21 @@ export default function App() {
           <article className="ref-service-card"><ShieldCheck/><div><b>اصالت و شفافیت</b><small>اطلاعات روشن برای انتخاب آگاهانه</small></div></article>
           <article className="ref-service-card"><Gift/><div><b>بسته‌بندی ویژه</b><small>تجربه‌ای شایسته هدیه دادن</small></div></article>
           <article className="ref-service-card"><Headphones/><div><b>همراهی تا انتخاب</b><small>پشتیبانی در مسیر خرید</small></div></article>
+        </div>
+      </section>
+
+      <section className="mahgold-arrivals-section" aria-label="جدیدترین محصولات">
+        <div className="mx-auto max-w-7xl px-4 md:px-7">
+          <div className="mahgold-section-heading">
+            <div><span className="eyebrow text-gold-deep">JUST ARRIVED</span><h2>تازه‌های مه‌گلد</h2><p>جدیدترین انتخاب‌هایی که به مجموعه اضافه شده‌اند</p></div>
+            <button onClick={()=>{setCategory('همه محصولات');setSortMode('newest');document.getElementById('shop')?.scrollIntoView({behavior:'smooth'});}}>مشاهده همه محصولات <ArrowLeft size={15}/></button>
+          </div>
+          {dataStatus==='loading'?<div className="mahgold-arrivals-empty">در حال دریافت محصولات…</div>:newArrivals.length>0?<div className="mahgold-arrivals-grid">
+            {newArrivals.map(product=><article className="mahgold-arrival-card" key={product.id}>
+              <button className="mahgold-arrival-image" onClick={()=>setSelectedProduct(product)} aria-label={'مشاهده '+product.name}><ProductImage product={product}/></button>
+              <div className="mahgold-arrival-info"><span>{product.category}</span><button onClick={()=>setSelectedProduct(product)}>{product.name}</button><small>{product.weight_grams?gram(product.weight_grams):'جزئیات محصول'}</small><div><strong>{product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'نیازمند نرخ معتبر':<>{money(product.price_toman)} <small>تومان</small></>}</strong><button aria-label={'افزودن '+product.name+' به سبد'} disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}><Plus size={16}/></button></div></div>
+            </article>)}
+          </div>:<div className="mahgold-arrivals-empty">{dataStatus==='error'?'برای نمایش محصولات، اتصال فروشگاه را بررسی کنید.':'محصول تازه‌ای برای نمایش ثبت نشده است.'}</div>}
         </div>
       </section>
 
