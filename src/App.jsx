@@ -201,12 +201,12 @@ export default function App() {
     const params=new URLSearchParams(window.location.search);
     params.set('product',String(product.id));
     window.history.pushState({...(window.history.state||{}),mahgoldProductId:String(product.id)},'','?'+params.toString());
-    openProduct(product);
+    setSelectedProduct(product);
     window.scrollTo({top:0,behavior:'smooth'});
   };
   const closeProduct=()=>{
     if(new URLSearchParams(window.location.search).has('product')) window.history.back();
-    else closeProduct();
+    else setSelectedProduct(null);
   };
   useEffect(()=>{
     const syncProductRoute=()=>{
