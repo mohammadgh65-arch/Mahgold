@@ -51,6 +51,7 @@ const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638
 const money = value => new Intl.NumberFormat('fa-IR').format(Math.round(Number(value || 0)));
 const isJewelryCategory = category => ['طلای زینتی','انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'].includes(category);
 const priceBreakdown = (p,q) => {const base=Number(p.weight_grams||0)*Number(q?.price_toman||0)*(Number(p.karat||18)/18);const mode=p.labor_mode||'percent',v=Number(p.labor_value||0);const labor=mode==='per_gram'?Number(p.weight_grams||0)*v:mode==='fixed'?v:base*v/100;const profit=(base+labor)*Number(p.seller_profit_percent??7)/100;const commission=(base+labor+profit)*Number(p.commission_percent||0)/100;const tax=(labor+profit+commission)*0.10;return {base,labor,profit,commission,tax,total:Math.round(base+labor+profit+commission+tax)};};
+const isFreshLiveQuote = q => {const t=q?.observed_at?Date.parse(q.observed_at):NaN;return q?.is_live===true&&Number.isFinite(t)&&Date.now()-t<=5*60*1000&&t<=Date.now()+60*1000&&Number(q?.price_toman)>0;};
 const gram = value => new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(Number(value || 0)) + ' گرم';
 const toLatinDigits = value => value.replace(/[۰-۹٠-٩]/g, d => {
   const fa='۰۱۲۳۴۵۶۷۸۹', ar='٠١٢٣٤٥٦٧٨٩';
@@ -279,6 +280,7 @@ export default function App() {
 
   const addToCart=product=>{
     if(!supabase||dataStatus!=='connected'||!product.id){setCheckoutError('اتصال فروشگاه برقرار نیست.');return;}
+    if(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)){setCheckoutError('قیمت این محصول فعلاً قابل تأیید نیست؛ نرخ زنده طلای ۱۸ عیار تازه نیست.');return;}
     setCart(old=>{
       const previous=old.find(item=>item.id===product.id);
       const nextQty=(previous?.qty||0)+1;
@@ -425,8 +427,8 @@ export default function App() {
                 <button className="ref-product-name line-clamp-1 text-right" onClick={()=>setSelectedProduct(product)}>{product.name}</button>
                 <div className="mt-0.5 text-[11px] text-muted-foreground">{[product.weight_grams?gram(product.weight_grams):null,product.karat?money(product.karat)+' عیار':null].filter(Boolean).join(' · ')}</div>
                 <div className="ref-product-bottom">
-                  <strong>{money(product.price_toman)} <small>تومان</small></strong>
-                  <button aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'} onClick={()=>addToCart(product)}><Plus size={17}/></button>
+                  <strong>{product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'قیمت موقتاً نامعتبر':<>{money(product.price_toman)} <small>تومان</small></>}</strong>
+                  <button aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}><Plus size={17}/></button>
                 </div>
               </div>
             </article>)}
@@ -519,7 +521,7 @@ export default function App() {
             <h2>{selectedProduct.name}</h2>
             <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
             <div className="grid gap-2 text-xs text-muted-foreground"><span>وزن: {gram(selectedProduct.weight_grams)}</span><span>عیار: {money(selectedProduct.karat||18)}</span><span>موجودی: {money(selectedProduct.stock||0)}</span></div>
-            {selectedProduct.pricing_mode==='auto'&&<div className="ref-price-breakdown"><b>جزئیات محاسبه قیمت</b>{(()=>{const x=priceBreakdown(selectedProduct,quote);return <><span>اصل طلا: {money(x.base)} تومان</span><span>اجرت ساخت: {money(x.labor)} تومان</span><span>سود فروشنده: {money(x.profit)} تومان</span>{x.commission>0&&<span>حق‌العمل: {money(x.commission)} تومان</span>}<span>مالیات: {money(x.tax)} تومان</span></>;})()}<small>مبنای نرخ: {quote?.is_live?'نرخ زنده':'آخرین نرخ ثبت‌شده به‌صورت دستی'} طلای ۱۸ عیار</small></div>}<strong className="ref-detail-price">{money(selectedProduct.price_toman)} تومان</strong>
+            {selectedProduct.pricing_mode==='auto'&&<div className="ref-price-breakdown"><b>جزئیات محاسبه قیمت</b>{!isFreshLiveQuote(quote)?<span>نرخ زنده و تازه در دسترس نیست؛ قیمت نهایی تا دریافت نرخ معتبر قابل تأیید نیست.</span>:<>{(()=>{const x=priceBreakdown(selectedProduct,quote);return <><span>اصل طلا: {money(x.base)} تومان</span><span>اجرت ساخت: {money(x.labor)} تومان</span><span>سود فروشنده: {money(x.profit)} تومان</span>{x.commission>0&&<span>حق‌العمل: {money(x.commission)} تومان</span>}<span>مالیات: {money(x.tax)} تومان</span></>;})()}<small>مبنای نرخ: نرخ زنده طلای ۱۸ عیار</small></div>}<strong className="ref-detail-price">{money(selectedProduct.price_toman)} تومان</strong>
             <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
           </div>
         </div>
