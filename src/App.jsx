@@ -198,15 +198,21 @@ export default function App() {
 
   const openProduct=(product)=>{
     if(!product?.id)return;
-    const params=new URLSearchParams(window.location.search);
-    params.set('product',String(product.id));
-    window.history.pushState({...(window.history.state||{}),mahgoldProductId:String(product.id)},'','?'+params.toString());
+    // Render the detail view first. Local file previews and some embedded browsers
+    // reject History API URL changes; that must never block the product page.
     setSelectedProduct(product);
+    try{
+      const params=new URLSearchParams(window.location.search);
+      params.set('product',String(product.id));
+      window.history.pushState({...(window.history.state||{}),mahgoldProductId:String(product.id)},'','?'+params.toString());
+    }catch(error){console.warn('Product route history is unavailable in this preview:',error);}
     window.scrollTo({top:0,behavior:'smooth'});
   };
   const closeProduct=()=>{
-    if(new URLSearchParams(window.location.search).has('product')) window.history.back();
-    else setSelectedProduct(null);
+    setSelectedProduct(null);
+    try{
+      if(new URLSearchParams(window.location.search).has('product'))window.history.back();
+    }catch(error){console.warn('Product route history is unavailable in this preview:',error);}
   };
   useEffect(()=>{
     const syncProductRoute=()=>{
