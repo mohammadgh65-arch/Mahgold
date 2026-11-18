@@ -288,3 +288,58 @@ button,input,select,textarea{font:inherit}
  .ref-product-purchase{position:sticky;bottom:-15px;z-index:3;margin:0 -15px -15px;padding:12px 15px calc(12px + env(safe-area-inset-bottom));background:rgba(255,252,246,.96);backdrop-filter:blur(18px);box-shadow:0 -8px 24px rgba(55,40,19,.08)}
  .ref-detail-price{font-size:21px}
 }
+
+
+/* Premium product discovery cards: luminous gold, editorial spacing and tactile hover */
+.ref-product-select-card{
+ position:relative;isolation:isolate;overflow:hidden;border:1px solid rgba(174,139,79,.2)!important;
+ border-radius:19px!important;background:linear-gradient(155deg,#fffefa 0%,#f8f3e9 100%)!important;
+ box-shadow:0 7px 24px rgba(61,43,18,.055),inset 0 1px 0 rgba(255,255,255,.95)!important;
+ transition:transform .32s cubic-bezier(.2,.75,.25,1),box-shadow .32s,border-color .32s!important;
+ animation:mahgold-card-appear .55s both;animation-delay:calc(var(--card-order,0)*55ms)
+}
+.ref-product-select-card:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 50% 0%,rgba(215,177,105,.18),transparent 65%);transition:opacity .35s}
+.ref-product-select-card:hover{transform:translateY(-7px);border-color:rgba(180,139,68,.55)!important;box-shadow:0 18px 42px rgba(61,43,18,.12),0 0 0 1px rgba(203,166,96,.12)!important}
+.ref-product-select-card:hover:before{opacity:1}
+.ref-product-card-visual{position:relative;display:block;width:100%;overflow:hidden;text-align:right;isolation:isolate;background:radial-gradient(ellipse at 50% 40%,#fffdf8 0%,#f0e8d9 78%,#e8decb 100%)}
+.ref-product-card-visual:after{content:"";position:absolute;inset:12px;border:1px solid rgba(255,255,255,.5);border-radius:13px;pointer-events:none;opacity:.8}
+.ref-product-card-visual .ref-product-image{width:100%;aspect-ratio:1/1;overflow:hidden}
+.ref-product-card-visual .ref-product-image img{width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.75,.25,1),filter .5s}
+.ref-product-select-card:hover .ref-product-card-visual .ref-product-image img{transform:scale(1.075);filter:saturate(1.07) contrast(1.025)}
+.ref-product-visual-shade{position:absolute;inset:35% 0 0;background:linear-gradient(transparent,rgba(35,25,14,.44));opacity:0;transition:opacity .3s}
+.ref-product-quickview{position:absolute;bottom:22px;left:50%;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;transform:translate(-50%,8px);padding:9px 15px;border:1px solid rgba(255,255,255,.48);border-radius:999px;background:rgba(255,250,240,.91);backdrop-filter:blur(12px);color:#6f4e1e;font-size:10px;font-weight:750;opacity:0;transition:opacity .3s,transform .3s;box-shadow:0 5px 18px rgba(35,25,14,.12)}
+.ref-product-select-card:hover .ref-product-visual-shade,.ref-product-select-card:focus-within .ref-product-visual-shade{opacity:1}
+.ref-product-select-card:hover .ref-product-quickview,.ref-product-select-card:focus-within .ref-product-quickview{opacity:1;transform:translate(-50%,0)}
+.ref-product-stock-tag{position:absolute;top:17px;right:17px;padding:5px 10px;border:1px solid rgba(255,255,255,.55);border-radius:999px;background:rgba(255,253,248,.88);backdrop-filter:blur(10px);color:#47734f;font-size:9px;font-weight:750}
+.ref-product-stock-tag:where(:not(:empty)){box-shadow:0 3px 12px rgba(48,39,23,.06)}
+.ref-product-image-sparkle{position:absolute;left:18px;top:15px;color:#b18a4c;font-size:18px;opacity:.65;text-shadow:0 1px 9px rgba(255,255,255,.8)}
+.ref-product-select-body{display:grid;gap:7px;padding:14px 15px 15px!important}
+.ref-product-card-meta{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ref-product-card-meta>span:first-child{font-size:9px;color:#a17d48}
+.ref-product-weight{padding:4px 8px;border-radius:999px;background:rgba(187,151,89,.1);color:#8b7045;font-size:9px;white-space:nowrap}
+.ref-product-select-body .ref-product-name{font-size:13px;font-weight:750;color:#3d3020;transition:color .2s}
+.ref-product-select-card:hover .ref-product-name{color:#91692d}
+.ref-product-karat{font-size:10px;color:#9a8b73;min-height:16px}
+.ref-product-select-bottom{align-items:center;margin-top:5px;padding-top:11px;border-top:1px solid rgba(174,139,79,.16)}
+.ref-product-price-wrap{display:grid;gap:3px;min-width:0}
+.ref-product-price-wrap>small{font-size:9px;color:#99896f}
+.ref-product-price-wrap>strong{font-size:13px;color:#815b26;white-space:nowrap}
+.ref-product-price-wrap>strong small{font-size:9px;font-weight:500;color:#9b896c}
+.ref-product-add-glow{width:38px!important;height:38px!important;border:1px solid rgba(255,255,255,.7)!important;background:linear-gradient(145deg,#c9a568,#98703a)!important;color:white!important;box-shadow:0 5px 13px rgba(147,105,44,.24),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .22s,box-shadow .22s,filter .22s!important}
+.ref-product-add-glow:hover:not(:disabled){transform:translateY(-2px) scale(1.06);box-shadow:0 8px 19px rgba(147,105,44,.34);filter:brightness(1.07)}
+.ref-product-add-glow:disabled{filter:grayscale(.7);opacity:.4}
+.ref-product-card-visual:focus-visible,.ref-product-add-glow:focus-visible{outline:3px solid #b99051;outline-offset:3px}
+@keyframes mahgold-card-appear{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:700px){
+ .ref-product-select-card{border-radius:15px!important}
+ .ref-product-select-body{padding:10px 10px 12px!important;gap:6px}
+ .ref-product-card-meta>span:first-child{font-size:8px}
+ .ref-product-weight{font-size:8px;padding:3px 6px}
+ .ref-product-select-body .ref-product-name{font-size:11px}
+ .ref-product-price-wrap>strong{font-size:11px}
+ .ref-product-add-glow{width:34px!important;height:34px!important}
+ .ref-product-quickview{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ .ref-product-select-card,.ref-product-card-visual .ref-product-image img,.ref-product-quickview{animation:none!important;transition:none!important}
+}
