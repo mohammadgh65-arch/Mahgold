@@ -23,3 +23,26 @@
 
 /* Customer account dialog */
 .account-drawer{padding-bottom:34px}.account-form,.account-panel{display:flex;flex-direction:column;gap:14px;padding-top:12px}.account-form label{display:flex;flex-direction:column;gap:7px;color:#d8c9a8;font-size:12px}.account-form input{width:100%;min-height:44px;background:#17140f;border:1px solid #5b492d;color:#f6ead0;padding:10px 12px;outline:none;border-radius:3px}.account-form input:focus{border-color:#d3b36d;box-shadow:0 0 0 2px #d3b36d22}.account-form .primary-btn,.account-panel .primary-btn{justify-content:center;border:0;cursor:pointer;font:inherit}.account-form .primary-btn:disabled{opacity:.55;cursor:wait}.account-tabs{display:flex;border-bottom:1px solid #51432d;margin-bottom:5px}.account-tabs button{flex:1;background:transparent;border:0;color:#b9aa8d;padding:12px}.account-tabs button.active{color:#e6c982;border-bottom:2px solid #c7a45f}.account-form>small,.account-panel>small{color:#a99b7d;font-size:10px;line-height:2}.account-message{color:#e2c47c;background:#2b2316;padding:9px 11px;font-size:12px}.account-panel{align-items:center;text-align:center}.account-panel p{margin:0}.account-avatar{width:62px;height:62px;border:1px solid #b99554;border-radius:50%;display:grid;place-items:center;color:#dfc17c}.account-logout{display:flex;align-items:center;gap:8px;border:1px solid #5b492d;background:transparent;color:#e4d3b1;padding:10px 16px}
+
+
+/* Mahgold live market rate board */
+.mahgold-market-board{position:relative;z-index:5;background:linear-gradient(112deg,#17140f 0%,#292116 48%,#17140f 100%);color:#f7ecd5;border-bottom:1px solid rgba(205,171,104,.38);box-shadow:0 8px 24px rgba(28,20,9,.08)}
+.mahgold-market-inner{max-width:1280px;min-height:104px;margin:0 auto;padding:17px 28px;display:grid;grid-template-columns:minmax(170px,1fr) minmax(230px,1.15fr) minmax(240px,1.2fr);align-items:center;gap:24px}
+.mahgold-market-heading{display:flex;align-items:center;gap:12px}
+.mahgold-market-heading>div{display:grid;gap:5px}
+.mahgold-market-heading b{font-size:14px;font-weight:700;color:#f4dfae}
+.mahgold-market-heading small{font-size:10px;color:#b9a783}
+.mahgold-market-pulse,.mahgold-market-status i{display:inline-block;width:9px;height:9px;flex:none;border-radius:50%;background:#55c987;box-shadow:0 0 0 4px rgba(85,201,135,.12),0 0 12px rgba(85,201,135,.55)}
+.mahgold-market-main{display:grid;gap:7px;padding-right:22px;border-right:1px solid rgba(221,190,129,.22)}
+.mahgold-market-label{font-size:11px;color:#c9b991}
+.mahgold-market-price{display:flex;align-items:baseline;gap:8px;font-size:clamp(22px,2.2vw,30px);font-weight:800;letter-spacing:.2px;color:#f2d18a;font-variant-numeric:tabular-nums}
+.mahgold-market-price small{font-size:11px;font-weight:500;color:#d2c19d}
+.mahgold-market-meta{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:9px 15px;font-size:10px;color:#b9ad94}
+.mahgold-market-status{display:inline-flex;align-items:center;gap:7px;font-weight:700}
+.mahgold-market-status.is-live{color:#8de0ad}
+.mahgold-market-status.is-live i{width:7px;height:7px}
+.mahgold-market-status.is-stale{color:#e5bd70}
+.mahgold-market-status.is-stale i{width:7px;height:7px;background:#dca94e;box-shadow:0 0 0 4px rgba(220,169,78,.12)}
+.mahgold-market-source{color:#d6c49f}
+@media(max-width:700px){.mahgold-market-inner{min-height:0;padding:14px 16px;grid-template-columns:1fr auto;gap:11px 12px}.mahgold-market-heading{grid-column:1;grid-row:1}.mahgold-market-main{grid-column:2;grid-row:1/3;border:0;border-right:1px solid rgba(221,190,129,.22);padding-right:14px;gap:5px}.mahgold-market-label{font-size:9px}.mahgold-market-price{font-size:22px}.mahgold-market-price small{font-size:9px}.mahgold-market-meta{grid-column:1;grid-row:2;gap:5px 10px;font-size:9px}.mahgold-market-updated{width:100%}}
+@media(max-width:360px){.mahgold-market-inner{padding:12px 10px;gap:9px}.mahgold-market-price{font-size:19px}.mahgold-market-main{padding-right:10px}.mahgold-market-meta{font-size:8px}}
