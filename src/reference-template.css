@@ -203,17 +203,16 @@ button,input,select,textarea{font:inherit}
 }
 
 
-/* Keep the same logo aspect ratio in header and footer */
+/* Larger standalone header logo; Persian wordmark removed from header markup */
+.ref-brand{display:flex;align-items:center;justify-content:center;min-width:140px}
 .ref-brand img{
-  width:104px;
-  height:36px;
+  width:140px;
+  height:48px;
   object-fit:contain;
   object-position:center;
   flex:none;
 }
 @media(max-width:700px){
-  .ref-brand img{
-    width:92px;
-    height:32px;
-  }
+  .ref-brand{min-width:118px}
+  .ref-brand img{width:118px;height:42px}
 }
