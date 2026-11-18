@@ -358,6 +358,7 @@ export default function App() {
         <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
           <a className="transition-colors hover:text-gold-deep" href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a>
           <a className="transition-colors hover:text-gold-deep" href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a>
+          <a className="transition-colors hover:text-gold-deep" href="#market-rates" onClick={()=>setMenuOpen(false)}>تابلو نرخ آنلاین</a>
           <a className="transition-colors hover:text-gold-deep" href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a>
         </nav>
         <div className="flex items-center gap-2">
@@ -368,10 +369,35 @@ export default function App() {
         </div>
       </div>
       {menuOpen&&<nav className="ref-mobile-links flex flex-col gap-4 border-t border-border bg-background px-5 py-4 text-sm text-muted-foreground md:hidden">
-        <a href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a><a href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a><a href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a>
+        <a href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a><a href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a><a href="#market-rates" onClick={()=>setMenuOpen(false)}>تابلو نرخ آنلاین</a><a href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a>
         <button className="text-right" onClick={()=>{setAccountOpen(true);setMenuOpen(false);}}>ورود / ثبت‌نام</button>
       </nav>}
     </header>
+
+    <section aria-label="تابلو نرخ آنلاین طلا" className="mahgold-market-board" id="market-rates">
+      <div className="mahgold-market-inner">
+        <div className="mahgold-market-heading">
+          <span className="mahgold-market-pulse" aria-hidden="true"/>
+          <div><b>تابلو نرخ آنلاین</b><small>بازار طلا · مه‌گلد</small></div>
+        </div>
+        <div className="mahgold-market-main">
+          <span className="mahgold-market-label">هر گرم طلای ۱۸ عیار</span>
+          <strong className="mahgold-market-price" aria-live="polite">
+            {quote?.price_toman&&Number(quote.price_toman)>0?money(quote.price_toman):'—'}
+            <small>تومان</small>
+          </strong>
+        </div>
+        <div className="mahgold-market-meta">
+          <span className={isFreshLiveQuote(quote)?'mahgold-market-status is-live':'mahgold-market-status is-stale'}>
+            <i aria-hidden="true"/>{isFreshLiveQuote(quote)?'نرخ زنده و معتبر':quote?'آخرین نرخ ثبت‌شده · غیرزنده':'در انتظار دریافت نرخ'}
+          </span>
+          <span className="mahgold-market-updated">
+            {quote?.observed_at?('آخرین دریافت: '+new Date(quote.observed_at).toLocaleString('fa-IR',{timeZone:'Asia/Tehran',hour:'2-digit',minute:'2-digit',day:'2-digit',month:'long'})):'زمان دریافت ثبت نشده'}
+          </span>
+          <span className="mahgold-market-source">{quote?.source==='arzhaam'?'منبع: ارزهاام':'منبع: '+(quote?.source||'—')}</span>
+        </div>
+      </div>
+    </section>
 
     <main className="min-h-[60vh]" id="home">
       <section aria-label="اسلایدهای مه‌گلد" aria-roledescription="carousel" className="relative h-[560px] overflow-hidden bg-ink text-ink-foreground md:h-[640px]">
