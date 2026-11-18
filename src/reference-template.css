@@ -662,3 +662,46 @@ footer{border-top:1px solid rgba(190,151,82,.22)}
   background:#fffdf8;
  }
 }
+
+/* Final responsive refinement: balanced tablet grids and consistent card rhythm */
+@media (min-width:768px) and (max-width:1100px){
+  .ref-product-grid,
+  .mahgold-arrivals-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:15px}
+  .ref-category-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .ref-product-body{padding:12px}
+  .ref-product-name{font-size:13px}
+  .ref-product-price-wrap{padding:7px 8px}
+  .ref-product-price-wrap>strong{font-size:12px}
+  .mahgold-product-page-content{gap:28px;width:min(100% - 48px,1000px)}
+  .mahgold-product-page-image{min-height:380px}
+  .mahgold-product-page-photo img{min-height:350px}
+}
+@media (max-width:767px){
+  .ref-product-grid,
+  .mahgold-arrivals-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ref-product-card{min-height:100%}
+  .ref-product-card-visual{display:block;width:100%;min-width:0}
+  .ref-product-image{width:100%}
+  .ref-product-bottom{align-items:center}
+  .ref-product-price-wrap{min-width:0;max-width:calc(100% - 42px)}
+  .ref-product-price-wrap>strong{display:block;overflow-wrap:anywhere;line-height:1.7}
+  .mahgold-arrival-info>button{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mahgold-arrival-info>div>strong{font-size:11px}
+  .ref-service-card{border-radius:12px}
+  .mahgold-product-spec-table th,.mahgold-product-spec-table td{padding:12px 13px}
+}
+@media (max-width:390px){
+  .ref-product-grid,.mahgold-arrivals-grid{column-gap:8px;row-gap:11px}
+  .ref-product-body{padding:8px}
+  .ref-product-card-meta{font-size:9px}
+  .ref-product-name{font-size:11px}
+  .ref-product-price-wrap{padding:6px}
+  .ref-product-price-wrap>small{font-size:9px}
+  .ref-product-price-wrap>strong{font-size:10px}
+  .ref-add-button{width:30px;height:30px}
+  .mahgold-arrival-info{padding:9px}
+}
+@media (hover:none){
+  .ref-product-card:hover,.ref-category-card:hover,
+  .ref-page-back:hover,.mahgold-page-cart:hover{transform:none;box-shadow:inherit}
+}
