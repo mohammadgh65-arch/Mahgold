@@ -632,7 +632,17 @@ export default function App() {
         <h2 className="my-4 text-xl font-semibold">درخواست سفارش ثبت شد</h2>
         <p className="mb-2 text-sm">شماره سفارش: <b>{money(orderResult.order_number)}</b></p>
         <p className="mb-3 text-sm">مبلغ: <b>{money(orderResult.total_toman)} تومان</b></p>
-        {Array.isArray(orderResult.items)&&orderResult.items.length>0&&<div className="mb-5 max-h-64 overflow-y-auto rounded-xl border border-gold/20 p-3 text-right text-xs"><b className="mb-2 block">خلاصه سفارش</b>{orderResult.items.map((item,index)=><div key={index} className="mb-3 flex items-center justify-between gap-3 border-b border-gold/10 pb-3 last:mb-0 last:border-0"><strong>{item.product_name} × {money(item.quantity)}</strong><b>{money(item.line_total_toman)} تومان</b></div>)</div>}
+        {Array.isArray(orderResult.items) && orderResult.items.length > 0 && (
+          <div className="mb-5 max-h-64 overflow-y-auto rounded-xl border border-gold/20 p-3 text-right text-xs">
+            <b className="mb-2 block">خلاصه سفارش</b>
+            {orderResult.items.map((item,index) => (
+              <div key={index} className="mb-3 flex items-center justify-between gap-3 border-b border-gold/10 pb-3 last:mb-0 last:border-0">
+                <strong>{item.product_name} × {money(item.quantity)}</strong>
+                <b>{money(item.line_total_toman)} تومان</b>
+              </div>
+            ))}
+          </div>
+        )}
         <button className="h-11 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" onClick={()=>setOrderResult(null)}>متوجه شدم</button>
       </section>
     </div>}
