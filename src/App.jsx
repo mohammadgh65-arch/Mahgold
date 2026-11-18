@@ -211,11 +211,20 @@ export default function App() {
   useEffect(()=>{
     const syncProductRoute=()=>{
       const id=new URLSearchParams(window.location.search).get('product');
+      if(id&&!window.history.state?.mahgoldProductId){
+        const productUrl=window.location.pathname+window.location.search+window.location.hash;
+        const baseParams=new URLSearchParams(window.location.search);baseParams.delete('product');
+        const baseUrl=window.location.pathname+(baseParams.toString()?'?'+baseParams.toString():'')+window.location.hash;
+        window.history.replaceState({...(window.history.state||{}),mahgoldProductId:null},'',baseUrl);
+        window.history.pushState({...(window.history.state||{}),mahgoldProductId:String(id)},'',productUrl);
+      }
       setSelectedProduct(id?products.find(item=>String(item.id)===id)||null:null);
     };
+    const onProductKeyDown=event=>{if(event.key==='Escape'&&new URLSearchParams(window.location.search).has('product'))closeProduct();};
     window.addEventListener('popstate',syncProductRoute);
+    window.addEventListener('keydown',onProductKeyDown);
     syncProductRoute();
-    return()=>window.removeEventListener('popstate',syncProductRoute);
+    return()=>{window.removeEventListener('popstate',syncProductRoute);window.removeEventListener('keydown',onProductKeyDown);};
   },[products]);
 
   const displaySlides=useMemo(()=>{const source=Array.isArray(siteContent?.slides)?siteContent.slides:(Array.isArray(siteContent?.specials)?siteContent.specials.map(s=>({active:true,eyebrow:s?.kicker||'',title:s?.title||'',description:s?.sub||'',button:'مشاهده محصولات',image:s?.image||'',category:s?.category||'طلای زینتی'})):[]);const rows=source.filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
