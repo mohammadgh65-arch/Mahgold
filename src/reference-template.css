@@ -705,3 +705,138 @@ footer{border-top:1px solid rgba(190,151,82,.22)}
   .ref-product-card:hover,.ref-category-card:hover,
   .ref-page-back:hover,.mahgold-page-cart:hover{transform:none;box-shadow:inherit}
 }
+
+/* Brand presentation pass: header, hero, and footer */
+.ref-announcement{
+  position:relative;
+  background:linear-gradient(100deg,#211b12,#382b18 48%,#211b12);
+  color:#ead7ad;
+  letter-spacing:.015em;
+}
+header.sticky>.mx-auto{
+  min-height:76px;
+}
+header.sticky nav a{
+  position:relative;
+  padding:9px 0;
+  transition:color .2s ease;
+}
+header.sticky nav a:after{
+  content:"";
+  position:absolute;
+  right:0;left:100%;bottom:2px;height:1px;
+  background:linear-gradient(90deg,#b58a48,#e6cf98);
+  transition:left .24s ease;
+}
+header.sticky nav a:hover:after{left:0}
+.ref-mobile-menu{
+  border-color:rgba(166,130,69,.25);
+  color:#73572e;
+  background:rgba(255,253,248,.8);
+}
+.ref-brand img{max-width:100%;object-fit:contain}
+.mahgold-glass-market{
+  border-top-color:rgba(173,135,69,.22);
+  border-bottom-color:rgba(173,135,69,.3);
+}
+.mahgold-glass-inner{max-width:1320px}
+main#home>section[aria-label="اسلایدهای مه‌گلد"]{
+  isolation:isolate;
+  box-shadow:0 18px 42px rgba(39,29,14,.1);
+}
+main#home>section[aria-label="اسلایدهای مه‌گلد"]>div[aria-hidden] img{
+  filter:saturate(.88) contrast(1.035);
+}
+main#home>section[aria-label="اسلایدهای مه‌گلد"] .slide-shade{
+  background:linear-gradient(90deg,rgba(13,10,7,.76) 0%,rgba(19,14,8,.49) 42%,rgba(19,14,8,.12) 100%);
+}
+main#home>section[aria-label="اسلایدهای مه‌گلد"] .eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  color:#e6ca8e;
+  letter-spacing:.18em;
+}
+main#home>section[aria-label="اسلایدهای مه‌گلد"] .eyebrow:before{
+  content:"";
+  width:28px;height:1px;
+  background:#c9a45f;
+}
+main#home>section[aria-label="اسلایدهای مه‌گلد"] h1{
+  max-width:570px;
+  font-weight:500;
+  letter-spacing:-.025em;
+  line-height:1.55;
+}
+main#home>section[aria-label="اسلایدهای مه‌گلد"] p{
+  max-width:460px;
+  color:rgba(255,250,239,.83);
+}
+main#home>section[aria-label="اسلایدهای مه‌گلد"] button:not([aria-label^="اسلاید"]){
+  border:1px solid rgba(255,239,201,.32);
+  box-shadow:0 10px 28px rgba(12,9,5,.2),inset 0 1px 0 rgba(255,255,255,.28);
+}
+footer.bg-ink{
+  position:relative;
+  overflow:hidden;
+  padding-top:52px;
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(172,132,62,.16),transparent 55%),
+    linear-gradient(180deg,#211b12 0%,#17130e 100%);
+  border-top:1px solid rgba(205,171,104,.34);
+}
+footer.bg-ink:before{
+  content:"";
+  position:absolute;
+  top:0;left:50%;transform:translateX(-50%);
+  width:min(220px,42vw);height:1px;
+  background:linear-gradient(90deg,transparent,#c7a15e,transparent);
+}
+footer.bg-ink img{
+  width:auto;
+  height:92px;
+  max-width:min(220px,65vw);
+  object-fit:contain;
+  filter:drop-shadow(0 5px 18px rgba(198,158,82,.13));
+}
+footer.bg-ink>div:first-of-type{
+  color:#e8d5ad;
+  font-size:13px;
+  letter-spacing:.03em;
+}
+footer.bg-ink>div:nth-of-type(2){
+  margin-top:18px;
+  padding-top:16px;
+  border-top:1px solid rgba(221,190,129,.13);
+}
+footer.bg-ink>div:nth-of-type(2) span{
+  color:#c7b99d;
+}
+footer.bg-ink>div:last-of-type{
+  margin:20px auto 0;
+  padding-top:12px;
+  max-width:900px;
+  border-top:1px solid rgba(221,190,129,.1);
+  color:#a99b80;
+}
+@media(max-width:767px){
+  header.sticky>.mx-auto{min-height:62px}
+  .ref-brand{min-width:104px}
+  .ref-brand img{width:104px;height:39px}
+  main#home>section[aria-label="اسلایدهای مه‌گلد"]{
+    border-radius:0 0 22px 22px;
+    box-shadow:0 12px 28px rgba(39,29,14,.09);
+  }
+  main#home>section[aria-label="اسلایدهای مه‌گلد"] .slide-shade{
+    background:linear-gradient(0deg,rgba(12,9,6,.86) 0%,rgba(12,9,6,.48) 50%,rgba(12,9,6,.12) 100%);
+  }
+  main#home>section[aria-label="اسلایدهای مه‌گلد"] .eyebrow{font-size:9px}
+  main#home>section[aria-label="اسلایدهای مه‌گلد"] h1{max-width:100%;font-size:clamp(26px,7vw,34px)}
+  main#home>section[aria-label="اسلایدهای مه‌گلد"] p{max-width:100%;font-size:11px}
+  footer.bg-ink{padding-top:36px;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+  footer.bg-ink img{height:76px}
+  footer.bg-ink>div:nth-of-type(2){gap:8px;padding-top:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  header.sticky nav a:after{transition:none}
+}
