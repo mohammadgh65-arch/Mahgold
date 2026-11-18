@@ -375,3 +375,11 @@ button,input,select,textarea{font:inherit}
 .mahgold-finalize-action{min-height:54px;border-radius:16px!important;font-size:15px!important;font-weight:900!important;box-shadow:0 8px 22px rgba(161,113,32,.3),0 0 0 1px rgba(255,226,156,.55),inset 0 1px 0 rgba(255,255,255,.82)!important}
 @keyframes mahgold-gold-sweep{0%,18%{left:-70%;opacity:0}32%{opacity:1}58%{left:130%;opacity:0}100%{left:130%;opacity:0}}
 @media(prefers-reduced-motion:reduce){.mahgold-gold-shine::before,.mahgold-premium-action::before{animation:none;display:none}.mahgold-gold-shine,.mahgold-premium-action{transition:none}}
+
+
+/* Clear confirmation after adding an item to the cart */
+.mahgold-cart-toast{position:fixed;top:18px;left:50%;z-index:120;display:flex;align-items:center;gap:10px;width:max-content;max-width:calc(100vw - 28px);padding:12px 14px;border:1px solid rgba(190,151,83,.42);border-radius:14px;background:rgba(255,252,245,.97);box-shadow:0 14px 38px rgba(48,34,15,.2);color:#4b3921;font-size:12px;font-weight:700;transform:translateX(-50%);animation:mahgold-toast-in .24s ease-out}
+.mahgold-cart-toast>span{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:linear-gradient(145deg,#d9bd7b,#a47a39);color:white;font-size:13px}
+.mahgold-cart-toast>button{margin-right:5px;padding:7px 11px;border-radius:9px;background:linear-gradient(110deg,#98713a,#e6ce94);color:#382711;font-size:10px;font-weight:800;white-space:nowrap}
+@keyframes mahgold-toast-in{from{opacity:0;transform:translate(-50%,-9px)}to{opacity:1;transform:translate(-50%,0)}}
+@media(prefers-reduced-motion:reduce){.mahgold-cart-toast{animation:none}}
