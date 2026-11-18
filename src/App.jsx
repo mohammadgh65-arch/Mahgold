@@ -496,25 +496,19 @@ export default function App() {
               <option value="newest">جدیدترین</option><option value="cheap">ارزان‌ترین</option><option value="expensive">گران‌ترین</option>
             </select></label>
           </div>
-          <div className="ref-product-grid">
-            {filtered.map((product,index)=><article className="ref-product-card ref-product-select-card group" key={product.id} style={{'--card-order':index}}>
-              <button className="ref-product-card-visual" onClick={()=>setSelectedProduct(product)} aria-label={'مشاهده '+product.name}>
-                <ProductImage product={product}/>
-                <span className="ref-product-visual-shade"/>
-                <span className="ref-product-quickview">مشاهده جزئیات <ArrowLeft size={13}/></span>
-                <span className="ref-product-stock-tag">{Number(product.stock||0)>0?'موجود':'ناموجود'}</span>
-                <span className="ref-product-image-sparkle" aria-hidden="true">✦</span>
-              </button>
-              <div className="ref-product-body ref-product-select-body">
-                <div className="ref-product-card-meta"><span>{product.category||'مجموعه مه‌گلد'}</span><span className="ref-product-weight">{product.weight_grams?gram(product.weight_grams):'طلای منتخب'}</span></div>
-                <button className="ref-product-name line-clamp-1 text-right" onClick={()=>setSelectedProduct(product)}>{product.name}</button>
-                <div className="ref-product-karat">{product.karat?money(product.karat)+' عیار':'جزئیات و مشخصات محصول'}</div>
-                <div className="ref-product-bottom ref-product-select-bottom">
-                  <div className="ref-product-price-wrap"><small>قیمت محصول</small><strong>{product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'در انتظار نرخ':<>{money(product.price_toman)} <small>تومان</small></>}</strong></div>
-                  <button aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button ref-product-add-glow" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}><Plus size={18}/></button>
-                </div>
-              </div>
-            </article>)}
+          <div className="mahgold-selection-table-wrap">
+            <table className="mahgold-selection-table" aria-label="فهرست انتخاب محصولات مه‌گلد">
+              <thead><tr><th>خرید</th><th>قیمت</th><th>اجرت</th><th>ویژگی</th><th>وزن</th><th>موجودی</th><th>محصول</th></tr></thead>
+              <tbody>{filtered.map(product=><tr key={product.id}>
+                <td><button className="mahgold-select-row-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}>انتخاب</button></td>
+                <td className="mahgold-table-price">{product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'در انتظار نرخ':<>{money(product.price_toman)} <small>تومان</small></>}</td>
+                <td>{product.labor_mode==='fixed'?money(product.labor_value)+' تومان':product.labor_mode==='per_gram'?money(product.labor_value)+' / گرم':(Number(product.labor_value||0).toLocaleString('fa-IR')+'٪')}</td>
+                <td>{product.tag||((product.karat?money(product.karat)+' عیار':'')||'—')}</td>
+                <td>{product.weight_grams?gram(product.weight_grams):'—'}</td>
+                <td><span className={Number(product.stock||0)>0?'mahgold-stock-yes':'mahgold-stock-no'}>{Number(product.stock||0)>0?'موجود':'ناموجود'}</span></td>
+                <td><button className="mahgold-table-product" onClick={()=>setSelectedProduct(product)}>{product.name}</button></td>
+              </tr>)}</tbody>
+            </table>
           </div>
           {dataStatus==='loading'&&<div className="ref-state">در حال دریافت محصولات مه‌گلد…</div>}
           {dataStatus==='error'&&<div className="ref-state">{dataMessage}</div>}
