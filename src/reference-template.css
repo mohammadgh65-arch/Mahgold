@@ -142,3 +142,62 @@ button,input,select,textarea{font:inherit}
   .mahgold-market-price{font-size:20px}
 }
 @media(max-width:360px){.mahgold-market-inner{padding:10px 9px}.mahgold-market-price{font-size:18px}}
+
+
+/* Refined glass ticker inside the sticky storefront header */
+.mahgold-glass-market{
+  position:relative;z-index:45;
+  border-top:1px solid rgba(197,158,86,.18);
+  border-bottom:1px solid rgba(197,158,86,.28);
+  background:linear-gradient(105deg,rgba(255,255,255,.62),rgba(248,242,229,.48) 48%,rgba(255,255,255,.58));
+  -webkit-backdrop-filter:blur(22px) saturate(155%);backdrop-filter:blur(22px) saturate(155%);
+}
+.mahgold-glass-inner{
+  max-width:1280px;min-height:48px;margin:0 auto;padding:7px 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+}
+.mahgold-glass-gold{display:flex;align-items:center;gap:11px;min-width:0;color:#342719}
+.mahgold-glass-live{width:7px;height:7px;flex:none;border-radius:50%;background:#38a66a;box-shadow:0 0 0 4px rgba(56,166,106,.12),0 0 10px rgba(56,166,106,.3)}
+.mahgold-glass-label{font-size:11px;color:#79694e;white-space:nowrap}
+.mahgold-glass-gold strong{font-size:17px;font-weight:800;letter-spacing:.1px;color:#886022;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mahgold-glass-gold strong small{font-size:9px;font-weight:500;color:#88795f}
+.mahgold-glass-state{font-size:9px;color:#9b7540;border:1px solid rgba(176,133,65,.25);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.mahgold-glass-state.live{color:#278353;border-color:rgba(56,166,106,.25);background:rgba(56,166,106,.06)}
+.mahgold-coins-toggle{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:32px;padding:0 13px;border:1px solid rgba(170,132,68,.28);border-radius:999px;background:rgba(255,255,255,.42);color:#72552d;font-size:10px;font-weight:700;transition:background .2s,border-color .2s,box-shadow .2s}
+.mahgold-coins-toggle:hover,.mahgold-coins-toggle.is-open{background:rgba(255,255,255,.78);border-color:rgba(170,132,68,.48);box-shadow:0 3px 14px rgba(89,65,30,.07)}
+.mahgold-coins-toggle svg{transition:transform .2s}
+.mahgold-coins-toggle.is-open svg{transform:rotate(180deg)}
+.mahgold-coins-panel{
+  position:absolute;top:calc(100% + 8px);right:max(16px,calc((100vw - 1280px)/2 + 28px));z-index:70;
+  width:min(610px,calc(100vw - 32px));padding:12px;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;
+  border:1px solid rgba(190,153,91,.32);border-radius:17px;
+  background:rgba(255,252,246,.92);-webkit-backdrop-filter:blur(26px) saturate(165%);backdrop-filter:blur(26px) saturate(165%);
+  box-shadow:0 18px 55px rgba(48,34,15,.18);
+}
+.mahgold-coin-item{min-width:0;display:grid;grid-template-columns:1fr auto;align-items:center;gap:5px 10px;padding:11px 12px;border:1px solid rgba(180,148,94,.16);border-radius:11px;background:rgba(255,255,255,.55)}
+.mahgold-coin-item>span{font-size:11px;color:#65543a}
+.mahgold-coin-item strong{grid-column:1;grid-row:2;font-size:14px;color:#805b27;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mahgold-coin-item strong small{font-size:9px;font-weight:500;color:#8b7a60}
+.mahgold-coin-item em{grid-column:2;grid-row:1/3;align-self:center;font-size:9px;font-style:normal;color:#a17b45;white-space:nowrap}
+.mahgold-coin-item em.live{color:#278353}
+.mahgold-coins-foot{grid-column:1/-1;padding:4px 5px 0;text-align:center;font-size:9px;color:#93836a}
+@media(max-width:700px){
+  .mahgold-glass-inner{min-height:44px;padding:6px 13px;gap:8px}
+  .mahgold-glass-gold{gap:7px}
+  .mahgold-glass-label{font-size:10px}
+  .mahgold-glass-gold strong{font-size:14px}
+  .mahgold-glass-state{font-size:8px;padding:2px 6px}
+  .mahgold-coins-toggle{min-height:30px;padding:0 10px;font-size:9px;gap:5px}
+  .mahgold-coins-panel{right:10px;width:calc(100vw - 20px);padding:9px;gap:6px;grid-template-columns:1fr}
+  .mahgold-coin-item{padding:9px 10px}
+  .mahgold-coin-item strong{font-size:13px}
+}
+@media(max-width:370px){
+  .mahgold-glass-inner{padding-inline:8px}
+  .mahgold-glass-gold{gap:5px}
+  .mahgold-glass-label{font-size:9px}
+  .mahgold-glass-gold strong{font-size:12px}
+  .mahgold-glass-state{display:none}
+  .mahgold-coins-toggle{padding-inline:8px}
+}
