@@ -447,13 +447,13 @@ export default function App() {
 
       <section className="mx-auto max-w-7xl scroll-mt-20 px-4 py-16 md:px-7 md:py-24" id="categories">
         <div className="mb-8 flex items-end justify-between gap-5">
-          <div><div className="eyebrow text-gold-deep">DISCOVER MAHGOLD</div><h2 className="mt-3 text-2xl font-semibold md:text-3xl">از میان مجموعه‌ها انتخاب کنید</h2></div>
-          <p className="hidden text-xs text-muted-foreground md:block">جزئیاتی برای سلیقه‌های خاص</p>
+          <div><div className="eyebrow text-gold-deep">DISCOVER MAHGOLD</div><h2 className="mt-3 text-2xl font-semibold md:text-3xl">از میان مجموعه‌ها انتخاب کنید</h2><p className="mt-2 text-xs leading-7 text-muted-foreground">هر دسته را انتخاب کنید تا محصولات همان مجموعه را ببینید؛ تعداد محصولات از موجودی فعال فروشگاه محاسبه می‌شود.</p></div>
+          <p className="hidden text-xs text-muted-foreground md:block">مجموعه‌های مه‌گلد</p>
         </div>
         <div className="ref-category-grid">
           {displayTiles.map(tile=><button key={tile.name} className="ref-category-card" onClick={()=>{setCategory(tile.name);document.getElementById('shop')?.scrollIntoView({behavior:'smooth'});}}>
             <img src={tile.image} alt={tile.name} loading="lazy"/><span className="ref-category-shade"/>
-            <span className="ref-category-text"><b>{tile.name}</b><small>{tile.desc}</small><em>مشاهده <ArrowLeft size={12}/></em></span>
+            <span className="ref-category-text"><b>{tile.name}</b><small>{tile.desc}</small><span className="mahgold-category-count">{dataStatus==='connected'?money(products.filter(product=>product.category===tile.name||product.name?.includes(tile.name)).length)+' محصول فعال':dataStatus==='loading'?'در حال دریافت…':'اتصال در دسترس نیست'}</span><em>مشاهده محصولات <ArrowLeft size={12}/></em></span>
           </button>)}
         </div>
         <div className="ref-service-grid">
