@@ -150,7 +150,7 @@ function AccountContent({onClose}) {
       <div className="mb-3 flex items-center justify-between text-sm"><b>آخرین سفارش‌ها</b><span className="text-muted-foreground">{money(orders.length)} مورد</span></div>
       {orders.length ? <div className="ref-order-list">{orders.map(order=><div className="ref-order-item" key={order.id}>
         <div><b>سفارش {order.order_number||'—'}</b><small>{new Date(order.created_at).toLocaleDateString('fa-IR')}</small></div>
-        <div className="text-left"><b>{money(order.total_toman)} تومان</b><small>{order.status}</small></div>
+        <div className="text-left"><b>{money(order.total_toman)} تومان</b><small>{({pending:"در انتظار بررسی",awaiting_payment:"در انتظار پرداخت",paid:"پرداخت‌شده",processing:"در حال آماده‌سازی",shipped:"ارسال‌شده",completed:"تکمیل‌شده",cancelled:"لغوشده",payment_failed:"پرداخت ناموفق"})[order.status]||order.status}</small></div>
       </div>)}</div> : <p className="text-xs text-muted-foreground">هنوز سفارشی برای این حساب ثبت نشده است.</p>}
     </div>
     <button className="h-11 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" onClick={onClose}>ادامه خرید</button>
