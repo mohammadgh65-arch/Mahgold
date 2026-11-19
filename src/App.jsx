@@ -192,7 +192,7 @@ export default function App() {
     (async()=>{
       try{
         const [productResult,categoryResult,quoteResult]=await Promise.all([
-          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,created_at,tag')
+          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,created_at,tag,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,attributes')
             .eq('is_active',true).order('created_at',{ascending:false}),
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
             .eq('is_active',true).order('sort_order',{ascending:true}),
@@ -371,7 +371,7 @@ export default function App() {
               <div className="ref-product-body">
                 <span className="text-[10px] text-muted-foreground md:text-[11px]">{product.category}</span>
                 <button className="ref-product-name line-clamp-1 text-right" onClick={()=>setSelectedProduct(product)}>{product.name}</button>
-                <div className="mt-0.5 text-[11px] text-muted-foreground">{[product.weight_grams?gram(product.weight_grams):null,product.karat?money(product.karat)+' عیار':null].filter(Boolean).join(' · ')}</div>
+                <div className="mt-0.5 text-[11px] text-muted-foreground">{[product.weight_grams?gram(product.weight_grams):null,product.karat?money(product.karat)+' عیار':null,product.tag||null].filter(Boolean).join(' · ')}</div>
                 <div className="ref-product-bottom">
                   <strong>{money(product.price_toman)} <small>تومان</small></strong>
                   <button aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'} onClick={()=>addToCart(product)}><Plus size={17}/></button>
@@ -466,7 +466,7 @@ export default function App() {
             <span className="text-xs text-muted-foreground">{selectedProduct.category}</span>
             <h2>{selectedProduct.name}</h2>
             <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
-            <div className="grid gap-2 text-xs text-muted-foreground"><span>وزن: {gram(selectedProduct.weight_grams)}</span><span>عیار: {money(selectedProduct.karat||18)}</span><span>موجودی: {money(selectedProduct.stock||0)}</span></div>
+            <div className="grid gap-2 text-xs text-muted-foreground"><span>وزن: {gram(selectedProduct.weight_grams)}</span><span>عیار: {money(selectedProduct.karat||18)}</span><span>موجودی: {money(selectedProduct.stock||0)} عدد</span><span>شیوه قیمت‌گذاری: {selectedProduct.pricing_mode==="auto"?"وابسته به نرخ روز طلا":"قیمت ثابت فروشگاه"}</span>{selectedProduct.tag&&<span>ویژگی: {selectedProduct.tag}</span>}</div>
             <strong className="ref-detail-price">{money(selectedProduct.price_toman)} تومان</strong>
             <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
           </div>
