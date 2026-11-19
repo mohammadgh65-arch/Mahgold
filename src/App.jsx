@@ -171,7 +171,7 @@ function AccountContent({onClose}) {
       <label>شماره موبایل<input required type="tel" autoComplete="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></label>
     </>}
     <label>ایمیل<input required type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)}/></label>
-    <label>گذرواژه<input required minLength="6" type="password" autoComplete={mode==='login'?'current-password':'new-password'} value={password} onChange={e=>setPassword(e.target.value)}/></label>
+    <label>گذرواژه<input required minLength={mode==='signup'?12:6} type="password" autoComplete={mode==='login'?'current-password':'new-password'} value={password} onChange={e=>setPassword(e.target.value)}/>{mode==='signup'&&<small>برای امنیت حساب، گذرواژه ثبت‌نام باید حداقل ۱۲ نویسه داشته باشد.</small>}</label>
     {message&&<p className="ref-message">{message}</p>}
     <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={busy}>{busy?'در حال بررسی…':mode==='login'?'ورود به حساب':'ایجاد حساب مشتری'}</button>
   </form>;
