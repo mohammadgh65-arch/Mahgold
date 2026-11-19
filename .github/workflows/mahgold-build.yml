@@ -31,5 +31,12 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
       - name: Build Vite app
         run: npm run build
+      - name: Verify deployed security headers
+        run: |
+          test -s dist/_headers
+          grep -q 'Strict-Transport-Security' dist/_headers
+          grep -q 'X-Content-Type-Options' dist/_headers
