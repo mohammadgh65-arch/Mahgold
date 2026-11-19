@@ -50,6 +50,7 @@ const presetCategories = [
 const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85';
 const money = value => new Intl.NumberFormat('fa-IR').format(Number(value || 0));
 const gram = value => new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(Number(value || 0)) + ' گرم';
+const createIdempotencyKey = () => crypto.randomUUID();
 const toLatinDigits = value => value.replace(/[۰-۹٠-٩]/g, d => {
   const fa='۰۱۲۳۴۵۶۷۸۹', ar='٠١٢٣٤٥٦٧٨٩';
   return String(fa.indexOf(d)>=0 ? fa.indexOf(d) : ar.indexOf(d));
@@ -144,6 +145,7 @@ export default function App() {
   const [query,setQuery]=useState('');
   const [sortMode,setSortMode]=useState('newest');
   const [cart,setCart]=useState(()=>{try{return JSON.parse(localStorage.getItem('mahgold_cart')||'[]');}catch{return [];}});
+  const [idempotencyKey,setIdempotencyKey]=useState(()=>createIdempotencyKey());
   const [cartOpen,setCartOpen]=useState(false);
   const [accountOpen,setAccountOpen]=useState(false);
   const [checkoutOpen,setCheckoutOpen]=useState(false);
@@ -214,6 +216,7 @@ export default function App() {
     return()=>{active=false;};
   },[]);
   useEffect(()=>{try{localStorage.setItem('mahgold_cart',JSON.stringify(cart));}catch{}},[cart]);
+  useEffect(()=>{setIdempotencyKey(createIdempotencyKey());},[cart,customer]);
 
   const categories=useMemo(()=>{
     const rows=dbCategories.map(row=>row.name).filter(Boolean);
@@ -249,17 +252,25 @@ export default function App() {
     event.preventDefault();setCheckoutError('');
     if(!supabase||!cart.length)return;
     setCheckoutBusy(true);
-    const {data,error}=await supabase.rpc('mahgold_create_order',{
-      p_customer_name:customer.name,
-      p_customer_phone:toLatinDigits(customer.phone),
-      p_customer_email:customer.email||null,
-      p_shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
-      p_customer_note:customer.note||'',
-      p_items:cart.map(item=>({product_id:item.id,quantity:item.qty}))
-    });
-    setCheckoutBusy(false);
-    if(error){setCheckoutError(error.message||'ثبت سفارش انجام نشد.');return;}
-    setOrderResult(data);setCart([]);setCheckoutOpen(false);setCartOpen(false);
+    try{
+      const {data,error}=await supabase.functions.invoke('mahgold-create-order',{
+        body:{
+          customer_name:customer.name.trim(),
+          customer_phone:toLatinDigits(customer.phone),
+          customer_email:customer.email.trim()||null,
+          shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
+          customer_note:customer.note||'',
+          items:cart.map(item=>({product_id:item.id,quantity:item.qty})),
+          idempotency_key:idempotencyKey
+        }
+      });
+      if(error)throw error;
+      const created=data?.data;
+      if(!created?.order_id||!created?.order_number)throw new Error('پاسخ سرویس سفارش معتبر نیست؛ وضعیت سفارش را از پشتیبانی پیگیری کنید.');
+      setOrderResult(created);setCart([]);setCheckoutOpen(false);setCartOpen(false);
+    }catch(error){
+      setCheckoutError(error?.context?.error||error?.message||'ثبت سفارش انجام نشد. لطفاً دوباره تلاش کنید.');
+    }finally{setCheckoutBusy(false);}
   };
   if(isAdminPage)return <AdminPanel/>;
 
