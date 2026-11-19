@@ -2,8 +2,19 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" };
+const coinAssets = [
+  { id: "coin_emami", symbol: "coin_emami", title: "سکه امامی" },
+  { id: "coin_bahar", symbol: "coin_bahar", title: "سکه بهار آزادی" },
+  { id: "coin_nim", symbol: "coin_nim", title: "نیم سکه" },
+  { id: "coin_rob", symbol: "coin_rob", title: "ربع سکه" },
+  { id: "coin_gerami", symbol: "coin_gerami", title: "سکه گرمی" },
+];
 function reply(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers: jsonHeaders });
+}
+function isFreshProviderTime(value: string | undefined, nowMs: number) {
+  const time = Date.parse(value || "");
+  return Number.isFinite(time) && time <= nowMs + 60000 && nowMs - time <= 300000;
 }
 
 Deno.serve(async (req: Request) => {
@@ -17,6 +28,14 @@ Deno.serve(async (req: Request) => {
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!appKey || !supabaseUrl || !serviceRoleKey) return reply(500, { error: "Server configuration is incomplete" });
 
+  const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false, autoRefreshToken: false } });
+  const nowMs = Date.now();
+  const fetchedAt = new Date(nowMs).toISOString();
+  const accepted: Array<Record<string, unknown>> = [];
+  const skipped: Array<Record<string, string>> = [];
+
+  // Gold is the checkout-critical quote. One provider request every two minutes
+  // stays below the smallest documented daily quota while retaining freshness.
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
   let upstream: Response;
@@ -32,42 +51,89 @@ Deno.serve(async (req: Request) => {
   let payload: any;
   try { payload = await upstream.json(); } catch { return reply(502, { error: "Rate provider returned invalid JSON" }); }
 
-  const rates = Array.isArray(payload?.rates) ? payload.rates : [];
-  const rate = rates.find((item: any) => item?.assetId === "gold_18") ?? (payload?.assetId === "gold_18" ? payload : null);
+  const rate = Array.isArray(payload?.rates)
+    ? payload.rates.find((item: any) => item?.assetId === "gold_18")
+    : (payload?.assetId === "gold_18" ? payload : null);
   const price = Number(rate?.price);
-  const providerUpdatedAtMs = Date.parse(rate?.updatedAt || "");
-  const nowMs = Date.now();
   const cacheAgeMs = Number(payload?.meta?.cacheAgeMs);
   const currency = payload?.meta?.currency;
-  const checks = {
+  const goldChecks = {
     found_rate: Boolean(rate),
     positive_price: Number.isFinite(price) && price > 0,
-    valid_provider_timestamp: Number.isFinite(providerUpdatedAtMs) && providerUpdatedAtMs <= nowMs + 60000,
+    fresh_provider_timestamp: isFreshProviderTime(rate?.updatedAt, nowMs),
     fresh_provider_cache: Number.isFinite(cacheAgeMs) && cacheAgeMs >= 0 && cacheAgeMs <= 300000,
     live_source: payload?.meta?.source === "live",
     currency_valid: currency == null || String(currency).toLowerCase() === "toman",
   };
-  if (!Object.values(checks).every(Boolean)) {
-    return reply(409, {
-      error: "Provider quote failed validation; stored rate was not changed",
-      checks, source: payload?.meta?.source ?? null, currency: currency ?? null,
-      asset_id: rate?.assetId ?? null,
-      cache_age_ms: Number.isFinite(cacheAgeMs) ? cacheAgeMs : null,
+  if (Object.values(goldChecks).every(Boolean)) {
+    accepted.push({
+      symbol: "gold_18k", title: "طلای ۱۸ عیار", price_toman: price,
+      source: "arzhaam", observed_at: fetchedAt,
+      provider_updated_at: new Date(Date.parse(rate.updatedAt)).toISOString(), is_live: true,
     });
+  } else {
+    skipped.push({ asset_id: "gold_18", reason: "provider_quote_failed_freshness_validation" });
   }
 
-  const fetchedAt = new Date(nowMs).toISOString();
-  const providerUpdatedAt = new Date(providerUpdatedAtMs).toISOString();
-  const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false, autoRefreshToken: false } });
-  const { error } = await admin.from("market_quotes").upsert({
-    symbol: "gold_18k", title: "طلای ۱۸ عیار", price_toman: price,
-    source: "arzhaam", observed_at: fetchedAt, provider_updated_at: providerUpdatedAt, is_live: true,
-  }, { onConflict: "symbol" });
-  if (error) return reply(500, { error: "Could not store the verified quote" });
+  // Coin conversion is intentionally hourly: five extra API calls every hour
+  // plus 30 gold calls/hour remain safely below the trial plan's 1,000/day cap.
+  const shouldSyncCoins = new Date(nowMs).getUTCMinutes() === 0;
+  const coinResults: string[] = [];
+  if (shouldSyncCoins) {
+    for (const asset of coinAssets) {
+      const convertUrl = new URL("https://arzhaam.ir/api/rates/convert");
+      convertUrl.searchParams.set("from", asset.id);
+      convertUrl.searchParams.set("to", "toman");
+      convertUrl.searchParams.set("amount", "1");
+      const convertController = new AbortController();
+      const convertTimeout = setTimeout(() => convertController.abort(), 8000);
+      try {
+        const response = await fetch(convertUrl.toString(), {
+          headers: { "X-App-Key": appKey, "Accept": "application/json" },
+          signal: convertController.signal,
+        });
+        if (!response.ok) {
+          skipped.push({ asset_id: asset.id, reason: "conversion_http_" + response.status });
+          continue;
+        }
+        const converted: any = await response.json();
+        const normalized = Number(converted?.to?.amount);
+        const conversionAge = Number(converted?.meta?.cacheAgeMs);
+        const providerTime = converted?.from?.updatedAt;
+        const valid = converted?.to?.assetId === "toman" &&
+          converted?.from?.assetId === asset.id &&
+          Number.isFinite(normalized) && normalized > 1000000 &&
+          converted?.meta?.source === "live" &&
+          Number.isFinite(conversionAge) && conversionAge >= 0 && conversionAge <= 300000 &&
+          isFreshProviderTime(providerTime, nowMs);
+        if (!valid) {
+          skipped.push({ asset_id: asset.id, reason: "conversion_failed_freshness_validation" });
+          continue;
+        }
+        accepted.push({
+          symbol: asset.symbol, title: asset.title, price_toman: normalized,
+          source: "arzhaam", observed_at: fetchedAt,
+          provider_updated_at: new Date(Date.parse(providerTime)).toISOString(), is_live: true,
+        });
+        coinResults.push(asset.symbol);
+      } catch {
+        skipped.push({ asset_id: asset.id, reason: "conversion_unavailable" });
+      } finally { clearTimeout(convertTimeout); }
+    }
+  }
+
+  if (!accepted.length) return reply(409, {
+    error: "No asset passed rate validation; stored rates were not changed",
+    skipped, gold_checks: goldChecks, coin_sync_attempted: shouldSyncCoins,
+  });
+
+  const { error } = await admin.from("market_quotes").upsert(accepted, { onConflict: "symbol" });
+  if (error) return reply(500, { error: "Could not store verified market quotes" });
 
   return reply(200, {
-    ok: true, symbol: "gold_18k", price_toman: price,
-    observed_at: fetchedAt, provider_updated_at: providerUpdatedAt,
-    provider_source: payload.meta.source, cache_age_ms: cacheAgeMs,
+    ok: true, updated: accepted.map((item) => item.symbol),
+    skipped, coin_sync_attempted: shouldSyncCoins, coin_updated: coinResults,
+    observed_at: fetchedAt, provider_source: payload?.meta?.source ?? null,
+    cache_age_ms: Number.isFinite(cacheAgeMs) ? cacheAgeMs : null,
   });
 });
