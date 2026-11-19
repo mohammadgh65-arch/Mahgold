@@ -339,6 +339,7 @@ export default function App() {
   const newArrivals=useMemo(()=>products.slice(0,4),[products]);
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const cartTotal=cart.reduce((sum,item)=>sum+Number(item.price_toman||0)*Number(item.qty||0),0);
+  const cartNeedsFreshQuote=cart.some(item=>item.pricing_mode==='auto')&&!isFreshLiveQuote(quote);
 
   const refreshCartPrices=async()=>{
     if(!cart.length)return true;
@@ -649,7 +650,7 @@ export default function App() {
               <button className="ref-remove" aria-label="حذف محصول" onClick={()=>setCart(old=>old.filter(p=>p.id!==item.id))}><X size={15}/></button>
             </div>)}</div>
             <div className="ref-cart-trust"><div><ShieldCheck size={16}/><span>بررسی قیمت و موجودی پیش از ثبت سفارش</span></div><div><Clock3 size={16}/><span>رزرو موجودی پس از ثبت سفارش، به مدت ۱۵ دقیقه</span></div></div>
-            <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{money(cartTotal)} تومان</b></div>
+            <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{cartNeedsFreshQuote?'پس از دریافت نرخ معتبر':money(cartTotal)+' تومان'}</b></div>
             <p className="mb-4 text-[11px] leading-7 text-muted-foreground">قیمت نهایی پیش از ثبت سفارش بررسی می‌شود.</p>
             <button type="button" className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full mahgold-premium-action" disabled={cartRefreshing} onClick={async()=>{const ready=await refreshCartPrices();if(ready)setCheckoutOpen(true);}}>{cartRefreshing?'در حال به‌روزرسانی قیمت‌ها…':'ادامه و ثبت سفارش'} <ArrowLeft className="mr-2 inline" size={16}/></button>
           </>}
