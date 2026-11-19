@@ -78,6 +78,13 @@ function getProductSpecRows(product){
   if(Number(product?.weight_grams)>0) rows.push([has('سکه')?'وزن سکه':'وزن',gram(product.weight_grams)]);
   if(Number(product?.karat)>0) rows.push([has('سکه')?'عیار سکه':'عیار',money(product.karat)]);
   if(product?.tag?.trim()) rows.push(['ویژگی',product.tag.trim()]);
+  if(product?.attributes&&typeof product.attributes==='object'&&!Array.isArray(product.attributes)){
+    Object.entries(product.attributes).forEach(([label,value])=>{
+      const key=String(label||'').trim();
+      const val=typeof value==='string'||typeof value==='number'?String(value).trim():'';
+      if(key&&val)rows.push([key,val]);
+    });
+  }
   if(Number(product?.stock)>=0) rows.push(['وضعیت موجودی',Number(product.stock)>0?'موجود':'ناموجود']);
   return rows;
 }
@@ -261,7 +268,7 @@ export default function App() {
     (async()=>{
       try{
         const [productResult,categoryResult,quoteResult]=await Promise.all([
-          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active,created_at,tag')
+          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active,created_at,tag,attributes')
             .eq('is_active',true).order('created_at',{ascending:false}),
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
             .eq('is_active',true).order('sort_order',{ascending:true}),
@@ -296,7 +303,7 @@ export default function App() {
       const [quoteResult,productResult]=await Promise.all([
         supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
           .in('symbol',['gold_18k','coin_emami','coin_bahar','coin_nim','coin_rob','coin_gerami']).order('observed_at',{ascending:false}),
-        supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active,created_at,tag')
+        supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active,created_at,tag,attributes')
           .eq('is_active',true).order('created_at',{ascending:false})
       ]);
       if(!active)return;
@@ -338,7 +345,7 @@ export default function App() {
     try{
       const ids=cart.map(item=>item.id);
       const [productResult,quoteResult]=await Promise.all([
-        supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active').in('id',ids),
+        supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active,attributes').in('id',ids),
         supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live').eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle()
       ]);
       if(productResult.error)throw productResult.error;
