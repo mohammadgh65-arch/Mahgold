@@ -145,3 +145,5 @@
 .admin-preview-foot{background:#0c0b09;color:#bfae8a;text-align:center;padding:12px;font-size:8px}
 .admin-preview-note{font-size:10px;color:#b9aa8d;text-align:center;padding:9px 4px 1px}
 @media(max-width:640px){.admin-live-preview{padding:9px}.admin-preview-stage{padding:5px}.admin-preview-device.mobile{max-width:100%}.admin-preview-categories{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-preview-category,.admin-preview-category img{height:82px;min-height:82px}.admin-preview-products{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-preview-links{display:none}.admin-preview-hero{min-height:160px}.admin-preview-copy{max-width:90%}}
+
+.admin-preview-category small{position:absolute;right:6px;left:6px;bottom:25px;color:#ead9b8;font-size:7px;line-height:1.5;z-index:1;text-shadow:0 1px 3px #000}
