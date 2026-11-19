@@ -1,6 +1,14 @@
-@import url("https://growth-and-advancement-garden.lovable.app/assets/styles-LaDTnYWT.css");
 @import url("https://cdn.jsdelivr.net/npm/shabnam-font@5.0.0/dist/font-face.min.css");
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap");
+:root{
+ --background:#f7f3eb;--foreground:#211d17;--card:#fffdfa;--border:#e6dcc9;--input:#d7cbb8;
+ --muted-foreground:#807565;--muted:#817969;--gold:#c9a45c;--gold-deep:#8f682d;--gold-light:#ead8aa;
+ --ink:#17130d;--ink-foreground:#f7ecd4;--ink-muted:#c8b995;--sand:#f1e9da;
+ --gold-gradient:linear-gradient(115deg,#ead39b,#c49a51 55%,#a87c35);
+ --sand-gradient:linear-gradient(135deg,#fbf7ef,#eee5d4);
+ --background-rgb:247,243,235;
+}
+@import "./mahgold-utilities.css";
 
 html{scroll-behavior:smooth;scroll-padding-top:88px}
 body{margin:0;background:var(--background);color:var(--foreground);font-family:"Shabnam",Tahoma,sans-serif}
