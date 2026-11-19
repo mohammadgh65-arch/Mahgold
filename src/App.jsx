@@ -621,6 +621,7 @@ export default function App() {
         <span className="inline-flex items-center gap-1.5"><MapPin className="size-3.5 text-gold"/> {siteContent?.address||"نشانی: به‌زودی اعلام می‌شود"}</span>
       </div>
       <div className="mt-3 text-[11px] opacity-60">© ۱۴۰۵ {siteContent?.storeName||"فروشگاه آنلاین مه‌گلد"} · {siteContent?.footer||"زیورآلات طلا"}</div>
+      {siteContent?.policies&&[['terms','شرایط خرید'],['shipping','ارسال و تحویل'],['returns','مرجوعی و تعویض'],['privacy','حریم خصوصی']].filter(([key])=>siteContent.policies[key]?.trim()).length>0&&<div className="mahgold-policy-links">{[['terms','شرایط خرید'],['shipping','ارسال و تحویل'],['returns','مرجوعی و تعویض'],['privacy','حریم خصوصی']].filter(([key])=>siteContent.policies[key]?.trim()).map(([key,label])=><details key={key}><summary>{label}</summary><p>{siteContent.policies[key]}</p></details>)}</div>}
     </footer>
 
     <nav className="ref-mobile-nav fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background/95 px-2 pt-1 backdrop-blur-xl md:hidden">
