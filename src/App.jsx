@@ -2,7 +2,7 @@ import { MAHGOLD_LOGO } from './mahgold-brand';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight, ChevronDown,
-  ShieldCheck, Gift, Headphones, Plus, Minus, UserRound, LogOut,
+  ShieldCheck, Clock3, Gift, Headphones, Plus, Minus, UserRound, LogOut,
   House, LayoutGrid, Phone, MapPin, PackageCheck
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
@@ -386,7 +386,14 @@ export default function App() {
     setCheckoutError('');
     setCartNotice('«'+product.name+'» به سبد خرید اضافه شد.');
   };
-  const changeQuantity=(id,delta)=>setCart(old=>old.map(item=>item.id===id?{...item,qty:item.qty+delta}:item).filter(item=>item.qty>0&&item.qty<=Number(item.stock||0)));
+  const changeQuantity=(id,delta)=>{
+    const current=cart.find(item=>item.id===id);
+    if(!current)return;
+    const nextQty=Number(current.qty||0)+delta;
+    if(nextQty>Number(current.stock||0)){setCheckoutError('موجودی «'+current.name+'» برای تعداد بیشتر کافی نیست.');return;}
+    setCheckoutError('');
+    setCart(old=>old.map(item=>item.id===id?{...item,qty:nextQty}:item).filter(item=>item.qty>0));
+  };
   const submitOrder=async event=>{
     event.preventDefault();
     if(checkoutBusy)return;
@@ -639,16 +646,18 @@ export default function App() {
               </div></div>
               <button className="ref-remove" aria-label="حذف محصول" onClick={()=>setCart(old=>old.filter(p=>p.id!==item.id))}><X size={15}/></button>
             </div>)}</div>
-            <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{money(cartTotal)} تومان</b></div>
+            <div className="ref-cart-trust"><div><ShieldCheck size={16}/><span>بررسی قیمت و موجودی پیش از ثبت سفارش</span></div><div><Clock3 size={16}/><span>رزرو موجودی پس از ثبت سفارش، به مدت ۱۵ دقیقه</span></div></div>
+            <div className="ref-checkout-items"><strong>خلاصه اقلام سفارش</strong>{cart.map(item=><div key={item.id}><span>{item.name} × {money(item.qty)}</span><b>{money(Number(item.price_toman||0)*Number(item.qty||0))} تومان</b></div>)}</div>
+        <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{money(cartTotal)} تومان</b></div>
             <p className="mb-4 text-[11px] leading-7 text-muted-foreground">قیمت نهایی پیش از ثبت سفارش بررسی می‌شود.</p>
             <button type="button" className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full mahgold-premium-action" disabled={cartRefreshing} onClick={async()=>{const ready=await refreshCartPrices();if(ready)setCheckoutOpen(true);}}>{cartRefreshing?'در حال به‌روزرسانی قیمت‌ها…':'ادامه و ثبت سفارش'} <ArrowLeft className="mr-2 inline" size={16}/></button>
           </>}
       </aside>
     </div>}
 
-    {checkoutOpen&&<div className="ref-overlay" onClick={()=>setCheckoutOpen(false)}>
+    {checkoutOpen&&<div className="ref-overlay" onClick={()=>{if(!checkoutBusy)setCheckoutOpen(false);}}>
       <form className="ref-drawer ref-checkout-form" onClick={e=>e.stopPropagation()} onSubmit={submitOrder}>
-        <div className="ref-drawer-head"><div><div className="eyebrow text-gold-deep">SECURE CHECKOUT</div><h2>اطلاعات سفارش</h2></div><button type="button" className="ref-close" aria-label="بستن" onClick={()=>setCheckoutOpen(false)}><X/></button></div>
+        <div className="ref-drawer-head"><div><div className="eyebrow text-gold-deep">SECURE CHECKOUT</div><h2>اطلاعات سفارش</h2></div><button type="button" className="ref-close" aria-label="بستن" onClick={()=>setCheckoutOpen(false)}><X/></button></div><div className="ref-checkout-steps"><span>۱ · سبد خرید</span><b>۲ · اطلاعات ارسال</b><span>۳ · رزرو موجودی</span></div>
         <label>نام و نام خانوادگی<input required minLength="2" value={customer.name} onChange={e=>setCustomer({...customer,name:e.target.value})}/></label>
         <label>شماره تماس<input required type="tel" minLength="8" value={customer.phone} onChange={e=>setCustomer({...customer,phone:e.target.value})}/></label>
         <label>ایمیل (اختیاری)<input type="email" value={customer.email} onChange={e=>setCustomer({...customer,email:e.target.value})}/></label>
@@ -668,7 +677,7 @@ export default function App() {
       <header className="mahgold-product-page-head">
         <button type="button" className="mahgold-page-back" onClick={closeProduct}><ArrowLeft size={19}/> بازگشت به فروشگاه</button>
         <span className="mahgold-product-brand">MAHGOLD <i>✦</i></span>
-        <button type="button" className="mahgold-page-cart" onClick={()=>setCartOpen(true)}><ShoppingBag size={18}/> سبد خرید {cart.length>0&&<b>{money(cart.reduce((n,item)=>n+Number(item.quantity||0),0))}</b>}</button>
+        <button type="button" className="mahgold-page-cart" onClick={()=>setCartOpen(true)}><ShoppingBag size={18}/> سبد خرید {cart.length>0&&<b>{money(cart.reduce((n,item)=>n+Number(item.qty||0),0))}</b>}</button>
       </header>
       <section className="mahgold-product-page-content">
         <div className="mahgold-product-page-gallery">
