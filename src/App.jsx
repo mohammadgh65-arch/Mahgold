@@ -649,8 +649,7 @@ export default function App() {
               <button className="ref-remove" aria-label="حذف محصول" onClick={()=>setCart(old=>old.filter(p=>p.id!==item.id))}><X size={15}/></button>
             </div>)}</div>
             <div className="ref-cart-trust"><div><ShieldCheck size={16}/><span>بررسی قیمت و موجودی پیش از ثبت سفارش</span></div><div><Clock3 size={16}/><span>رزرو موجودی پس از ثبت سفارش، به مدت ۱۵ دقیقه</span></div></div>
-            <div className="ref-checkout-items"><strong>خلاصه اقلام سفارش</strong>{cart.map(item=><div key={item.id}><span>{item.name} × {money(item.qty)}</span><b>{money(Number(item.price_toman||0)*Number(item.qty||0))} تومان</b></div>)}</div>
-        <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{money(cartTotal)} تومان</b></div>
+            <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{money(cartTotal)} تومان</b></div>
             <p className="mb-4 text-[11px] leading-7 text-muted-foreground">قیمت نهایی پیش از ثبت سفارش بررسی می‌شود.</p>
             <button type="button" className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full mahgold-premium-action" disabled={cartRefreshing} onClick={async()=>{const ready=await refreshCartPrices();if(ready)setCheckoutOpen(true);}}>{cartRefreshing?'در حال به‌روزرسانی قیمت‌ها…':'ادامه و ثبت سفارش'} <ArrowLeft className="mr-2 inline" size={16}/></button>
           </>}
@@ -659,7 +658,7 @@ export default function App() {
 
     {checkoutOpen&&<div className="ref-overlay" onClick={()=>{if(!checkoutBusy)setCheckoutOpen(false);}}>
       <form className="ref-drawer ref-checkout-form" onClick={e=>e.stopPropagation()} onSubmit={submitOrder}>
-        <div className="ref-drawer-head"><div><div className="eyebrow text-gold-deep">SECURE CHECKOUT</div><h2>اطلاعات سفارش</h2></div><button type="button" className="ref-close" aria-label="بستن" onClick={()=>setCheckoutOpen(false)}><X/></button></div><div className="ref-checkout-steps"><span>۱ · سبد خرید</span><b>۲ · اطلاعات ارسال</b><span>۳ · رزرو موجودی</span></div>
+        <div className="ref-drawer-head"><div><div className="eyebrow text-gold-deep">SECURE CHECKOUT</div><h2>اطلاعات سفارش</h2></div><button type="button" className="ref-close" aria-label="بستن" onClick={()=>{if(!checkoutBusy)setCheckoutOpen(false);}}><X/></button></div><div className="ref-checkout-steps"><span>۱ · سبد خرید</span><b>۲ · اطلاعات ارسال</b><span>۳ · رزرو موجودی</span></div>
         <label>نام و نام خانوادگی<input required minLength="2" value={customer.name} onChange={e=>setCustomer({...customer,name:e.target.value})}/></label>
         <label>شماره تماس<input required type="tel" minLength="8" value={customer.phone} onChange={e=>setCustomer({...customer,phone:e.target.value})}/></label>
         <label>ایمیل (اختیاری)<input type="email" value={customer.email} onChange={e=>setCustomer({...customer,email:e.target.value})}/></label>
@@ -667,6 +666,7 @@ export default function App() {
         <label>کد پستی<input value={customer.postalCode} onChange={e=>setCustomer({...customer,postalCode:e.target.value})}/></label>
         <label>نشانی کامل ارسال<textarea required rows="3" value={customer.address} onChange={e=>setCustomer({...customer,address:e.target.value})}/></label>
         <label>توضیحات سفارش<textarea rows="2" value={customer.note} onChange={e=>setCustomer({...customer,note:e.target.value})}/></label>
+        <div className="ref-checkout-items"><strong>خلاصه اقلام سفارش</strong>{cart.map(item=><div key={item.id}><span>{item.name} × {money(item.qty)}</span><b>{money(Number(item.price_toman||0)*Number(item.qty||0))} تومان</b></div>)}</div>
         <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{money(cartTotal)} تومان</b></div>
         {checkoutError&&<p className="ref-message">{checkoutError}</p>}
         <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full mahgold-premium-action mahgold-finalize-action" disabled={checkoutBusy}>{checkoutBusy?'در حال ثبت…':'ثبت سفارش و رزرو موجودی'}</button>
