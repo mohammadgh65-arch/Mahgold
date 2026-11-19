@@ -436,7 +436,7 @@ export default function App() {
 
   return <div dir="rtl" className="min-h-screen bg-background text-foreground">
     {cartNotice&&<div className="mahgold-cart-toast" role="status"><span>✓</span>{cartNotice}<button onClick={()=>{setCartNotice('');setCartOpen(true);}}>مشاهده سبد</button></div>}
-    {siteContent?.announcement?.active!==false&&<div className="ref-announcement">{siteContent?.announcement?.text||[siteContent?.top1,siteContent?.top2].filter(Boolean).join('  ✦  ')||"ارسال امن و بسته‌بندی ویژه ✦ پشتیبانی مه‌گلد ✦ همراه انتخاب شما"}</div>}
+    {siteContent?.announcement?.active!==false&&(siteContent?.announcement&&typeof siteContent.announcement.text==='string'?(siteContent.announcement.text.trim()&&<div className="ref-announcement">{siteContent.announcement.text}</div>):<div className="ref-announcement">{[siteContent?.top1,siteContent?.top2].filter(Boolean).join('  ✦  ')||"ارسال امن و بسته‌بندی ویژه ✦ پشتیبانی مه‌گلد ✦ همراه انتخاب شما"}</div>)}
 
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-xl transition-shadow">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:h-[72px] md:px-7">
