@@ -50,7 +50,13 @@ const presetCategories = [
 const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85';
 const money = value => new Intl.NumberFormat('fa-IR').format(Number(value || 0));
 const gram = value => new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(Number(value || 0)) + ' گرم';
-const createIdempotencyKey = () => crypto.randomUUID();
+const createIdempotencyKey = () => {
+  if(typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function')return crypto.randomUUID();
+  const bytes=new Uint8Array(16);crypto.getRandomValues(bytes);
+  bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+  const hex=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
+  return hex.slice(0,8)+'-'+hex.slice(8,12)+'-'+hex.slice(12,16)+'-'+hex.slice(16,20)+'-'+hex.slice(20);
+};
 const toLatinDigits = value => value.replace(/[۰-۹٠-٩]/g, d => {
   const fa='۰۱۲۳۴۵۶۷۸۹', ar='٠١٢٣٤٥٦٧٨٩';
   return String(fa.indexOf(d)>=0 ? fa.indexOf(d) : ar.indexOf(d));
@@ -264,7 +270,11 @@ export default function App() {
           idempotency_key:idempotencyKey
         }
       });
-      if(error)throw error;
+      if(error){
+        let message=error.message||'ثبت سفارش انجام نشد.';
+        try{const response=error.context?.clone?.();const body=response?await response.json():null;if(body?.error)message=body.error;}catch{}
+        throw new Error(message);
+      }
       const created=data?.data;
       if(!created?.order_id||!created?.order_number)throw new Error('پاسخ سرویس سفارش معتبر نیست؛ وضعیت سفارش را از پشتیبانی پیگیری کنید.');
       setOrderResult(created);setCart([]);setCheckoutOpen(false);setCartOpen(false);
