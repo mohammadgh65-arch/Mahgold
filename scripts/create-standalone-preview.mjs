@@ -30,7 +30,7 @@ if (/<script[^>]+src=["'](?:\/|\.\/)?assets\/|<link[^>]+href=["'](?:\/|\.\/)?ass
 if (!html.includes('data:image/svg+xml;base64')) throw new Error('Embedded SVG logo is missing.');
 if (!html.includes('ورود مدیریت مه‌گلد')) throw new Error('Admin login screen is missing.');
 const embeddedStorefront = JSON.stringify(storefrontHtml).replace(/</g, '\\u003c');
-html = html.replace('</head>', '<script>window.__MAHGOLD_STORE_PREVIEW_HTML=' + embeddedStorefront + ';<\\/script></head>');
+html = html.replace('</head>', '<script>window.__MAHGOLD_STORE_PREVIEW_HTML=' + embeddedStorefront + ';</script></head>');
 if (!html.includes('__MAHGOLD_STORE_PREVIEW_HTML')) throw new Error('Embedded storefront preview is missing.');
 writeFileSync(join(out, 'index.html'), html, 'utf8');
 console.log('Standalone admin preview created:', Buffer.byteLength(html), 'bytes');
