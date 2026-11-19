@@ -167,3 +167,5 @@
 .admin-content-preview-head button{border:1px solid #d5c092;background:#f5ecd9;color:#70552b;border-radius:9px;padding:9px 13px;font:inherit;font-size:11px}
 .admin-content-preview iframe{display:block;width:100%;height:760px;border:1px solid #e8decb;border-radius:12px;background:#fbf8f1}
 @media(max-width:640px){.admin-product-attribute-row{grid-template-columns:1fr 1fr}.admin-product-attribute-row>button{grid-column:1/-1}.admin-content-preview{padding:10px}.admin-content-preview iframe{height:680px}}
+
+.admin-preview-note{padding:22px;border:1px dashed #d5c092;border-radius:11px;background:#faf5e9;color:#796644;font-size:12px;line-height:2;text-align:center}
