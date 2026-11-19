@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - mahgold-independent-react
+      - mahgold-professional-preview-2026-11-19
   workflow_dispatch:
 
 permissions:
