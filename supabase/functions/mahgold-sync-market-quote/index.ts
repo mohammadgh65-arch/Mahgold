@@ -49,7 +49,20 @@ Deno.serve(async (req: Request) => {
     return reply(502, { error: "Rate provider is unreachable" });
   } finally { clearTimeout(timeout); }
 
-  if (!upstream.ok) { await setProviderStatus(upstream.status === 429 ? "stale" : "error"); return reply(502, { error: "Rate provider rejected the request", upstream_status: upstream.status }); }
+  if (!upstream.ok) {
+    let providerError: any = {};
+    try { providerError = await upstream.clone().json(); } catch { /* keep a safe generic error */ }
+    const retryAfterHeader = Number(upstream.headers.get("Retry-After"));
+    const retryAfterBody = Number(providerError?.retryAfter);
+    await setProviderStatus(upstream.status === 429 ? "stale" : "error");
+    return reply(upstream.status === 429 ? 429 : 502, {
+      error: "Rate provider rejected the request",
+      upstream_status: upstream.status,
+      provider_code: typeof providerError?.error === "string" ? providerError.error : null,
+      provider_message: typeof providerError?.message === "string" ? providerError.message.slice(0, 180) : null,
+      retry_after_seconds: Number.isFinite(retryAfterHeader) && retryAfterHeader > 0 ? retryAfterHeader : (Number.isFinite(retryAfterBody) && retryAfterBody > 0 ? retryAfterBody : null),
+    });
+  }
   let payload: any;
   try { payload = await upstream.json(); } catch { await setProviderStatus("error"); return reply(502, { error: "Rate provider returned invalid JSON" }); }
 
