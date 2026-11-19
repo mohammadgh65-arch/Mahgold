@@ -24,12 +24,22 @@ jobs:
           cache: npm
       - name: Install exact locked dependencies
         run: npm ci --no-audit --no-fund
+      - name: Build storefront for embedded admin preview
+        env:
+          VITE_SUPABASE_URL: https://nzvvvpbwavaodhxrnkdr.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_8UgFkQuDJNNeez2O1CNv3Q_Jf44PrL9
+        run: |
+          npm run build
+          node scripts/create-storefront-preview.mjs
+          cp dist/index.html /tmp/mahgold-storefront-preview.html
       - name: Build admin-only React application
         env:
           VITE_ADMIN_PREVIEW: "true"
           VITE_SUPABASE_URL: https://nzvvvpbwavaodhxrnkdr.supabase.co
           VITE_SUPABASE_ANON_KEY: sb_publishable_8UgFkQuDJNNeez2O1CNv3Q_Jf44PrL9
-        run: npm run build
+        run: |
+          npm run build
+          cp /tmp/mahgold-storefront-preview.html dist/storefront-preview.html
       - name: Assemble standalone HTML
         run: node scripts/create-standalone-preview.mjs
       - name: Verify admin-only standalone output
@@ -38,6 +48,8 @@ jobs:
           ! grep -Eq '<script[^>]+src=.*assets/|<link[^>]+href=.*assets/.*\\.css' dist/index.html
           grep -q 'ورود مدیر' dist/index.html
           grep -q 'نمای کلی' dist/index.html
+          grep -q '__MAHGOLD_STORE_PREVIEW_HTML' dist/index.html
+          grep -q 'درخششِ طلا' dist/index.html
           echo "Admin preview verified: $(wc -c < dist/index.html) bytes"
       - name: Upload private admin preview artifact
         uses: actions/upload-artifact@v4
