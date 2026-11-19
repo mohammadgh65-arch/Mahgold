@@ -562,7 +562,7 @@ export default function App() {
       <section className="scroll-mt-16 bg-sand-gradient py-16 md:py-24" id="shop">
         <div className="mx-auto max-w-7xl px-4 md:px-7">
           <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div><div className="eyebrow text-gold-deep">THE CURATED EDIT</div><h2 className="mt-2 text-2xl font-semibold md:text-3xl">منتخب‌های مه‌گلد</h2>{quote&&<p className="mt-2 text-xs text-muted-foreground">{quote.title||'آخرین نرخ ثبت‌شده طلا'}: <b className="text-gold-deep">{money(quote.price_toman)} تومان</b> <span className="mr-1 text-[10px]">{quote.is_live?'نرخ زنده':'ثبت دستی · غیرزنده'}</span></p>}</div>
+            <div><div className="eyebrow text-gold-deep">THE CURATED EDIT</div><h2 className="mt-2 text-2xl font-semibold md:text-3xl">منتخب‌های مه‌گلد</h2>{quote&&<p className="mt-2 text-xs text-muted-foreground">{quote.title||'آخرین نرخ ثبت‌شده طلا'}: <b className="text-gold-deep">{money(quote.price_toman)} تومان</b> <span className="mr-1 text-[10px]">{isFreshLiveQuote(quote)?'نرخ زنده و به‌روز':quote.is_live?'آخرین نرخ · قدیمی':'ثبت دستی · غیرزنده'}</span></p>}</div>
             <label className="flex h-10 w-full items-center gap-2 rounded-full border border-border bg-card px-4 text-muted-foreground md:w-72">
               <Search size={16}/><input aria-label="جست‌وجوی محصول" className="w-full bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground" value={query} onChange={e=>setQuery(e.target.value)} placeholder="نام محصول را جستجو کنید..."/>
             </label>
