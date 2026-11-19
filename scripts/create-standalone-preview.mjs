@@ -3,6 +3,7 @@ import { join, basename } from 'node:path';
 
 const out = 'dist';
 const assetDir = join(out, 'assets');
+const storefrontHtml = readFileSync(join(out, 'storefront-preview.html'), 'utf8');
 const logo = 'data:image/svg+xml;base64,' + readFileSync('public/mahgold-app-icon.svg').toString('base64');
 let html = readFileSync(join(out, 'index.html'), 'utf8').replaceAll('\\n', '\n');
 
@@ -28,5 +29,8 @@ if (/<script[^>]+src=["'](?:\/|\.\/)?assets\/|<link[^>]+href=["'](?:\/|\.\/)?ass
 }
 if (!html.includes('data:image/svg+xml;base64')) throw new Error('Embedded SVG logo is missing.');
 if (!html.includes('ورود مدیریت مه‌گلد')) throw new Error('Admin login screen is missing.');
+const embeddedStorefront = JSON.stringify(storefrontHtml).replace(/</g, '\\\\u003c');
+html = html.replace('</head>', '<script>window.__MAHGOLD_STORE_PREVIEW_HTML=' + embeddedStorefront + ';<\\/script></head>');
+if (!html.includes('__MAHGOLD_STORE_PREVIEW_HTML')) throw new Error('Embedded storefront preview is missing.');
 writeFileSync(join(out, 'index.html'), html, 'utf8');
 console.log('Standalone admin preview created:', Buffer.byteLength(html), 'bytes');
