@@ -79,10 +79,12 @@ function getProductSpecRows(product){
   if(Number(product?.karat)>0) rows.push([has('سکه')?'عیار سکه':'عیار',money(product.karat)]);
   if(product?.tag?.trim()) rows.push(['ویژگی',product.tag.trim()]);
   if(product?.attributes&&typeof product.attributes==='object'&&!Array.isArray(product.attributes)){
+    const privateKeys=new Set(['variant_sku','parent_product_id','variant_model_name','internal_sku','admin_note']);
+    const labels={ring_size:'سایز انگشتر',variant_size:'سایز',chain_length:'طول زنجیر',bracelet_length:'طول دستبند',lock_type:'نوع قفل',stone_type:'نوع سنگ',stone_weight:'وزن سنگ',model:'مدل',finish:'نوع پرداخت',color:'رنگ',certificate:'گواهی'};
     Object.entries(product.attributes).forEach(([label,value])=>{
       const key=String(label||'').trim();
       const val=typeof value==='string'||typeof value==='number'?String(value).trim():'';
-      if(key&&val)rows.push([key,val]);
+      if(key&&val&&!privateKeys.has(key))rows.push([labels[key]||key.replaceAll('_',' '),val]);
     });
   }
   if(Number(product?.stock)>=0) rows.push(['وضعیت موجودی',Number(product.stock)>0?'موجود':'ناموجود']);
@@ -434,7 +436,7 @@ export default function App() {
 
   return <div dir="rtl" className="min-h-screen bg-background text-foreground">
     {cartNotice&&<div className="mahgold-cart-toast" role="status"><span>✓</span>{cartNotice}<button onClick={()=>{setCartNotice('');setCartOpen(true);}}>مشاهده سبد</button></div>}
-    {siteContent?.announcement?.active!==false&&<div className="ref-announcement">{siteContent?.announcement?.text||"ارسال امن و بسته‌بندی ویژه ✦ پشتیبانی مه‌گلد ✦ همراه انتخاب شما"}</div>}
+    {siteContent?.announcement?.active!==false&&<div className="ref-announcement">{siteContent?.announcement?.text||[siteContent?.top1,siteContent?.top2].filter(Boolean).join('  ✦  ')||"ارسال امن و بسته‌بندی ویژه ✦ پشتیبانی مه‌گلد ✦ همراه انتخاب شما"}</div>}
 
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-xl transition-shadow">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:h-[72px] md:px-7">
@@ -612,12 +614,12 @@ export default function App() {
 
     <footer className="bg-ink px-6 pb-28 pt-14 text-center text-xs leading-8 text-ink-muted md:pb-14">
       <img alt="مه‌گلد" className="mx-auto mb-4 h-36 w-auto" height="630" loading="lazy" src={siteContent?.logo_url||MAHGOLD_LOGO} width="525"/>
-      <div>طلایی به زیباییِ لحظه‌های تو</div>
+      <div>{siteContent?.slogan||"طلایی به زیباییِ لحظه‌های تو"}</div>
       <div className="mt-3 flex flex-col items-center gap-1 md:flex-row md:justify-center md:gap-6">
-        <span className="inline-flex items-center gap-1.5"><Phone className="size-3.5 text-gold"/> شماره تماس: به‌زودی</span>
-        <span className="inline-flex items-center gap-1.5"><MapPin className="size-3.5 text-gold"/> نشانی: به‌زودی اعلام می‌شود</span>
+        <span className="inline-flex items-center gap-1.5"><Phone className="size-3.5 text-gold"/> {siteContent?.phone||"شماره تماس: به‌زودی"}</span>
+        <span className="inline-flex items-center gap-1.5"><MapPin className="size-3.5 text-gold"/> {siteContent?.address||"نشانی: به‌زودی اعلام می‌شود"}</span>
       </div>
-      <div className="mt-3 text-[11px] opacity-60">© ۱۴۰۵ فروشگاه آنلاین مه‌گلد · زیورآلات طلا</div>
+      <div className="mt-3 text-[11px] opacity-60">© ۱۴۰۵ {siteContent?.storeName||"فروشگاه آنلاین مه‌گلد"} · {siteContent?.footer||"زیورآلات طلا"}</div>
     </footer>
 
     <nav className="ref-mobile-nav fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background/95 px-2 pt-1 backdrop-blur-xl md:hidden">
