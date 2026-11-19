@@ -260,7 +260,7 @@ export default function App() {
           customer_email:customer.email.trim()||null,
           shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
           customer_note:customer.note||'',
-          items:cart.map(item=>({product_id:item.id,quantity:item.qty})),
+          items:cart.map(item=>({product_id:item.id,quantity:item.qty,expected_price_toman:Number(item.price_toman)})),
           idempotency_key:idempotencyKey
         }
       });
