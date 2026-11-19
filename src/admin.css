@@ -200,3 +200,11 @@
 .admin-readiness-grid b{font-size:11px;color:#493d2b}
 .admin-readiness-grid small{font-size:9px;line-height:1.6;color:#8c806d}
 @media(max-width:640px){.admin-readiness-grid{grid-template-columns:1fr}.admin-readiness-panel{padding:14px}}
+
+.admin-logo-comparison{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:stretch}
+.admin-logo-option{display:grid;align-content:start;justify-items:center;gap:10px;min-width:0;padding:15px;border:1px solid #e7dcc9;border-radius:14px;background:#fffdf8}
+.admin-logo-option img{width:100%;height:132px;object-fit:contain;padding:12px;border-radius:11px;background:linear-gradient(145deg,#29251f,#17140f)}
+.admin-logo-option small{font-size:10px;color:#806e51;text-align:center;line-height:1.8}
+.admin-logo-option button{font:inherit;font-size:10px;padding:8px 12px;border:1px solid #d5c092;border-radius:9px;background:#f5ecd9;color:#70552b}
+.admin-logo-option-proposed{border-color:#d8c294;background:linear-gradient(145deg,#fffdf8,#f6eddd)}
+@media(max-width:520px){.admin-logo-comparison{grid-template-columns:1fr}.admin-logo-option img{height:118px}}
