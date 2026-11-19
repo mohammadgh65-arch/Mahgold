@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react';
 
 const defaults = [
- {name:'طلای زینتی',desc:'زیورآلات ظریف و ماندگار',image:'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=700&q=80'},
- {name:'طلای آب‌شده',desc:'انتخابی برای سرمایه‌گذاری',image:'https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&w=700&q=80'},
- {name:'سکه',desc:'ارزش آشنا و ماندگار',image:'https://images.unsplash.com/photo-1610375461369-d613b6f6e2d4?auto=format&fit=crop&w=700&q=80'},
+ {name:'طلای زینتی',desc:'زیورآلات ظریف و ماندگار',image:'https://growth-and-advancement-garden.lovable.app/assets/jewelry-CwLx7kUY.jpg'},
+ {name:'طلای آب‌شده',desc:'انتخابی برای سرمایه‌گذاری',image:'https://growth-and-advancement-garden.lovable.app/assets/melted-nOWRYhbE.jpg'},
+ {name:'سکه',desc:'ارزش آشنا و ماندگار',image:'https://growth-and-advancement-garden.lovable.app/assets/coin-CsyrnHPB.jpg'},
  {name:'شمش',desc:'خلوص در ساده‌ترین شکل',image:'https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&w=700&q=80'}
 ];
-const defaultSlide = {eyebrow:'MAHGOLD · FINE JEWELRY',title:'درخششِ طلا، امضایِ استایلِ شما',description:'زیبایی در سادگی‌ست؛ انتخاب‌هایی ظریف و ماندگار برای لحظه‌هایی که ارزش، معنا پیدا می‌کند.',button:'کشف مجموعه مه‌گلد',image:'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1600&q=85'};
+const defaultSlide = {eyebrow:'MAHGOLD · FINE JEWELRY',title:'درخششِ طلا، امضایِ استایلِ شما',description:'زیبایی در سادگی‌ست؛ انتخاب‌هایی ظریف و ماندگار برای لحظه‌هایی که ارزش، معنا پیدا می‌کند.',button:'کشف مجموعه مه‌گلد',image:'https://growth-and-advancement-garden.lovable.app/assets/slide-necklace-Bn1Ooa9V.jpg'};
 const safeImage = value => typeof value==='string' && (/^https:\/\//i.test(value)||/^\/[^/]/.test(value)) ? value : '';
 const money = value => new Intl.NumberFormat('fa-IR').format(Number(value||0));
 
@@ -17,7 +17,7 @@ export default function SiteLivePreview({content={},products=[],quotes=[]}){
  const quote=quotes.find(x=>x.symbol==='gold_18k')||quotes[0];
  const logo=safeImage(content.logo_url)||'/mahgold-logo.webp';
  const hero=safeImage(slide.image)||defaultSlide.image;
- const story=safeImage(content.story_image)||'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=900&q=80';
+ const story=safeImage(content.story_image)||'https://growth-and-advancement-garden.lovable.app/assets/slide-necklace-Bn1Ooa9V.jpg';
  const announcement=content.announcement?.active===false?'':(content.announcement?.text||'ارسال امن و بسته‌بندی ویژه ✦ پشتیبانی مه‌گلد ✦ همراه انتخاب شما');
  return <section className="admin-live-preview" aria-label="پیش‌نمایش زنده فروشگاه">
   <div className="admin-live-preview-head">
