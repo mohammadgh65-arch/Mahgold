@@ -169,3 +169,13 @@
 @media(max-width:640px){.admin-product-attribute-row{grid-template-columns:1fr 1fr}.admin-product-attribute-row>button{grid-column:1/-1}.admin-content-preview{padding:10px}.admin-content-preview iframe{height:680px}}
 
 .admin-preview-note{padding:22px;border:1px dashed #d5c092;border-radius:11px;background:#faf5e9;color:#796644;font-size:12px;line-height:2;text-align:center}
+
+.admin-price-health{display:grid;gap:12px;padding:18px 20px;border:1px solid #e6d8bd;border-radius:15px;background:linear-gradient(125deg,#fffdf8,#f4ead8);box-shadow:0 12px 30px rgba(57,43,22,.055)}
+.admin-price-health-main{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.admin-price-health-main>div{display:grid;gap:5px}
+.admin-price-health-main>div>span{font-size:11px;color:#8b7b61}
+.admin-price-health-main>div>strong{font-size:13px}
+.admin-price-health-main>div>strong.is-live{color:#28734d}
+.admin-price-health-main>div>strong.is-stale{color:#a15c31}
+.admin-price-health-main>b{font-size:20px;color:#856337;direction:rtl}
+.admin-price-health-meta{display:flex;gap:9px 18px;flex-wrap:wrap;padding-top:10px;border-top:1px solid #eadfc9;color:#897b66;font-size:10px}
