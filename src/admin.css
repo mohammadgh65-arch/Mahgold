@@ -125,3 +125,45 @@
 @media(max-width:640px){.admin-product-image-preview{align-items:flex-start}.admin-product-image-preview img{width:96px;height:96px}.admin-product-upload{min-height:52px}}
 
 .ref-price-breakdown{display:grid;gap:7px;padding:13px 14px;border:1px solid #e7dcc4;border-radius:12px;background:#fbf8f0;color:#53665a;font-size:11px;line-height:1.8}.ref-price-breakdown>b{color:#274b38;font-size:12px}.ref-price-breakdown>span{display:flex;justify-content:space-between;gap:10px}.ref-price-breakdown>small{color:#9a7a42;font-size:10px;margin-top:3px}.admin-pricing-editor{display:grid;gap:10px;border:1px solid #dce7df;border-radius:13px;background:#f5faf6;padding:14px}.admin-pricing-editor h3{font-size:13px;color:#204432;margin:0}.admin-pricing-editor p{font-size:11px;line-height:1.9;color:#718079;margin:0}.admin-pricing-editor label{display:grid;gap:6px;font-size:11px;color:#52695b}.admin-pricing-preview{display:grid;gap:6px;border:1px solid #e7dcc4;background:#fffaf0;border-radius:10px;padding:12px;font-size:11px;color:#6a6a55}.admin-pricing-preview b{color:#775d2c;font-size:11px}.admin-pricing-preview strong{border-top:1px solid #eadfc8;padding-top:8px;color:#1c5538;font-size:14px}
+
+/* MAHGOLD unified brand system — storefront and control center */
+:root{--admin-bg:#f4f0e8;--admin-card:#fffdf8;--admin-ink:#29251f;--admin-muted:#81786b;--admin-green:#29251f;--admin-gold:#c5a36a;--admin-line:#e9dfcd;--admin-shadow:0 16px 42px rgba(57,43,22,.075)}
+.admin-shell{background:radial-gradient(ellipse at 85% 0%,rgba(218,190,139,.16),transparent 34%),#f4f0e8;color:#29251f}
+.admin-side{background:linear-gradient(160deg,#24211d 0%,#332c22 58%,#211e19 100%);border-left:1px solid rgba(205,174,117,.2)}
+.admin-side>img,.admin-login img{background:#f8f3e8;border-color:rgba(204,174,119,.6);box-shadow:0 10px 28px rgba(0,0,0,.2)}
+.admin-side>small:before{color:#f6e8c9}
+.admin-side nav button.active{background:linear-gradient(100deg,rgba(204,174,119,.25),rgba(204,174,119,.08));border-color:rgba(224,195,142,.32);color:#f4dba9;box-shadow:inset -3px 0 #d3b47c}
+.admin-main header{border-color:#e6dcc9}
+.admin-main header span{color:#a48550;letter-spacing:2px}
+.admin-main h1{color:#29251f}
+.admin-stats article,.admin-panel{background:rgba(255,253,248,.94);border-color:#e9dfcd;box-shadow:0 14px 38px rgba(57,43,22,.055)}
+.admin-stats b{color:#9a7740}
+.admin-panel h2{color:#342d22}
+.admin-user button,.admin-toolbar button,.admin-form>button,.admin-modal button:not(.secondary),.admin-login button{border-color:#9c7b46;background:linear-gradient(135deg,#d9bd85,#b89153);color:#29251f;box-shadow:0 8px 18px rgba(155,120,61,.16)}
+.admin-table-wrap th{background:#f6f0e5;color:#78664b}
+.admin-table-wrap td{border-color:#eee6d9}
+.admin-table-wrap tbody tr:hover td{background:#fffaf1}
+.admin-status-pill{background:#f3eee4;color:#65533a}
+.admin-status-pill.status-paid,.admin-status-pill.status-completed{background:#e9f4ec;color:#26724c}
+.admin-status-pill.status-cancelled,.admin-status-pill.status-payment_failed{background:#faeae8;color:#a33e39}
+.admin-gate{background:radial-gradient(circle at 18% 12%,#665137 0%,transparent 38%),linear-gradient(145deg,#201d18,#383024 58%,#201d18)}
+.admin-login{background:linear-gradient(160deg,#fffdf8,#f5efe3);border-color:#ddc99e}
+.admin-content-card{background:#fffdf8;border-color:#e9dfcd}
+.admin-content-card h3{color:#4c3d27}
+.admin-product-attributes-editor{display:grid;gap:12px;padding:15px;border:1px solid #e7dcc8;border-radius:14px;background:linear-gradient(145deg,#fffdf8,#f8f2e8)}
+.admin-product-attributes-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.admin-product-attributes-head>div{display:grid;gap:5px}
+.admin-product-attributes-head strong{font-size:13px;color:#4c3d27}
+.admin-product-attributes-head small{font-size:10px;line-height:1.9;color:#837966}
+.admin-product-attributes-head button,.admin-product-attribute-row>button{border:1px solid #d8c59f;background:#f7f0e2;color:#70552b;border-radius:9px;padding:9px 12px;font:inherit;font-size:11px}
+.admin-product-attribute-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:9px;align-items:end;padding-top:10px;border-top:1px solid #eee4d3}
+.admin-product-attribute-row label{display:grid;gap:6px;font-size:10px;color:#786b55}
+.admin-product-attribute-row input{width:100%;min-width:0;border:1px solid #e2d8c6;border-radius:9px;padding:10px;background:#fffefa;font:inherit;font-size:12px;color:#30291f}
+.admin-product-attributes-empty{font-size:11px;color:#938773;margin:0}
+.admin-content-preview{border:1px solid #dfcfad;border-radius:16px;padding:15px;background:linear-gradient(145deg,#fffdf8,#f5eee0);box-shadow:0 12px 30px rgba(76,56,24,.06)}
+.admin-content-preview-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.admin-content-preview-head h3{margin:0;color:#4c3d27;font-size:15px}
+.admin-content-preview-head p{margin:4px 0 0}
+.admin-content-preview-head button{border:1px solid #d5c092;background:#f5ecd9;color:#70552b;border-radius:9px;padding:9px 13px;font:inherit;font-size:11px}
+.admin-content-preview iframe{display:block;width:100%;height:760px;border:1px solid #e8decb;border-radius:12px;background:#fbf8f1}
+@media(max-width:640px){.admin-product-attribute-row{grid-template-columns:1fr 1fr}.admin-product-attribute-row>button{grid-column:1/-1}.admin-content-preview{padding:10px}.admin-content-preview iframe{height:680px}}
