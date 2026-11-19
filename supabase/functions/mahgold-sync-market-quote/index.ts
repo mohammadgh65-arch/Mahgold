@@ -29,6 +29,7 @@ Deno.serve(async (req: Request) => {
   if (!appKey || !supabaseUrl || !serviceRoleKey) return reply(500, { error: "Server configuration is incomplete" });
 
   const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false, autoRefreshToken: false } });
+  const setProviderStatus = async (status: string) => { await admin.from("store_settings").update({ price_provider_status: status, updated_at: new Date().toISOString() }).eq("id", 1); };
   const nowMs = Date.now();
   const fetchedAt = new Date(nowMs).toISOString();
   const accepted: Array<Record<string, unknown>> = [];
@@ -44,12 +45,13 @@ Deno.serve(async (req: Request) => {
       headers: { "X-App-Key": appKey, "Accept": "application/json" }, signal: controller.signal,
     });
   } catch {
+    await setProviderStatus("error");
     return reply(502, { error: "Rate provider is unreachable" });
   } finally { clearTimeout(timeout); }
 
-  if (!upstream.ok) return reply(502, { error: "Rate provider rejected the request", upstream_status: upstream.status });
+  if (!upstream.ok) { await setProviderStatus(upstream.status === 429 ? "stale" : "error"); return reply(502, { error: "Rate provider rejected the request", upstream_status: upstream.status }); }
   let payload: any;
-  try { payload = await upstream.json(); } catch { return reply(502, { error: "Rate provider returned invalid JSON" }); }
+  try { payload = await upstream.json(); } catch { await setProviderStatus("error"); return reply(502, { error: "Rate provider returned invalid JSON" }); }
 
   const rate = Array.isArray(payload?.rates)
     ? payload.rates.find((item: any) => item?.assetId === "gold_18")
@@ -122,13 +124,14 @@ Deno.serve(async (req: Request) => {
     }
   }
 
-  if (!accepted.length) return reply(409, {
+  if (!accepted.length) { await setProviderStatus("stale"); return reply(409, {
     error: "No asset passed rate validation; stored rates were not changed",
     skipped, gold_checks: goldChecks, coin_sync_attempted: shouldSyncCoins,
-  });
+  }); }
 
   const { error } = await admin.from("market_quotes").upsert(accepted, { onConflict: "symbol" });
-  if (error) return reply(500, { error: "Could not store verified market quotes" });
+  if (error) { await setProviderStatus("error"); return reply(500, { error: "Could not store verified market quotes" }); }
+  await setProviderStatus(accepted.some((item) => item.symbol === "gold_18k") ? "connected" : "stale");
 
   return reply(200, {
     ok: true, updated: accepted.map((item) => item.symbol),
