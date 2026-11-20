@@ -308,6 +308,7 @@ export default function App() {
 
   return <div dir="rtl" className="min-h-screen bg-background text-foreground">
     {siteContent?.announcement?.active!==false&&<div className="ref-announcement">{siteContent?.announcement?.text||"ارسال امن و بسته‌بندی ویژه ✦ پشتیبانی مه‌گلد ✦ همراه انتخاب شما"}</div>}
+    <div className="ref-brand-masthead" aria-label="مه‌گلد"><img src="/mahgold-brand-masthead.jpg" alt="مه‌گلد؛ نشان هلال و الماس طلایی روی مخمل سبز زمردی" fetchPriority="high"/></div>
 
     <header className="ref-site-header sticky top-0 z-40">
       <div className="ref-main-header mx-auto max-w-[1440px] px-4 md:px-6">
