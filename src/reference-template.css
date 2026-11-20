@@ -339,3 +339,57 @@ footer.bg-ink{padding-top:0!important}
  .ref-hero-copy>div{width:52%}
  .ref-hero h1{font-size:30px!important}
 }
+
+
+/* MAHGOLD BRAND RESET — one clean artwork, no duplicate/blurred layers */
+.ref-brand-masthead{
+  display:block!important;width:100%!important;height:clamp(190px,22vw,285px)!important;
+  margin:0!important;padding:0!important;overflow:hidden!important;position:relative!important;
+  background:#031b12!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+  isolation:isolate!important;
+}
+.ref-brand-masthead::before,.ref-brand-masthead::after{content:none!important;display:none!important;background:none!important;filter:none!important}
+.ref-brand-masthead img{
+  display:block!important;position:relative!important;inset:auto!important;z-index:auto!important;
+  width:100%!important;height:100%!important;max-width:none!important;margin:0!important;
+  object-fit:cover!important;object-position:center 48%!important;
+  transform:none!important;filter:none!important;mask-image:none!important;-webkit-mask-image:none!important;
+  opacity:1!important;image-rendering:auto!important;
+}
+/* The wordmark is already inside the banner; remove the competing miniature SVG logo. */
+.ref-site-header{background:#062719!important;border-top:1px solid rgba(224,184,103,.48)!important;border-bottom:1px solid #bd914b!important;box-shadow:0 7px 22px rgba(0,0,0,.22)!important}
+.ref-main-header{background:transparent!important;min-height:72px!important}
+.ref-brand{display:none!important}
+.ref-primary-nav a{color:#f1dfb7!important;font-weight:650!important}
+.ref-primary-nav a:hover,.ref-primary-nav a.active{color:#f6ca73!important;border-color:#d7aa59!important}
+.ref-header-search{background:rgba(255,244,220,.09)!important;border-color:rgba(221,181,106,.58)!important;color:#f5e4c0!important}
+.ref-header-search input{color:#fff0ce!important}
+.ref-header-search input::placeholder{color:#e2cfaa!important}
+.ref-header-actions button,.ref-mobile-menu{color:#f1d69c!important;border-color:rgba(220,180,103,.45)!important}
+.ref-site-header svg{color:#e6bd70!important}
+.ref-footer-brand{
+  display:block!important;width:100%!important;max-width:none!important;
+  height:clamp(170px,19vw,245px)!important;margin:0!important;padding:0!important;
+  overflow:hidden!important;position:relative!important;background:#062719!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+}
+.ref-footer-brand img{
+  display:block!important;width:100%!important;height:100%!important;margin:0!important;
+  object-fit:cover!important;object-position:center 48%!important;
+  border:0!important;border-radius:0!important;filter:none!important;transform:none!important;
+}
+footer.bg-ink{
+  padding:0 0 26px!important;background:#062719!important;
+  border-top:1px solid #bd914b!important;color:#f0dfbb!important;
+}
+footer.bg-ink>div:not(.ref-footer-brand),footer.bg-ink span{color:#f0dfbb!important}
+footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
+@media(max-width:767px){
+  .ref-brand-masthead{height:clamp(145px,39vw,190px)!important}
+  .ref-brand-masthead img{object-position:center 48%!important}
+  .ref-main-header{min-height:62px!important}
+  .ref-primary-nav,.ref-header-search{display:none!important}
+  .ref-mobile-menu{color:#f1d69c!important}
+  .ref-footer-brand{height:clamp(130px,38vw,175px)!important}
+  footer.bg-ink{padding-bottom:calc(24px + env(safe-area-inset-bottom))!important}
+}
