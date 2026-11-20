@@ -63,16 +63,22 @@ function ProductImage({product, className=''}) {
   </div>;
 }
 
-function AccountContent({onClose}) {
+function orderStatusLabel(status) {
+  return ({pending:'در انتظار بررسی',awaiting_payment:'در انتظار پرداخت',paid:'پرداخت‌شده',processing:'در حال آماده‌سازی',shipped:'ارسال‌شده',completed:'تحویل‌شده',cancelled:'لغوشده',payment_failed:'خطای پرداخت'})[status]||'در حال بررسی';
+}
+
+function AccountContent({onClose,notice=''}) {
   const [session,setSession]=useState(null);
-  const [mode,setMode]=useState('login');
+  const [authMode,setAuthMode]=useState('email');
   const [name,setName]=useState('');
   const [phone,setPhone]=useState('');
   const [email,setEmail]=useState('');
-  const [password,setPassword]=useState('');
-  const [message,setMessage]=useState('');
+  const [code,setCode]=useState('');
+  const [sent,setSent]=useState(false);
+  const [message,setMessage]=useState(notice);
   const [busy,setBusy]=useState(false);
   const [orders,setOrders]=useState([]);
+  const [events,setEvents]=useState([]);
 
   useEffect(()=>{
     if(!supabase)return;
@@ -82,36 +88,61 @@ function AccountContent({onClose}) {
   },[]);
 
   useEffect(()=>{
-    if(!supabase || !session?.user?.id){setOrders([]);return;}
+    if(!supabase || !session?.user?.id){setOrders([]);setEvents([]);return;}
     let active=true;
-    supabase.from('orders').select('id,order_number,status,total_toman,created_at')
-      .eq('customer_id',session.user.id).order('created_at',{ascending:false}).limit(5)
-      .then(({data})=>{if(active)setOrders(data||[]);});
+    (async()=>{
+      const {data,error}=await supabase.from('orders')
+        .select('id,order_number,status,total_toman,created_at,updated_at')
+        .eq('customer_id',session.user.id).order('created_at',{ascending:false}).limit(50);
+      if(!active)return;
+      if(error){setMessage('دریافت سفارش‌ها با خطا مواجه شد.');return;}
+      setOrders(data||[]);
+      const ids=(data||[]).map(o=>o.id);
+      if(ids.length){
+        const history=await supabase.from('order_status_events')
+          .select('id,order_id,status,note,created_at').in('order_id',ids)
+          .order('created_at',{ascending:false});
+        if(active&&!history.error)setEvents(history.data||[]);
+      }
+    })();
     return ()=>{active=false;};
   },[session?.user?.id]);
 
-  const submit=async event=>{
+  const sendCode=async event=>{
     event.preventDefault();
-    if(!supabase){setMessage('اتصال حساب کاربری در دسترس نیست.');return;}
+    if(!supabase)return setMessage('اتصال حساب کاربری در دسترس نیست.');
+    if(authMode==='phone')return setMessage('ورود پیامکی آماده اتصال است؛ پس از انتخاب و تنظیم سرویس پیامکی فعال می‌شود.');
+    if(!email.trim())return setMessage('ایمیل را وارد کنید.');
     setBusy(true);setMessage('');
-    const result=mode==='signup'
-      ? await supabase.auth.signUp({email,password,options:{data:{full_name:name,phone}}})
-      : await supabase.auth.signInWithPassword({email,password});
+    const result=await supabase.auth.signInWithOtp({
+      email:email.trim().toLowerCase(),
+      options:{shouldCreateUser:true,data:{full_name:name.trim(),phone:phone.trim(),preferred_auth_method:'email'}}
+    });
     setBusy(false);
-    if(result.error)setMessage(result.error.message);
-    else if(mode==='signup'&&!result.data.session)setMessage('ثبت‌نام انجام شد. برای فعال‌سازی حساب، ایمیل خود را تأیید کنید.');
-    else setMessage(mode==='signup'?'حساب مشتری ایجاد شد.':'با موفقیت وارد شدید.');
+    if(result.error)setMessage('ارسال کد انجام نشد: '+result.error.message);
+    else {setSent(true);setMessage('کد تأیید به ایمیل شما ارسال شد. کد را در همین بخش وارد کنید.');}
+  };
+  const verifyCode=async event=>{
+    event.preventDefault();
+    if(!supabase||!email.trim()||!code.trim())return;
+    setBusy(true);setMessage('');
+    const result=await supabase.auth.verifyOtp({email:email.trim().toLowerCase(),token:code.trim(),type:'email'});
+    setBusy(false);
+    if(result.error)setMessage('کد معتبر نیست یا منقضی شده است. دوباره درخواست کد بدهید.');
+    else setMessage('حساب شما با موفقیت تأیید شد.');
   };
 
   if(session)return <div className="ref-account-panel">
     <span className="eyebrow text-gold-deep">MAHGOLD ACCOUNT</span>
     <h3>حساب کاربری شما</h3>
-    <p className="text-sm text-muted-foreground">{session.user.email}</p>
+    <p className="text-sm text-muted-foreground">{session.user.email||session.user.phone||'حساب تأییدشده مه‌گلد'}</p>
     <div className="mt-3 border-t border-border pt-4">
-      <div className="mb-3 flex items-center justify-between text-sm"><b>آخرین سفارش‌ها</b><span className="text-muted-foreground">{money(orders.length)} مورد</span></div>
+      <div className="mb-3 flex items-center justify-between text-sm"><b>پیگیری سفارش‌ها</b><span className="text-muted-foreground">{money(orders.length)} مورد</span></div>
       {orders.length ? <div className="ref-order-list">{orders.map(order=><div className="ref-order-item" key={order.id}>
-        <div><b>سفارش {order.order_number||'—'}</b><small>{new Date(order.created_at).toLocaleDateString('fa-IR')}</small></div>
-        <div className="text-left"><b>{money(order.total_toman)} تومان</b><small>{order.status}</small></div>
+        <div><b>سفارش {order.order_number||'—'}</b><small>{new Date(order.created_at).toLocaleDateString('fa-IR')}</small><small className="text-gold-deep">{orderStatusLabel(order.status)}</small>
+          <details className="mt-2 text-xs"><summary className="cursor-pointer text-gold-deep">تاریخچه وضعیت سفارش</summary><div className="mt-2 space-y-2 border-r border-gold/40 pr-3">{events.filter(e=>e.order_id===order.id).map(e=><div key={e.id}><b>{orderStatusLabel(e.status)}</b><small className="block">{new Date(e.created_at).toLocaleString('fa-IR')}</small>{e.note&&<small>{e.note}</small>}</div>)}</div></details>
+        </div>
+        <div className="text-left"><b>{money(order.total_toman)} تومان</b></div>
       </div>)}</div> : <p className="text-xs text-muted-foreground">هنوز سفارشی برای این حساب ثبت نشده است.</p>}
     </div>
     <button className="h-11 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" onClick={onClose}>ادامه خرید</button>
@@ -119,26 +150,30 @@ function AccountContent({onClose}) {
     {message&&<p className="ref-message">{message}</p>}
   </div>;
 
-  return <form className="ref-auth-form" onSubmit={submit}>
+  return <form className="ref-auth-form" onSubmit={sent?verifyCode:sendCode}>
     <span className="eyebrow text-gold-deep">WELCOME TO MAHGOLD</span>
-    <h3>{mode==='login'?'به مه‌گلد خوش آمدید':'ایجاد حساب مشتری'}</h3>
-    <p className="ref-auth-intro">برای پیگیری سفارش‌ها و تجربه خرید آسان‌تر وارد حساب خود شوید.</p>
+    <h3>ورود یا ایجاد حساب مشتری</h3>
+    <p className="ref-auth-intro">برای ثبت سفارش و مشاهده امن وضعیت خرید، ابتدا حساب خود را با کد یک‌بارمصرف تأیید کنید.</p>
     <div className="ref-auth-tabs">
-      <button type="button" className={mode==='login'?'active':''} onClick={()=>{setMode('login');setMessage('');}}>ورود</button>
-      <button type="button" className={mode==='signup'?'active':''} onClick={()=>{setMode('signup');setMessage('');}}>ایجاد حساب</button>
+      <button type="button" className={authMode==='email'?'active':''} onClick={()=>{setAuthMode('email');setSent(false);setCode('');setMessage('');}}>ایمیل</button>
+      <button type="button" className={authMode==='phone'?'active':''} onClick={()=>{setAuthMode('phone');setSent(false);setCode('');setMessage('');}}>شماره موبایل</button>
     </div>
-    {mode==='signup'&&<>
-      <label>نام و نام خانوادگی<input required minLength="2" autoComplete="name" value={name} onChange={e=>setName(e.target.value)}/></label>
-      <label>شماره موبایل<input required type="tel" autoComplete="tel" value={phone} onChange={e=>setPhone(e.target.value)}/></label>
+    {authMode==='email'?<>
+      {!sent&&<><label>نام و نام خانوادگی (برای حساب جدید)<input autoComplete="name" value={name} onChange={e=>setName(e.target.value)}/></label>
+      <label>شماره موبایل تماس<input type="tel" autoComplete="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="09…"/></label>
+      <label>ایمیل<input required type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)}/></label></>}
+      {sent&&<><label>کد تأیید ایمیل<input required inputMode="numeric" autoComplete="one-time-code" value={code} onChange={e=>setCode(e.target.value)} placeholder="کد ارسال‌شده"/></label>
+      <button type="button" className="text-xs text-gold-deep underline" onClick={()=>{setSent(false);setCode('');setMessage('');}}>تغییر ایمیل یا ارسال دوباره کد</button></>}
+      {message&&<p className="ref-message">{message}</p>}
+      <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={busy}>{busy?'در حال بررسی…':sent?'تأیید کد و ورود':'ارسال کد یک‌بارمصرف'}</button>
+    </>:<>
+      <label>شماره موبایل<input type="tel" autoComplete="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="09…"/></label>
+      <p className="ref-message">ورود پیامکی در معماری آماده شده است، اما تا انتخاب و تنظیم سرویس پیامک فعال نمی‌شود.</p>
+      <button type="button" disabled className="h-12 rounded-lg border border-border text-sm ref-full opacity-60">ارسال کد پیامکی — پس از اتصال سرویس</button>
     </>}
-    <label>ایمیل<input required type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)}/></label>
-    <label>گذرواژه<input required minLength="6" type="password" autoComplete={mode==='login'?'current-password':'new-password'} value={password} onChange={e=>setPassword(e.target.value)}/></label>
-    {message&&<p className="ref-message">{message}</p>}
-    <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={busy}>{busy?'در حال بررسی…':mode==='login'?'ورود به حساب':'ایجاد حساب مشتری'}</button>
-    <small className="ref-note">اطلاعات حساب از طریق سرویس امن Supabase مدیریت می‌شود.</small>
+    <small className="ref-note">کد تأیید از سرویس احراز هویت Supabase ارسال می‌شود؛ گذرواژه‌ای در سایت ذخیره نمی‌شود.</small>
   </form>;
 }
-
 export default function App() {
   const [category,setCategory]=useState('همه محصولات');
   const [query,setQuery]=useState('');
@@ -146,6 +181,7 @@ export default function App() {
   const [cart,setCart]=useState(()=>{try{return JSON.parse(localStorage.getItem('mahgold_cart')||'[]');}catch{return [];}});
   const [cartOpen,setCartOpen]=useState(false);
   const [accountOpen,setAccountOpen]=useState(false);
+   const [accountNotice,setAccountNotice]=useState('');
   const [checkoutOpen,setCheckoutOpen]=useState(false);
   const [checkoutBusy,setCheckoutBusy]=useState(false);
   const [checkoutRequestKey,setCheckoutRequestKey]=useState(null);
@@ -456,7 +492,7 @@ export default function App() {
     {accountOpen&&<div className="ref-overlay" onClick={()=>setAccountOpen(false)}>
       <section className="ref-dialog" onClick={e=>e.stopPropagation()}>
         <div className="ref-dialog-head"><div><div className="eyebrow text-gold-deep">MAHGOLD</div><h2>حساب کاربری مه‌گلد</h2></div><button className="ref-close" aria-label="بستن" onClick={()=>setAccountOpen(false)}><X/></button></div>
-        <AccountContent onClose={()=>setAccountOpen(false)}/>
+        <AccountContent notice={accountNotice} onClose={()=>{setAccountOpen(false);setAccountNotice('');}}/>
       </section>
     </div>}
 
@@ -474,7 +510,7 @@ export default function App() {
             </div>)}</div>
             <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{money(cartTotal)} تومان</b></div>
             <p className="mb-4 text-[11px] leading-7 text-muted-foreground">مبلغ نهایی و موجودی هنگام ثبت سفارش در سرور دوباره بررسی می‌شود.</p>
-            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" onClick={()=>setCheckoutOpen(true)}>ادامه و ثبت سفارش <ArrowLeft className="mr-2 inline" size={16}/></button>
+            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" onClick={async()=>{const {data}=await supabase.auth.getSession();if(!data.session?.user){setAccountNotice('برای ثبت سفارش ابتدا حساب کاربری بسازید یا وارد شوید.');setAccountOpen(true);setCartOpen(false);}else setCheckoutOpen(true);}}>ادامه و ثبت سفارش <ArrowLeft className="mr-2 inline" size={16}/></button>
           </>}
       </aside>
     </div>}
