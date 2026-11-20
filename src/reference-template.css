@@ -268,3 +268,35 @@ footer.bg-ink>div,footer.bg-ink span{color:#e9d6a7}
  .ref-product-modal-copy p{font-size:12px}
  .ref-detail-price{font-size:20px}
 }
+
+
+/* Seamless brand artwork: no separate logo card in either header or footer */
+.ref-brand-masthead{width:100%;height:clamp(210px,28vw,360px);padding:0;margin:0;border:0;border-radius:0;box-shadow:none;background:#062318;overflow:hidden;position:relative;isolation:isolate}
+.ref-brand-masthead:before,.ref-brand-masthead:after{display:none!important}
+.ref-brand-masthead img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center 48%;filter:none;position:relative;z-index:1}
+.ref-footer-brand{display:block;width:100%;max-width:none;height:clamp(150px,20vw,250px);margin:0 auto 18px;padding:0;overflow:hidden;border:0;border-radius:0;background:#08271c;box-shadow:none}
+.ref-footer-brand img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 48%;border:0;border-radius:0}
+footer.bg-ink{padding-top:0!important}
+.ref-footer-brand+*{margin-top:0}
+/* Keep the frosted-glass surfaces, improve contrast instead of making them opaque */
+.ref-dialog,.ref-drawer{background:rgba(7,31,22,.78)!important;color:#f5e5bd!important;border:1px solid rgba(224,184,108,.72)!important;backdrop-filter:blur(24px) saturate(145%);-webkit-backdrop-filter:blur(24px) saturate(145%);box-shadow:0 26px 90px rgba(0,0,0,.48),inset 0 1px rgba(255,239,201,.16)}
+.ref-dialog-head,.ref-drawer-head{border-color:rgba(228,190,121,.45)!important}
+.ref-dialog h2,.ref-dialog h3,.ref-dialog h4,.ref-dialog p,.ref-dialog label,.ref-dialog span,.ref-dialog small,.ref-dialog .eyebrow,.ref-drawer h2,.ref-drawer h3,.ref-drawer h4,.ref-drawer p,.ref-drawer label,.ref-drawer span,.ref-drawer small,.ref-drawer .eyebrow,.ref-cart-line,.ref-cart-summary{color:#f5e5bd!important}
+.ref-dialog input,.ref-dialog textarea,.ref-dialog select,.ref-drawer input,.ref-drawer textarea,.ref-drawer select{color:#fff4d8!important;background:rgba(255,248,230,.12)!important;border-color:rgba(226,188,117,.48)!important}
+.ref-dialog input::placeholder,.ref-dialog textarea::placeholder,.ref-drawer input::placeholder{color:#e6d3aa!important;opacity:.82}
+.ref-dialog .text-muted-foreground,.ref-drawer .text-muted-foreground,.ref-dialog .ref-note,.ref-drawer .ref-note{color:#e7d6b5!important}
+.ref-dialog .ref-detail-price,.ref-dialog .ref-cart-line strong,.ref-drawer .ref-detail-price,.ref-drawer .ref-cart-line strong,.ref-cart-summary b{color:#ffdc87!important;text-shadow:0 0 12px rgba(238,192,103,.2)}
+.ref-dialog .ref-close,.ref-drawer .ref-close,.ref-drawer .ref-qty button{background:rgba(229,187,105,.16)!important;border-color:rgba(238,201,132,.65)!important;color:#ffe3a2!important}
+.ref-dialog .ref-remove,.ref-drawer .ref-remove{color:#f1d59c!important}
+.ref-dialog .ref-empty,.ref-drawer .ref-empty{color:#eddbb8!important}
+.ref-dialog .ref-empty h3,.ref-drawer .ref-empty h3{color:#fff0ce!important}
+.ref-dialog .ref-empty p,.ref-drawer .ref-empty p{color:#e9d7b4!important}
+.ref-dialog .ref-auth-tabs{background:rgba(255,245,222,.12)!important}
+.ref-dialog .ref-auth-tabs button{color:#f3dfb7!important}
+.ref-dialog .ref-auth-tabs button[aria-selected="true"],.ref-dialog .ref-auth-tabs button.active{background:rgba(220,174,91,.28)!important;color:#ffe4a8!important}
+@media(max-width:767px){
+ .ref-brand-masthead{height:clamp(190px,46vw,260px)}
+ .ref-brand-masthead img{object-position:center 48%}
+ .ref-footer-brand{height:clamp(130px,38vw,190px)}
+ .ref-dialog,.ref-drawer{background:rgba(7,31,22,.86)!important}
+}
