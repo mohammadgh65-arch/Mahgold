@@ -309,23 +309,24 @@ export default function App() {
   return <div dir="rtl" className="min-h-screen bg-background text-foreground">
     {siteContent?.announcement?.active!==false&&<div className="ref-announcement">{siteContent?.announcement?.text||"ارسال امن و بسته‌بندی ویژه ✦ پشتیبانی مه‌گلد ✦ همراه انتخاب شما"}</div>}
 
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-xl transition-shadow">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:h-[72px] md:px-7">
+    <header className="ref-site-header sticky top-0 z-40">
+      <div className="ref-main-header mx-auto max-w-[1440px] px-4 md:px-6">
         <button aria-label="منو" className="ref-mobile-menu md:hidden" onClick={()=>setMenuOpen(v=>!v)}><Menu size={20}/></button>
         <a aria-label="مه‌گلد - صفحه اصلی" className="ref-brand" href="#home">
-          <img src={siteContent?.logo_url||MAHGOLD_LOGO} alt=""/>
+          <img src={siteContent?.logo_url||MAHGOLD_LOGO} alt="لوگوی مه‌گلد"/>
           <span>مه‌گلد</span>
         </a>
-        <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
-          <a className="transition-colors hover:text-gold-deep" href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a>
-          <a className="transition-colors hover:text-gold-deep" href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a>
-          <a className="transition-colors hover:text-gold-deep" href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a>
+        <nav className="ref-primary-nav">
+          <a className="active" href="#home">خانه</a>
+          <a href="#categories" onClick={()=>setCategory('طلای زینتی')}>طلای زینتی</a>
+          <a href="#categories" onClick={()=>setCategory('طلای آب‌شده')}>طلای آب‌شده</a>
+          <a href="#categories" onClick={()=>setCategory('سکه')}>سکه</a>
+          <a href="#categories" onClick={()=>setCategory('شمش')}>شمش</a>
         </nav>
-        <div className="flex items-center gap-2">
-          <button className="hidden h-10 items-center justify-center rounded-full border border-input bg-background px-5 text-xs font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground md:inline-flex" onClick={()=>setAccountOpen(true)}>ورود / ثبت‌نام</button>
-          <button aria-label="سبد خرید" className="relative hidden h-10 items-center justify-center gap-2 rounded-full bg-ink px-3 text-xs font-semibold text-ink-foreground transition-all hover:bg-gold-deep md:inline-flex md:px-5" onClick={()=>setCartOpen(true)}>
-            <ShoppingBag size={16}/><span className="hidden md:inline">سبد خرید</span>{cartCount>0&&<span className="absolute -left-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-ink">{money(cartCount)}</span>}
-          </button>
+        <label className="ref-header-search"><Search size={16}/><input aria-label="جستجوی محصولات" value={query} onChange={e=>setQuery(e.target.value)} placeholder="جستجو در محصولات..."/></label>
+        <div className="ref-header-actions">
+          <button aria-label="حساب کاربری" onClick={()=>setAccountOpen(true)}><UserRound size={20}/></button>
+          <button aria-label="سبد خرید" className="ref-header-cart" onClick={()=>setCartOpen(true)}><ShoppingBag size={20}/>{cartCount>0&&<b>{money(cartCount)}</b>}</button>
         </div>
       </div>
       {menuOpen&&<nav className="ref-mobile-links flex flex-col gap-4 border-t border-border bg-background px-5 py-4 text-sm text-muted-foreground md:hidden">
@@ -335,12 +336,12 @@ export default function App() {
     </header>
 
     <main className="min-h-[60vh]" id="home">
-      <section aria-label="اسلایدهای مه‌گلد" aria-roledescription="carousel" className="relative h-[560px] overflow-hidden bg-ink text-ink-foreground md:h-[640px]">
+      <section aria-label="اسلایدهای مه‌گلد" aria-roledescription="carousel" className="ref-hero relative h-[330px] overflow-hidden bg-ink text-ink-foreground md:h-[390px]">
         {displaySlides.map((slide,index)=><div key={slide.image} aria-hidden={activeSlide!==index} className={'absolute inset-0 transition-opacity duration-1000 '+(activeSlide===index?'z-10 opacity-100':'pointer-events-none z-0 opacity-0')}>
           <img alt={slide.title} className="h-full w-full object-cover transition-transform duration-[7000ms] ease-out" src={slide.image} loading={index===0?'eager':'lazy'} style={{transform:activeSlide===index?'scale(1.05)':'scale(1)'}}/>
           <div className="slide-shade absolute inset-0"/>
-          <div className="absolute inset-0 mx-auto flex max-w-7xl flex-col justify-end px-6 pb-20 md:justify-center md:px-10 md:pb-0">
-            <div className="max-w-xl">
+          <div className="ref-hero-copy absolute inset-0 mx-auto flex max-w-7xl flex-col justify-center px-6 py-8 md:px-10">
+            <div className="max-w-[560px] text-right">
               <div className="eyebrow animate-rise text-gold-light">{slide.eyebrow||'MAHGOLD'}</div>
               <h1 className="animate-rise mt-3 text-[2.1rem] font-medium leading-[1.45] [animation-delay:120ms] md:text-6xl md:leading-[1.4]">{slide.title}</h1>
               <p className="animate-rise mt-4 max-w-md text-sm leading-8 text-ink-muted [animation-delay:240ms] md:text-[15px]">{slide.description||''}</p>
@@ -361,7 +362,7 @@ export default function App() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl scroll-mt-20 px-4 py-16 md:px-7 md:py-24" id="categories">
+      <section className="mx-auto max-w-7xl scroll-mt-20 px-4 py-5 md:px-7 md:py-6" id="categories">
         <div className="mb-8 flex items-end justify-between gap-5">
           <div><div className="eyebrow text-gold-deep">DISCOVER MAHGOLD</div><h2 className="mt-3 text-2xl font-semibold md:text-3xl">از میان مجموعه‌ها انتخاب کنید</h2></div>
           <p className="hidden text-xs text-muted-foreground md:block">جزئیاتی برای سلیقه‌های خاص</p>
@@ -379,10 +380,15 @@ export default function App() {
         </div>
       </section>
 
-      <section className="scroll-mt-16 bg-sand-gradient py-16 md:py-24" id="shop">
+      <section className="ref-shop-section scroll-mt-16 py-5 md:py-7" id="shop">
         <div className="mx-auto max-w-7xl px-4 md:px-7">
-          <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div><div className="eyebrow text-gold-deep">THE CURATED EDIT</div><h2 className="mt-2 text-2xl font-semibold md:text-3xl">منتخب‌های مه‌گلد</h2>{quote&&<p className="mt-2 text-xs text-muted-foreground">{quote.title||'آخرین نرخ طلای ۱۸ عیار'}: <b className="text-gold-deep">{money(quote.price_toman)} تومان</b> <span className="mr-1 text-[10px]">{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'نرخ زنده و تازه'):quoteIsManual?'نرخ دستی منقضی‌شده':quote.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'ثبت دستی · غیرمعتبر'}</span></p>}</div>
+          <div className="ref-quote-strip">
+          <div className="ref-quote-title"><span className="ref-quote-bars">▥</span><div><b>قیمت لحظه‌ای طلای ۱۸ عیار</b><small>{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'به‌روزرسانی لحظه‌ای'):quoteIsManual?'نرخ دستی منقضی‌شده':quote?.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'در انتظار نرخ معتبر'}</small></div></div>
+          <strong>{quote?money(quote.price_toman)+' تومان':'— تومان'}</strong>
+          <span className="ref-quote-live"><i/> بروزرسانی لحظه‌ای</span>
+        </div>
+        <div className="ref-shop-heading"><span className="eyebrow text-gold-deep">THE CURATED EDIT</span><h2 className="mt-1 text-xl font-semibold md:text-2xl">منتخب‌های مه‌گلد</h2></div>
+        <div className="hidden">
             <label className="flex h-10 w-full items-center gap-2 rounded-full border border-border bg-card px-4 text-muted-foreground md:w-72">
               <Search size={16}/><input aria-label="جست‌وجوی محصول" className="w-full bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground" value={query} onChange={e=>setQuery(e.target.value)} placeholder="نام محصول را جستجو کنید..."/>
             </label>
