@@ -67,7 +67,7 @@ function orderStatusLabel(status) {
   return ({pending:'در انتظار بررسی',awaiting_payment:'در انتظار پرداخت',paid:'پرداخت‌شده',processing:'در حال آماده‌سازی',shipped:'ارسال‌شده',completed:'تحویل‌شده',cancelled:'لغوشده',payment_failed:'خطای پرداخت'})[status]||'در حال بررسی';
 }
 
-function AccountContent({onClose,notice=''}) {
+function AccountContent({onClose,onAuthenticated,notice=''}) {
   const [session,setSession]=useState(null);
   const [authMode,setAuthMode]=useState('email');
   const [name,setName]=useState('');
@@ -129,7 +129,7 @@ function AccountContent({onClose,notice=''}) {
     const result=await supabase.auth.verifyOtp({email:email.trim().toLowerCase(),token:code.trim(),type:'email'});
     setBusy(false);
     if(result.error)setMessage('کد معتبر نیست یا منقضی شده است. دوباره درخواست کد بدهید.');
-    else setMessage('حساب شما با موفقیت تأیید شد.');
+    else {setMessage('حساب شما با موفقیت تأیید شد.');onAuthenticated?.();}
   };
 
   if(session)return <div className="ref-account-panel">
@@ -502,7 +502,7 @@ export default function App() {
     {accountOpen&&<div className="ref-overlay" onClick={()=>setAccountOpen(false)}>
       <section className="ref-dialog" onClick={e=>e.stopPropagation()}>
         <div className="ref-dialog-head"><div><div className="eyebrow text-gold-deep">MAHGOLD</div><h2>حساب کاربری مه‌گلد</h2></div><button className="ref-close" aria-label="بستن" onClick={()=>setAccountOpen(false)}><X/></button></div>
-        <AccountContent notice={accountNotice} onClose={()=>{setAccountOpen(false);setAccountNotice('');}}/>
+        <AccountContent notice={accountNotice} onAuthenticated={()=>{setAccountOpen(false);setAccountNotice('');setCartOpen(true);}} onClose={()=>{setAccountOpen(false);setAccountNotice('');}}/>
       </section>
     </div>}
 
