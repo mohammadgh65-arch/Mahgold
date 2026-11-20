@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --background: 42 42% 97%;
+  --foreground: 30 18% 12%;
+  --card: 42 48% 99%;
+  --border: 36 24% 84%;
+  --input: 36 22% 79%;
+  --accent: 42 35% 91%;
+  --accent-foreground: 30 20% 14%;
+  --muted-foreground: 30 8% 43%;
+  --gold: 40 54% 51%;
+  --gold-deep: 38 62% 37%;
+  --gold-light: 43 72% 77%;
+  --ink: 36 36% 8%;
+  --ink-foreground: 42 42% 94%;
+  --ink-muted: 38 12% 68%;
+  --sand: 40 38% 92%;
+}
+html { scroll-behavior: smooth; }
+body { font-family: "Shabnam", Tahoma, sans-serif; }
+button, input, select, textarea { font: inherit; }
+.eyebrow { display: inline-block; font-size: 10px; letter-spacing: .12em; line-height: 1.8; font-weight: 600; }
+.slide-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(14,12,8,.08) 0%, rgba(14,12,8,.22) 40%, rgba(14,12,8,.72) 100%); pointer-events: none; }
+.line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+:focus-visible { outline: 2px solid hsl(var(--gold)); outline-offset: 3px; }
+::selection { background: hsl(var(--gold) / .25); color: hsl(var(--foreground)); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
