@@ -362,6 +362,12 @@ export default function App() {
         </div>
       </section>
 
+                <div className="ref-quote-strip">
+          <div className="ref-quote-title"><span className="ref-quote-bars">▥</span><div><b>قیمت لحظه‌ای طلای ۱۸ عیار</b><small>{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'به‌روزرسانی لحظه‌ای'):quoteIsManual?'نرخ دستی منقضی‌شده':quote?.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'در انتظار نرخ معتبر'}</small></div></div>
+          <strong>{quote?money(quote.price_toman)+' تومان':'— تومان'}</strong>
+          <span className="ref-quote-live"><i/> بروزرسانی لحظه‌ای</span>
+        </div>
+
       <section className="mx-auto max-w-7xl scroll-mt-20 px-4 py-5 md:px-7 md:py-6" id="categories">
         <div className="mb-8 flex items-end justify-between gap-5">
           <div><div className="eyebrow text-gold-deep">DISCOVER MAHGOLD</div><h2 className="mt-3 text-2xl font-semibold md:text-3xl">از میان مجموعه‌ها انتخاب کنید</h2></div>
@@ -382,13 +388,8 @@ export default function App() {
 
       <section className="ref-shop-section scroll-mt-16 py-5 md:py-7" id="shop">
         <div className="mx-auto max-w-7xl px-4 md:px-7">
-          <div className="ref-quote-strip">
-          <div className="ref-quote-title"><span className="ref-quote-bars">▥</span><div><b>قیمت لحظه‌ای طلای ۱۸ عیار</b><small>{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'به‌روزرسانی لحظه‌ای'):quoteIsManual?'نرخ دستی منقضی‌شده':quote?.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'در انتظار نرخ معتبر'}</small></div></div>
-          <strong>{quote?money(quote.price_toman)+' تومان':'— تومان'}</strong>
-          <span className="ref-quote-live"><i/> بروزرسانی لحظه‌ای</span>
-        </div>
         <div className="ref-shop-heading"><span className="eyebrow text-gold-deep">THE CURATED EDIT</span><h2 className="mt-1 text-xl font-semibold md:text-2xl">منتخب‌های مه‌گلد</h2></div>
-        <div className="hidden">
+        <div className="ref-shop-tools">
             <label className="flex h-10 w-full items-center gap-2 rounded-full border border-border bg-card px-4 text-muted-foreground md:w-72">
               <Search size={16}/><input aria-label="جست‌وجوی محصول" className="w-full bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground" value={query} onChange={e=>setQuery(e.target.value)} placeholder="نام محصول را جستجو کنید..."/>
             </label>
