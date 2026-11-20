@@ -321,7 +321,7 @@ export default function App() {
         body:{
           customer_name:customer.name,
           customer_phone:toLatinDigits(customer.phone),
-          customer_email:customer.email||null,
+          customer_email:authData.session.user.email||customer.email||null,
           shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
           customer_note:customer.note||'',
           items:cart.map(item=>({product_id:item.id,quantity:item.qty,expected_price_toman:Number(item.price_toman)})),
