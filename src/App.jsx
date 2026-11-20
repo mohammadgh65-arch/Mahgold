@@ -447,10 +447,9 @@ export default function App() {
     </footer>
 
     <nav className="ref-mobile-nav fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background/95 px-2 pt-1 backdrop-blur-xl md:hidden">
-      <a className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium text-gold-deep" href="#home"><House size={20}/>خانه</a>
-      <a className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium text-muted-foreground" href="#shop"><LayoutGrid size={20}/>فروشگاه</a>
-      <button className="relative flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium text-muted-foreground" onClick={()=>setCartOpen(true)}><ShoppingBag size={20}/>سبد{cartCount>0&&<b className="absolute right-1/2 top-0 translate-x-5 rounded-full bg-gold px-1 text-[9px] text-ink">{money(cartCount)}</b>}</button>
-      <button className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium text-muted-foreground" onClick={()=>setAccountOpen(true)}><UserRound size={20}/>ورود</button>
+      <button className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium" onClick={()=>setAccountOpen(true)}><Headphones size={21}/>پشتیبانی</button>
+      <a className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium" href="#categories"><Gift size={21}/>اصالت کالا</a>
+      <button className="relative flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium" onClick={()=>setCartOpen(true)}><ShieldCheck size={21}/>خرید امن{cartCount>0&&<b className="absolute right-1/2 top-0 translate-x-5 rounded-full bg-gold px-1 text-[9px] text-ink">{money(cartCount)}</b>}</button>
     </nav>
 
     {accountOpen&&<div className="ref-overlay" onClick={()=>setAccountOpen(false)}>
