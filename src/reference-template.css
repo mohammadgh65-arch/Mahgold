@@ -235,3 +235,36 @@ footer.bg-ink{background:#10271e!important;border-top:1px solid #b88c49}
  .ref-header-actions{order:3}
  .ref-mobile-links{background:#f8f0e1}
 }
+
+
+/* Final requested visual corrections: full-width emerald masthead, unified footer mark, gold glass product detail */
+.ref-brand-masthead{width:100%;height:clamp(190px,24vw,300px);background:#062318;position:relative;isolation:isolate;overflow:hidden}
+.ref-brand-masthead:before{inset:-3%;background-image:url('/mahgold-brand-masthead.jpg');background-size:cover;background-position:center 48%;filter:blur(9px) brightness(.52) saturate(1.25);transform:scale(1.06)}
+.ref-brand-masthead:after{background:linear-gradient(90deg,rgba(2,17,11,.30),rgba(2,17,11,.04) 48%,rgba(2,17,11,.30)),linear-gradient(0deg,rgba(2,17,11,.12),transparent 24%,transparent 78%,rgba(2,17,11,.12))}
+.ref-brand-masthead img{position:relative;z-index:1;width:100%;height:100%;max-width:none;object-fit:contain;object-position:center;filter:drop-shadow(0 3px 16px rgba(0,0,0,.35))}
+.ref-footer-brand{width:min(340px,86vw);height:190px;margin:0 auto 14px;overflow:hidden;border-radius:14px;position:relative;background:#08271c;border:1px solid rgba(211,169,91,.42);box-shadow:0 12px 30px rgba(0,0,0,.2)}
+.ref-footer-brand img{width:100%;height:100%;display:block;object-fit:cover;object-position:center 49%}
+footer.bg-ink{background:#08271c!important;border-top:1px solid #c39a53;color:#e9d6a7!important}
+footer.bg-ink>div,footer.bg-ink span{color:#e9d6a7}
+.ref-dialog{background:rgba(7,31,22,.94)!important;color:#f0d79d!important;border:1px solid rgba(211,169,91,.75)!important;box-shadow:0 28px 100px rgba(0,0,0,.55),inset 0 1px rgba(255,231,174,.12);backdrop-filter:blur(22px) saturate(135%);-webkit-backdrop-filter:blur(22px) saturate(135%)}
+.ref-dialog-head{border-color:rgba(218,178,105,.38)!important}
+.ref-dialog-head h2,.ref-dialog-head .eyebrow,.ref-product-modal-copy h2,.ref-product-modal-copy p,.ref-product-modal-copy>span,.ref-product-modal-copy .grid,.ref-product-modal-copy .grid span{color:#f0d79d!important}
+.ref-product-modal-copy h2{font-weight:750;text-shadow:0 1px 12px rgba(212,164,78,.18)}
+.ref-product-modal-copy p{color:#f3e4bf!important;line-height:2.15}
+.ref-product-modal-copy .grid{color:#e9c982!important}
+.ref-detail-price{color:#ffd77f!important;text-shadow:0 0 18px rgba(230,183,91,.24)}
+.ref-product-modal-image{background:linear-gradient(145deg,#0c3325,#061b13)!important;border:1px solid rgba(211,169,91,.42);box-shadow:inset 0 0 30px rgba(0,0,0,.2)}
+.ref-dialog .ref-close{background:rgba(220,178,102,.12)!important;border-color:rgba(223,184,112,.48)!important;color:#f4d48f!important}
+.ref-dialog .ref-close:hover{background:rgba(220,178,102,.25)!important}
+.ref-dialog .ref-full{box-shadow:0 8px 24px rgba(0,0,0,.24)}
+@media(max-width:767px){
+ .ref-brand-masthead{height:clamp(150px,42vw,205px)}
+ .ref-brand-masthead img{object-fit:contain}
+ .ref-footer-brand{height:150px;width:min(290px,82vw)}
+ .ref-dialog{padding:16px!important;max-height:92dvh}
+ .ref-dialog-wide .grid{gap:14px}
+ .ref-product-modal-copy{gap:9px}
+ .ref-product-modal-copy h2{font-size:20px}
+ .ref-product-modal-copy p{font-size:12px}
+ .ref-detail-price{font-size:20px}
+}
