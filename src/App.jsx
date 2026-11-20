@@ -148,6 +148,7 @@ export default function App() {
   const [accountOpen,setAccountOpen]=useState(false);
   const [checkoutOpen,setCheckoutOpen]=useState(false);
   const [checkoutBusy,setCheckoutBusy]=useState(false);
+  const [checkoutRequestKey,setCheckoutRequestKey]=useState(null);
   const [checkoutError,setCheckoutError]=useState('');
   const [orderResult,setOrderResult]=useState(null);
   const [selectedProduct,setSelectedProduct]=useState(null);
@@ -157,6 +158,7 @@ export default function App() {
   const [products,setProducts]=useState([]);
   const [dbCategories,setDbCategories]=useState([]);
   const [quote,setQuote]=useState(null);
+  const [clockNow,setClockNow]=useState(()=>Date.now());
   const [siteContent,setSiteContent]=useState(null);
   const [dataStatus,setDataStatus]=useState(isSupabaseConfigured?'loading':'error');
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
@@ -165,6 +167,7 @@ export default function App() {
   const displaySlides=useMemo(()=>{const rows=(siteContent?.slides||[]).filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
   const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})),[siteContent]);
   useEffect(()=>{setActiveSlide(index=>Math.min(index,displaySlides.length-1));},[displaySlides.length]);
+  useEffect(()=>{const timer=setInterval(()=>setClockNow(Date.now()),15000);return()=>clearInterval(timer);},[]);
   useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%displaySlides.length),6000);return()=>clearInterval(timer);},[displaySlides.length]);
   useEffect(()=>{if(!supabase)return;let active=true;supabase.from('site_content').select('content').eq('id',1).maybeSingle().then(({data})=>{if(active&&data?.content)setSiteContent(data.content);});return()=>{active=false;};},[]);
   useEffect(()=>{
@@ -195,7 +198,7 @@ export default function App() {
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
             .eq('is_active',true).order('sort_order',{ascending:true}),
           supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
-            .order('observed_at',{ascending:false}).limit(1).maybeSingle()
+            .eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle()
         ]);
         if(!active)return;
         if(productResult.error){setDataStatus('error');setProducts([]);setDataMessage('دریافت محصولات ناموفق بود؛ برای جلوگیری از نمایش قیمت نادرست، اطلاعات نمونه نمایش داده نمی‌شود.');}
@@ -214,6 +217,7 @@ export default function App() {
     return()=>{active=false;};
   },[]);
   useEffect(()=>{try{localStorage.setItem('mahgold_cart',JSON.stringify(cart));}catch{}},[cart]);
+  useEffect(()=>{setCheckoutRequestKey(null);},[cart,customer]);
 
   const categories=useMemo(()=>{
     const rows=dbCategories.map(row=>row.name).filter(Boolean);
@@ -233,6 +237,8 @@ export default function App() {
   },[products,category,query,sortMode]);
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const cartTotal=cart.reduce((sum,item)=>sum+Number(item.price_toman||0)*Number(item.qty||0),0);
+  const quoteObservedAt=quote?.observed_at?Date.parse(quote.observed_at):NaN;
+  const quoteFresh=quote?.is_live===true&&Number.isFinite(quoteObservedAt)&&quoteObservedAt<=clockNow+60000&&clockNow-quoteObservedAt<=300000;
 
   const addToCart=product=>{
     if(!supabase||dataStatus!=='connected'||!product.id){setCheckoutError('اتصال فروشگاه برقرار نیست.');return;}
@@ -247,19 +253,33 @@ export default function App() {
   const changeQuantity=(id,delta)=>setCart(old=>old.map(item=>item.id===id?{...item,qty:item.qty+delta}:item).filter(item=>item.qty>0&&item.qty<=Number(item.stock||0)));
   const submitOrder=async event=>{
     event.preventDefault();setCheckoutError('');
-    if(!supabase||!cart.length)return;
+    if(!supabase||!cart.length||checkoutBusy)return;
     setCheckoutBusy(true);
-    const {data,error}=await supabase.rpc('mahgold_create_order',{
-      p_customer_name:customer.name,
-      p_customer_phone:toLatinDigits(customer.phone),
-      p_customer_email:customer.email||null,
-      p_shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
-      p_customer_note:customer.note||'',
-      p_items:cart.map(item=>({product_id:item.id,quantity:item.qty}))
-    });
-    setCheckoutBusy(false);
-    if(error){setCheckoutError(error.message||'ثبت سفارش انجام نشد.');return;}
-    setOrderResult(data);setCart([]);setCheckoutOpen(false);setCartOpen(false);
+    const idempotencyKey=checkoutRequestKey||crypto.randomUUID();
+    setCheckoutRequestKey(idempotencyKey);
+    try{
+      const {data,error}=await supabase.functions.invoke('mahgold-create-order',{
+        body:{
+          customer_name:customer.name,
+          customer_phone:toLatinDigits(customer.phone),
+          customer_email:customer.email||null,
+          shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
+          customer_note:customer.note||'',
+          items:cart.map(item=>({product_id:item.id,quantity:item.qty,expected_price_toman:Number(item.price_toman)})),
+          idempotency_key:idempotencyKey
+        }
+      });
+      if(error){
+        let message=error.message||'ثبت سفارش انجام نشد. در صورت خطای ارتباط، با همان اطلاعات دوباره تلاش کنید.';
+        try{const detail=await error.context?.json();if(detail?.error)message=detail.error;}catch{}
+        setCheckoutError(message);return;
+      }
+      const orderData=data?.data||data;
+      if(!orderData?.order_id||!orderData?.order_number){setCheckoutError('پاسخ ثبت سفارش کامل نبود. لطفاً وضعیت سفارش را پیش از ارسال مجدد بررسی کنید.');return;}
+      setOrderResult(orderData);setCart([]);setCheckoutRequestKey(null);setCheckoutOpen(false);setCartOpen(false);
+    }catch(error){
+      setCheckoutError(error?.message||'ارتباط با سرویس ثبت سفارش برقرار نشد. با همان اطلاعات دوباره تلاش کنید.');
+    }finally{setCheckoutBusy(false);}
   };
   if(isAdminPage)return <AdminPanel/>;
 
@@ -339,7 +359,7 @@ export default function App() {
       <section className="scroll-mt-16 bg-sand-gradient py-16 md:py-24" id="shop">
         <div className="mx-auto max-w-7xl px-4 md:px-7">
           <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div><div className="eyebrow text-gold-deep">THE CURATED EDIT</div><h2 className="mt-2 text-2xl font-semibold md:text-3xl">منتخب‌های مه‌گلد</h2>{quote&&<p className="mt-2 text-xs text-muted-foreground">{quote.title||'آخرین نرخ ثبت‌شده طلا'}: <b className="text-gold-deep">{money(quote.price_toman)} تومان</b> <span className="mr-1 text-[10px]">{quote.is_live?'نرخ زنده':'ثبت دستی · غیرزنده'}</span></p>}</div>
+            <div><div className="eyebrow text-gold-deep">THE CURATED EDIT</div><h2 className="mt-2 text-2xl font-semibold md:text-3xl">منتخب‌های مه‌گلد</h2>{quote&&<p className="mt-2 text-xs text-muted-foreground">{quote.title||'آخرین نرخ طلای ۱۸ عیار'}: <b className="text-gold-deep">{money(quote.price_toman)} تومان</b> <span className="mr-1 text-[10px]">{quoteFresh?'نرخ زنده و تازه':quote.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'ثبت دستی · غیرزنده'}</span></p>}</div>
             <label className="flex h-10 w-full items-center gap-2 rounded-full border border-border bg-card px-4 text-muted-foreground md:w-72">
               <Search size={16}/><input aria-label="جست‌وجوی محصول" className="w-full bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground" value={query} onChange={e=>setQuery(e.target.value)} placeholder="نام محصول را جستجو کنید..."/>
             </label>
