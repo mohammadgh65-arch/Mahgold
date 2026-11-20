@@ -214,3 +214,24 @@ footer.bg-ink{background:#10271e!important;border-top:1px solid #b88c49}
  .ref-quote-strip>strong{font-size:13px}
  .ref-category-text b{font-size:10px}
 }
+
+
+/* Exact supplied Mahgold emerald velvet + gold logo masthead */
+.ref-brand-masthead{height:clamp(150px,18vw,218px);position:relative;isolation:isolate;overflow:hidden;background:#08251a;display:flex;align-items:center;justify-content:center}
+.ref-brand-masthead:before{content:"";position:absolute;inset:-24px;z-index:-2;background-image:url('/mahgold-brand-masthead.jpg');background-size:cover;background-position:center 48%;filter:blur(13px) brightness(.53) saturate(1.15);transform:scale(1.08)}
+.ref-brand-masthead:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(4,22,15,.24),rgba(4,22,15,.05) 50%,rgba(4,22,15,.24))}
+.ref-brand-masthead img{display:block;height:100%;width:auto;max-width:100%;object-fit:contain;object-position:center;filter:drop-shadow(0 3px 10px rgba(0,0,0,.22))}
+.ref-site-header{position:sticky;top:0}
+.ref-brand{display:none!important}
+.ref-main-header{justify-content:space-between}
+.ref-primary-nav{order:1;justify-content:flex-start}
+.ref-header-search{order:2}
+.ref-header-actions{order:3}
+@media(max-width:767px){
+ .ref-brand-masthead{height:150px}
+ .ref-brand-masthead img{height:100%;max-width:100%;width:auto}
+ .ref-main-header{min-height:62px}
+ .ref-mobile-menu{order:1}
+ .ref-header-actions{order:3}
+ .ref-mobile-links{background:#f8f0e1}
+}
