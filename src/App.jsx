@@ -158,6 +158,7 @@ export default function App() {
   const [products,setProducts]=useState([]);
   const [dbCategories,setDbCategories]=useState([]);
   const [quote,setQuote]=useState(null);
+  const [clockNow,setClockNow]=useState(()=>Date.now());
   const [siteContent,setSiteContent]=useState(null);
   const [dataStatus,setDataStatus]=useState(isSupabaseConfigured?'loading':'error');
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
@@ -166,6 +167,7 @@ export default function App() {
   const displaySlides=useMemo(()=>{const rows=(siteContent?.slides||[]).filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
   const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})),[siteContent]);
   useEffect(()=>{setActiveSlide(index=>Math.min(index,displaySlides.length-1));},[displaySlides.length]);
+  useEffect(()=>{const timer=setInterval(()=>setClockNow(Date.now()),15000);return()=>clearInterval(timer);},[]);
   useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%displaySlides.length),6000);return()=>clearInterval(timer);},[displaySlides.length]);
   useEffect(()=>{if(!supabase)return;let active=true;supabase.from('site_content').select('content').eq('id',1).maybeSingle().then(({data})=>{if(active&&data?.content)setSiteContent(data.content);});return()=>{active=false;};},[]);
   useEffect(()=>{
@@ -236,7 +238,7 @@ export default function App() {
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const cartTotal=cart.reduce((sum,item)=>sum+Number(item.price_toman||0)*Number(item.qty||0),0);
   const quoteObservedAt=quote?.observed_at?Date.parse(quote.observed_at):NaN;
-  const quoteFresh=quote?.is_live===true&&Number.isFinite(quoteObservedAt)&&quoteObservedAt<=Date.now()+60000&&Date.now()-quoteObservedAt<=300000;
+  const quoteFresh=quote?.is_live===true&&Number.isFinite(quoteObservedAt)&&quoteObservedAt<=clockNow+60000&&clockNow-quoteObservedAt<=300000;
 
   const addToCart=product=>{
     if(!supabase||dataStatus!=='connected'||!product.id){setCheckoutError('اتصال فروشگاه برقرار نیست.');return;}
@@ -267,7 +269,11 @@ export default function App() {
           idempotency_key:idempotencyKey
         }
       });
-      if(error){setCheckoutError(error.message||'ثبت سفارش انجام نشد. در صورت خطای ارتباط، با همان اطلاعات دوباره تلاش کنید.');return;}
+      if(error){
+        let message=error.message||'ثبت سفارش انجام نشد. در صورت خطای ارتباط، با همان اطلاعات دوباره تلاش کنید.';
+        try{const detail=await error.context?.json();if(detail?.error)message=detail.error;}catch{}
+        setCheckoutError(message);return;
+      }
       const orderData=data?.data||data;
       if(!orderData?.order_id||!orderData?.order_number){setCheckoutError('پاسخ ثبت سفارش کامل نبود. لطفاً وضعیت سفارش را پیش از ارسال مجدد بررسی کنید.');return;}
       setOrderResult(orderData);setCart([]);setCheckoutRequestKey(null);setCheckoutOpen(false);setCartOpen(false);
