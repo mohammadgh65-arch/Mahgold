@@ -364,6 +364,7 @@ export default function App() {
         </a>
         <nav className="ref-primary-nav">
           <a className="active" href="#home">خانه</a>
+          <button type="button" onClick={()=>setAccountOpen(true)}>پیگیری سفارش</button>
           <a href="#categories" onClick={()=>setCategory('طلای زینتی')}>طلای زینتی</a>
           <a href="#categories" onClick={()=>setCategory('طلای آب‌شده')}>طلای آب‌شده</a>
           <a href="#categories" onClick={()=>setCategory('سکه')}>سکه</a>
@@ -376,7 +377,7 @@ export default function App() {
         </div>
       </div>
       {menuOpen&&<nav className="ref-mobile-links flex flex-col gap-4 border-t border-border bg-background px-5 py-4 text-sm text-muted-foreground md:hidden">
-        <a href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a><a href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a><a href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a>
+        <a href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a><a href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a><a href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a><button className="text-right" onClick={()=>{setAccountOpen(true);setMenuOpen(false);}}>پیگیری سفارش</button>
         <button className="text-right" onClick={()=>{setAccountOpen(true);setMenuOpen(false);}}>ورود / ثبت‌نام</button>
       </nav>}
     </header>
