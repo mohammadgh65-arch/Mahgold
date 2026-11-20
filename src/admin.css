@@ -1,4 +1,4 @@
-@import url("https://cdn.jsdelivr.net/npm/shabnam-font@5.0.0/dist/font-face.min.css");
+@import "shabnam-font/dist/font-face.min.css";
 :root{--admin-bg:#edf3ef;--admin-card:#fff;--admin-ink:#173127;--admin-muted:#718079;--admin-green:#123b2d;--admin-gold:#c9a45e;--admin-line:#dce7df;--admin-shadow:0 12px 34px rgba(17,57,42,.07)}
 .admin-shell{min-height:100vh;background:var(--admin-bg);color:var(--admin-ink);display:flex;font-family:"Shabnam",Tahoma,sans-serif}
 .admin-side{width:268px;flex:0 0 268px;background:linear-gradient(170deg,#102d23 0%,#153b2d 58%,#0e261e 100%);color:#f2e7c9;padding:24px 18px;display:flex;flex-direction:column;min-height:100vh;position:sticky;top:0;height:100vh;box-shadow:8px 0 30px rgba(12,37,27,.08)}
