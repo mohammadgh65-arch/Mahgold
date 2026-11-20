@@ -116,7 +116,7 @@ function AccountContent({onClose,onAuthenticated,notice=''}) {
     setBusy(true);setMessage('');
     const result=await supabase.auth.signInWithOtp({
       email:email.trim().toLowerCase(),
-      options:{shouldCreateUser:true,data:{full_name:name.trim(),phone:phone.trim(),preferred_auth_method:'email'}}
+      options:{shouldCreateUser:true,emailRedirectTo:/^https?:$/.test(window.location.protocol)?window.location.origin:undefined,data:{full_name:name.trim(),phone:phone.trim(),preferred_auth_method:'email'}}
     });
     setBusy(false);
     if(result.error)setMessage('ارسال کد انجام نشد: '+result.error.message);
