@@ -313,6 +313,14 @@ export default function App() {
   const submitOrder=async event=>{
     event.preventDefault();setCheckoutError('');
     if(!supabase||!cart.length||checkoutBusy)return;
+    const {data:authData}=await supabase.auth.getSession();
+    if(!authData.session?.user){
+      setCheckoutError('برای ثبت سفارش ابتدا حساب کاربری خود را با کد تأیید ایمیل فعال کنید.');
+      setCheckoutOpen(false);
+      setAccountNotice('برای ادامه سفارش، ابتدا وارد حساب شوید یا حساب جدید بسازید.');
+      setAccountOpen(true);
+      return;
+    }
     setCheckoutBusy(true);
     const idempotencyKey=checkoutRequestKey||crypto.randomUUID();
     setCheckoutRequestKey(idempotencyKey);
@@ -324,6 +332,7 @@ export default function App() {
           customer_email:authData.session.user.email||customer.email||null,
           shipping_address:[customer.city,customer.postalCode,customer.address].filter(Boolean).join(' · '),
           customer_note:customer.note||'',
+          auth_method:'email',
           items:cart.map(item=>({product_id:item.id,quantity:item.qty,expected_price_toman:Number(item.price_toman)})),
           idempotency_key:idempotencyKey
         }
