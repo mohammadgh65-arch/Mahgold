@@ -168,6 +168,17 @@ export default function App() {
   const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})),[siteContent]);
   useEffect(()=>{setActiveSlide(index=>Math.min(index,displaySlides.length-1));},[displaySlides.length]);
   useEffect(()=>{const timer=setInterval(()=>setClockNow(Date.now()),15000);return()=>clearInterval(timer);},[]);
+  useEffect(()=>{
+    if(!supabase)return;
+    let active=true;
+    const refreshGoldQuote=async()=>{
+      const {data,error}=await supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
+        .eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle();
+      if(active&&!error)setQuote(data||null);
+    };
+    const timer=setInterval(refreshGoldQuote,60000);
+    return()=>{active=false;clearInterval(timer);};
+  },[]);
   useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%displaySlides.length),6000);return()=>clearInterval(timer);},[displaySlides.length]);
   useEffect(()=>{if(!supabase)return;let active=true;supabase.from('site_content').select('content').eq('id',1).maybeSingle().then(({data})=>{if(active&&data?.content)setSiteContent(data.content);});return()=>{active=false;};},[]);
   useEffect(()=>{
@@ -193,7 +204,7 @@ export default function App() {
     (async()=>{
       try{
         const [productResult,categoryResult,quoteResult]=await Promise.all([
-          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,created_at,tag')
+          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,created_at,tag,pricing_mode')
             .eq('is_active',true).order('created_at',{ascending:false}),
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
             .eq('is_active',true).order('sort_order',{ascending:true}),
@@ -242,6 +253,7 @@ export default function App() {
 
   const addToCart=product=>{
     if(!supabase||dataStatus!=='connected'||!product.id){setCheckoutError('اتصال فروشگاه برقرار نیست.');return;}
+    if(product.pricing_mode==='auto'&&!quoteFresh){setCheckoutError('نرخ زنده و معتبر طلای ۱۸ عیار در دسترس نیست؛ افزودن این محصول تا تازه‌شدن نرخ متوقف شد.');return;}
     setCart(old=>{
       const previous=old.find(item=>item.id===product.id);
       const nextQty=(previous?.qty||0)+1;
@@ -383,7 +395,7 @@ export default function App() {
                 <div className="mt-0.5 text-[11px] text-muted-foreground">{[product.weight_grams?gram(product.weight_grams):null,product.karat?money(product.karat)+' عیار':null].filter(Boolean).join(' · ')}</div>
                 <div className="ref-product-bottom">
                   <strong>{money(product.price_toman)} <small>تومان</small></strong>
-                  <button aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'} onClick={()=>addToCart(product)}><Plus size={17}/></button>
+                  <button aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(product)}><Plus size={17}/></button>
                 </div>
               </div>
             </article>)}
@@ -477,7 +489,7 @@ export default function App() {
             <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
             <div className="grid gap-2 text-xs text-muted-foreground"><span>وزن: {gram(selectedProduct.weight_grams)}</span><span>عیار: {money(selectedProduct.karat||18)}</span><span>موجودی: {money(selectedProduct.stock||0)}</span></div>
             <strong className="ref-detail-price">{money(selectedProduct.price_toman)} تومان</strong>
-            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
+            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1||(selectedProduct.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
           </div>
         </div>
       </section>
