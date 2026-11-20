@@ -249,11 +249,12 @@ export default function App() {
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const cartTotal=cart.reduce((sum,item)=>sum+Number(item.price_toman||0)*Number(item.qty||0),0);
   const quoteObservedAt=quote?.observed_at?Date.parse(quote.observed_at):NaN;
-  const quoteFresh=quote?.is_live===true&&Number.isFinite(quoteObservedAt)&&quoteObservedAt<=clockNow+60000&&clockNow-quoteObservedAt<=300000;
+  const quoteIsManual=quote?.source==='manual'&&quote?.is_live===false;
+  const quoteFresh=(quote?.is_live===true||quoteIsManual)&&Number.isFinite(quoteObservedAt)&&quoteObservedAt<=clockNow+60000&&clockNow-quoteObservedAt<=300000;
 
   const addToCart=product=>{
     if(!supabase||dataStatus!=='connected'||!product.id){setCheckoutError('اتصال فروشگاه برقرار نیست.');return;}
-    if(product.pricing_mode==='auto'&&!quoteFresh){setCheckoutError('نرخ زنده و معتبر طلای ۱۸ عیار در دسترس نیست؛ افزودن این محصول تا تازه‌شدن نرخ متوقف شد.');return;}
+    if(product.pricing_mode==='auto'&&!quoteFresh){setCheckoutError('نرخ معتبر طلای ۱۸ عیار در دسترس نیست؛ نرخ دستی یا خودکار باید در ۵ دقیقه اخیر ثبت شده باشد.');return;}
     setCart(old=>{
       const previous=old.find(item=>item.id===product.id);
       const nextQty=(previous?.qty||0)+1;
@@ -371,7 +372,7 @@ export default function App() {
       <section className="scroll-mt-16 bg-sand-gradient py-16 md:py-24" id="shop">
         <div className="mx-auto max-w-7xl px-4 md:px-7">
           <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div><div className="eyebrow text-gold-deep">THE CURATED EDIT</div><h2 className="mt-2 text-2xl font-semibold md:text-3xl">منتخب‌های مه‌گلد</h2>{quote&&<p className="mt-2 text-xs text-muted-foreground">{quote.title||'آخرین نرخ طلای ۱۸ عیار'}: <b className="text-gold-deep">{money(quote.price_toman)} تومان</b> <span className="mr-1 text-[10px]">{quoteFresh?'نرخ زنده و تازه':quote.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'ثبت دستی · غیرزنده'}</span></p>}</div>
+            <div><div className="eyebrow text-gold-deep">THE CURATED EDIT</div><h2 className="mt-2 text-2xl font-semibold md:text-3xl">منتخب‌های مه‌گلد</h2>{quote&&<p className="mt-2 text-xs text-muted-foreground">{quote.title||'آخرین نرخ طلای ۱۸ عیار'}: <b className="text-gold-deep">{money(quote.price_toman)} تومان</b> <span className="mr-1 text-[10px]">{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'نرخ زنده و تازه'):quoteIsManual?'نرخ دستی منقضی‌شده':quote.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'ثبت دستی · غیرمعتبر'}</span></p>}</div>
             <label className="flex h-10 w-full items-center gap-2 rounded-full border border-border bg-card px-4 text-muted-foreground md:w-72">
               <Search size={16}/><input aria-label="جست‌وجوی محصول" className="w-full bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground" value={query} onChange={e=>setQuery(e.target.value)} placeholder="نام محصول را جستجو کنید..."/>
             </label>
