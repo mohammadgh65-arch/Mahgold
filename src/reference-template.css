@@ -1,6 +1,5 @@
-@import url("https://growth-and-advancement-garden.lovable.app/assets/styles-D1yBYbyy.css");
-@import url("https://cdn.jsdelivr.net/npm/shabnam-font@5.0.0/dist/font-face.min.css");
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap");
+@import "./tailwind.css";
+@import "shabnam-font/dist/font-face.min.css";
 
 html{scroll-behavior:smooth;scroll-padding-top:88px}
 body{margin:0;background:var(--background);color:var(--foreground);font-family:"Shabnam",Tahoma,sans-serif}
