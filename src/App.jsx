@@ -263,7 +263,17 @@ export default function App() {
     });
     setCheckoutError('');
   };
-  const changeQuantity=(id,delta)=>setCart(old=>old.map(item=>item.id===id?{...item,qty:item.qty+delta}:item).filter(item=>item.qty>0&&item.qty<=Number(item.stock||0)));
+  const changeQuantity=(id,delta)=>{
+    const current=cart.find(item=>item.id===id);
+    if(!current)return;
+    const nextQty=Number(current.qty||0)+delta;
+    if(nextQty>Number(current.stock||0)){
+      setCheckoutError('موجودی این محصول اجازه افزایش تعداد بیشتر را نمی‌دهد.');
+      return;
+    }
+    setCart(old=>old.map(item=>item.id===id?{...item,qty:nextQty}:item).filter(item=>item.qty>0));
+    setCheckoutError('');
+  };
   const submitOrder=async event=>{
     event.preventDefault();setCheckoutError('');
     if(!supabase||!cart.length||checkoutBusy)return;
