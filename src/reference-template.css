@@ -393,3 +393,60 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
   .ref-footer-brand{height:clamp(130px,38vw,175px)!important}
   footer.bg-ink{padding-bottom:calc(24px + env(safe-area-inset-bottom))!important}
 }
+
+
+/* Mahgold header containment fix — keep the complete supplied brand artwork inside its viewport */
+.ref-brand-masthead{
+  width:100%!important;
+  height:clamp(150px,22vw,230px)!important;
+  min-height:0!important;
+  max-height:230px!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:hidden!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  background:#062719!important;
+  isolation:isolate!important;
+}
+.ref-brand-masthead::before{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:0!important;
+  background:#062719 url('/mahgold-brand-masthead.jpg') center/cover no-repeat!important;
+  filter:brightness(.62) saturate(1.12)!important;
+}
+.ref-brand-masthead::after{display:none!important;content:none!important}
+.ref-brand-masthead img{
+  position:relative!important;
+  z-index:1!important;
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0 auto!important;
+  padding:clamp(8px,2vw,18px)!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  transform:none!important;
+  filter:drop-shadow(0 3px 12px rgba(0,0,0,.35))!important;
+  mask-image:none!important;
+  -webkit-mask-image:none!important;
+}
+.ref-site-header{width:100%!important;max-width:100%!important;overflow:visible!important}
+.ref-main-header{width:100%!important;max-width:1440px!important;min-width:0!important;box-sizing:border-box!important}
+@media(max-width:767px){
+  .ref-brand-masthead{height:clamp(135px,39vw,185px)!important;max-height:185px!important}
+  .ref-brand-masthead img{padding:8px!important;object-fit:contain!important}
+  .ref-main-header{min-height:60px!important;padding-inline:10px!important;gap:8px!important}
+}
+@media(max-width:360px){
+  .ref-brand-masthead{height:135px!important}
+  .ref-main-header{padding-inline:8px!important}
+}
