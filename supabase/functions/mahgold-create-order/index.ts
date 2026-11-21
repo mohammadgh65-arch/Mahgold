@@ -95,8 +95,10 @@ Deno.serve(async (req: Request) => {
   if (!customerId) return response(401, { error: "Please sign in with a verified customer account before ordering" });
 
   const authMethod = body.auth_method === "phone" ? "phone" : "email";
-  const ip = req.headers.get("cf-connecting-ip") || "unknown";
-  const ipHash = await sha256(ip);
+  // This endpoint is called directly from browsers; a proxy IP header is not guaranteed.
+  // Rate-limit by the verified Supabase user to avoid putting every shopper in one "unknown" bucket.
+  const rateLimitKey = `customer:${customerId}`;
+  const ipHash = await sha256(rateLimitKey);
   const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 
   const { data: allowed, error: rateError } = await admin.rpc("mahgold_consume_order_rate_limit", { p_ip_hash: ipHash });
