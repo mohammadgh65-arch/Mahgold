@@ -118,3 +118,11 @@
 .admin-toolbar input,.admin-form input,.admin-form select,.admin-form textarea,.admin-modal input,.admin-modal select,.admin-modal textarea{background:#fffaf0;border-color:#e5d8c2;color:#29251e}
 .admin-login{background:linear-gradient(160deg,#fffaf0,#f3ead9);border-color:#d8bd85}
 @media(max-width:640px){.admin-side{background:linear-gradient(170deg,#17140d,#153327);border:0;border-bottom:1px solid #b88e4e}}
+
+
+/* Admin brand mark: use the full supplied artwork, integrated into the sidebar header */
+.admin-side>img{width:min(100%,220px);height:auto;max-height:148px;aspect-ratio:3/2;object-fit:contain;margin:0 auto 8px;border:0;border-radius:0;background:transparent;padding:0;box-shadow:none}
+.admin-side>small:before{display:none}
+.admin-side>small{margin:0 0 20px;color:#d6c49a;font-size:11px}
+.admin-login img{width:min(100%,260px);height:auto;max-height:174px;aspect-ratio:3/2;object-fit:contain;margin:0 auto;border:0;border-radius:0;background:transparent;padding:0;box-shadow:none}
+@media(max-width:640px){.admin-side>img{width:min(78vw,210px);height:auto;max-height:140px;margin:0 auto 5px}.admin-side>small{margin:0 0 8px}}
