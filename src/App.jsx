@@ -138,11 +138,11 @@ function AccountContent({onClose}) {
       : await supabase.auth.signInWithPassword({email,password});
     setBusy(false);
     if(result.error)setMessage(result.error.message);
-    else if(mode==='signup'&&!result.data.session)setMessage('ثبت‌نام انجام شد. برای فعال‌سازی حساب، ایمیل خود را تأیید کنید.');
+    else if(!result.data.session||(!result.data.session.user.email_confirmed_at&&!result.data.session.user.phone_confirmed_at))setMessage(mode==='signup'?'ثبت‌نام انجام شد. برای فعال‌سازی حساب، ایمیل خود را تأیید کنید.':'حساب شما هنوز تأیید نشده است؛ ابتدا ایمیل یا شماره تأییدشده را فعال کنید.');
     else setMessage(mode==='signup'?'حساب مشتری ایجاد شد.':'با موفقیت وارد شدید.');
   };
 
-  if(session)return <div className="ref-account-panel">
+  if(session?.user?.email_confirmed_at||session?.user?.phone_confirmed_at)return <div className="ref-account-panel">
     <span className="eyebrow text-gold-deep">MAHGOLD ACCOUNT</span>
     <h3>حساب کاربری شما</h3>
     <p className="text-sm text-muted-foreground">{session.user.email}</p>
@@ -653,7 +653,7 @@ export default function App() {
             <div className="ref-cart-trust"><div><ShieldCheck size={16}/><span>بررسی قیمت و موجودی پیش از ثبت سفارش</span></div><div><Clock3 size={16}/><span>رزرو موجودی پس از ثبت سفارش، به مدت ۱۵ دقیقه</span></div></div>
             <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{cartNeedsFreshQuote?'پس از دریافت نرخ معتبر':money(cartTotal)+' تومان'}</b></div>
             <p className="mb-4 text-[11px] leading-7 text-muted-foreground">قیمت نهایی پیش از ثبت سفارش بررسی می‌شود.</p>
-            <button type="button" className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full mahgold-premium-action" disabled={cartRefreshing} onClick={async()=>{const ready=await refreshCartPrices();if(ready)setCheckoutOpen(true);}}>{cartRefreshing?'در حال به‌روزرسانی قیمت‌ها…':'ادامه و ثبت سفارش'} <ArrowLeft className="mr-2 inline" size={16}/></button>
+            <button type="button" className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full mahgold-premium-action" disabled={cartRefreshing} onClick={async()=>{const ready=await refreshCartPrices();if(!ready)return;const {data:authData,error:authError}=await supabase.auth.getSession();const user=authData?.session?.user;if(authError||!user||(!user.email_confirmed_at&&!user.phone_confirmed_at)){setCartOpen(false);setCartNotice("برای ثبت سفارش، ابتدا وارد حساب تأییدشده خود شوید.");setAccountOpen(true);return;}setCheckoutError("");setCheckoutOpen(true);}}>{cartRefreshing?'در حال به‌روزرسانی قیمت‌ها…':'ادامه و ثبت سفارش'} <ArrowLeft className="mr-2 inline" size={16}/></button>
           </>}
       </aside>
     </div>}
