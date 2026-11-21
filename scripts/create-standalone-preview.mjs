@@ -36,10 +36,10 @@ html = html.replace('</head>', '<script>window.__MAHGOLD_STORE_PREVIEW_HTML=' + 
 if (!html.includes('__MAHGOLD_STORE_PREVIEW_HTML')) throw new Error('Embedded storefront preview is missing.');
 // Inline bundles are required for the downloadable single-file preview. Authorize
 // their exact SHA-256 hashes instead of weakening CSP with unsafe-inline.
-const scriptHashes = [...html.matchAll(/<script\\b[^>]*>([\\s\\S]*?)<\\/script>/gi)]
+const scriptHashes = [...html.matchAll(/<script\b[^>]*>([\s\\S]*?)<\/script>/gi)]
   .map(match => "'sha256-" + createHash('sha256').update(match[1]).digest('base64') + "'");
 if (!scriptHashes.length) throw new Error('No inline application scripts found.');
 html = html.replace(/script-src ([^;"]+)/, (_match, policy) => 'script-src ' + policy + ' ' + scriptHashes.join(' '));
-if (/href=["']\\/Mahgolddata:image/.test(html)) throw new Error('Malformed embedded app icon URL remains.');
+if (/href=["']\/Mahgolddata:image/.test(html)) throw new Error('Malformed embedded app icon URL remains.');
 writeFileSync(join(out, 'index.html'), html, 'utf8');
 console.log('Standalone admin preview created:', Buffer.byteLength(html), 'bytes');
