@@ -208,3 +208,26 @@
 .admin-logo-option button{font:inherit;font-size:10px;padding:8px 12px;border:1px solid #d5c092;border-radius:9px;background:#f5ecd9;color:#70552b}
 .admin-logo-option-proposed{border-color:#d8c294;background:linear-gradient(145deg,#fffdf8,#f6eddd)}
 @media(max-width:520px){.admin-logo-comparison{grid-template-columns:1fr}.admin-logo-option img{height:118px}}
+
+/* Admin header and brand refinement — isolated admin-only repair */
+.admin-brand{display:grid;justify-items:center;gap:9px;margin:0 auto 28px;width:100%;text-align:center}
+.admin-brand>img{display:block;width:112px;height:88px;object-fit:contain;padding:8px;border:1px solid rgba(211,180,124,.58);border-radius:18px;background:linear-gradient(145deg,#f8f3e8,#e9dfcd);box-shadow:0 12px 30px rgba(0,0,0,.24)}
+.admin-brand>div{display:grid;gap:3px}
+.admin-brand>div>strong{font-size:21px;line-height:1.4;color:#f6e8c9;font-weight:800}
+.admin-brand>div>small{font-size:10px;line-height:1.7;color:#cdbb96}
+.admin-heading-brand{display:flex;align-items:center;gap:15px;min-width:0}
+.admin-heading-brand>img{display:block;flex:none;width:70px;height:62px;object-fit:contain;padding:5px;border:1px solid #dfc99e;border-radius:15px;background:linear-gradient(145deg,#fffdf8,#eee3ce);box-shadow:0 8px 22px rgba(57,43,22,.10)}
+.admin-heading-brand>div{display:grid;gap:5px;min-width:0}
+.admin-heading-brand>div>span{font:10px Georgia,serif;color:#a48550;letter-spacing:2px}
+.admin-heading-brand h1{margin:0;font-size:clamp(22px,2.1vw,30px);font-weight:800;color:#29251f}
+.admin-side>small{display:none}
+@media(max-width:640px){
+ .admin-brand{gap:5px;margin:0 auto 12px}
+ .admin-brand>img{width:76px;height:62px;padding:5px;border-radius:13px}
+ .admin-brand>div>strong{font-size:18px}
+ .admin-brand>div>small{font-size:9px}
+ .admin-heading-brand{gap:10px}
+ .admin-heading-brand>img{width:54px;height:50px;border-radius:12px}
+ .admin-heading-brand>div>span{font-size:8px;letter-spacing:1.4px}
+ .admin-heading-brand h1{font-size:22px}
+}
