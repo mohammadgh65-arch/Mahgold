@@ -52,6 +52,7 @@ const money = value => new Intl.NumberFormat('fa-IR').format(Math.round(Number(v
 const isJewelryCategory = category => ['طلای زینتی','انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'].includes(category);
 const priceBreakdown = (p,q) => {const base=Number(p.weight_grams||0)*Number(q?.price_toman||0)*(Number(p.karat||18)/18);const mode=p.labor_mode||'percent',v=Number(p.labor_value||0);const labor=mode==='per_gram'?Number(p.weight_grams||0)*v:mode==='fixed'?v:base*v/100;const profit=(base+labor)*Number(p.seller_profit_percent??7)/100;const commission=(base+labor+profit)*Number(p.commission_percent||0)/100;const tax=(labor+profit+commission)*0.10;return {base,labor,profit,commission,tax,total:Math.round(base+labor+profit+commission+tax)};};
 const isFreshLiveQuote = q => {const t=q?.observed_at?Date.parse(q.observed_at):NaN;return q?.is_live===true&&Number.isFinite(t)&&Date.now()-t<=5*60*1000&&t<=Date.now()+60*1000&&Number(q?.price_toman)>0;};
+const isFreshGoldQuote = q => {const t=q?.observed_at?Date.parse(q.observed_at):NaN;const validSource=(q?.source==='manual'&&q?.is_live===false)||(q?.source!=='manual'&&q?.is_live===true);return validSource&&Number.isFinite(t)&&Date.now()-t<=5*60*1000&&t<=Date.now()+60*1000&&Number(q?.price_toman)>0;};
 const gram = value => new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(Number(value || 0)) + ' گرم';
 const toLatinDigits = value => value.replace(/[۰-۹٠-٩]/g, d => {
   const fa='۰۱۲۳۴۵۶۷۸۹', ar='٠١٢٣٤٥٦٧٨٩';
@@ -339,7 +340,7 @@ export default function App() {
   const newArrivals=useMemo(()=>products.slice(0,4),[products]);
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const cartTotal=cart.reduce((sum,item)=>sum+Number(item.price_toman||0)*Number(item.qty||0),0);
-  const cartNeedsFreshQuote=cart.some(item=>item.pricing_mode==='auto')&&!isFreshLiveQuote(quote);
+  const cartNeedsFreshQuote=cart.some(item=>item.pricing_mode==='auto')&&!isFreshGoldQuote(quote);
 
   const refreshCartPrices=async()=>{
     if(!cart.length)return true;
@@ -362,9 +363,8 @@ export default function App() {
       }
       if(cart.some(item=>byId.get(item.id)?.pricing_mode==='auto')){
         const quote=quoteResult.data;
-        const observedAt=quote?.observed_at?Date.parse(quote.observed_at):NaN;
-        if(quoteResult.error||!quote||quote.is_live!==true||!Number.isFinite(observedAt)||Date.now()-observedAt>5*60*1000||observedAt>Date.now()+60*1000){
-          throw new Error('نرخ زنده و تازه طلای ۱۸ عیار در دسترس نیست؛ تا دریافت نرخ معتبر، سفارش طلای قیمت‌گذاری خودکار پذیرفته نمی‌شود.');
+        if(quoteResult.error||!isFreshGoldQuote(quote)){
+          throw new Error('نرخ معتبر و تازه طلای ۱۸ عیار در دسترس نیست؛ نرخ زنده یا نرخ دستی ثبت‌شده در ۵ دقیقه اخیر لازم است.');
         }
       }
       setCart(old=>old.map(item=>({...item,...byId.get(item.id),qty:item.qty})));
@@ -379,7 +379,7 @@ export default function App() {
 
   const addToCart=product=>{
     if(!supabase||dataStatus!=='connected'||!product.id){setCheckoutError('اتصال فروشگاه برقرار نیست.');return;}
-    if(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)){setCheckoutError('قیمت این محصول فعلاً قابل تأیید نیست؛ نرخ زنده طلای ۱۸ عیار تازه نیست.');return;}
+    if(product.pricing_mode==='auto'&&!isFreshGoldQuote(quote)){setCheckoutError('قیمت این محصول فعلاً قابل تأیید نیست؛ نرخ معتبر طلای ۱۸ عیار تازه نیست.');return;}
     setCart(old=>{
       const previous=old.find(item=>item.id===product.id);
       const nextQty=(previous?.qty||0)+1;
@@ -468,7 +468,7 @@ export default function App() {
             <span className="mahgold-glass-live" aria-hidden="true"/>
             <span className="mahgold-glass-label">طلای ۱۸ عیار</span>
             <strong>{quote?.price_toman&&Number(quote.price_toman)>0?money(quote.price_toman):'—'} <small>تومان</small></strong>
-            <span className={isFreshLiveQuote(quote)?'mahgold-glass-state live':'mahgold-glass-state'}>{isFreshLiveQuote(quote)?'زنده':'آخرین نرخ'}</span>
+            <span className={isFreshLiveQuote(quote)?'mahgold-glass-state live':'mahgold-glass-state'}>{isFreshLiveQuote(quote)?'زنده':isFreshGoldQuote(quote)?'دستی تازه':'آخرین نرخ'}</span>
           </div>
           <button type="button" className={'mahgold-coins-toggle '+(coinsOpen?'is-open':'')} aria-expanded={coinsOpen} aria-controls="mahgold-coins-panel" onClick={()=>setCoinsOpen(v=>!v)}>
             <span>قیمت سکه‌ها</span><ChevronDown size={15}/>
@@ -553,7 +553,7 @@ export default function App() {
           {dataStatus==='loading'?<div className="mahgold-arrivals-empty">در حال دریافت محصولات…</div>:newArrivals.length>0?<div className="mahgold-arrivals-grid">
             {newArrivals.map(product=><article className="mahgold-arrival-card" key={product.id}>
               <button className="mahgold-arrival-image" onClick={()=>openProduct(product)} aria-label={'مشاهده '+product.name}><ProductImage product={product}/></button>
-              <div className="mahgold-arrival-info"><span>{product.category}</span><button onClick={()=>openProduct(product)}>{product.name}</button><small>{product.weight_grams?gram(product.weight_grams):'جزئیات محصول'}</small><div><strong>{product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'نیازمند نرخ معتبر':<>{money(product.price_toman)} <small>تومان</small></>}</strong><button aria-label={'افزودن '+product.name+' به سبد'} disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}><Plus size={16}/></button></div></div>
+              <div className="mahgold-arrival-info"><span>{product.category}</span><button onClick={()=>openProduct(product)}>{product.name}</button><small>{product.weight_grams?gram(product.weight_grams):'جزئیات محصول'}</small><div><strong>{product.pricing_mode==='auto'&&!isFreshGoldQuote(quote)?'نیازمند نرخ معتبر':<>{money(product.price_toman)} <small>تومان</small></>}</strong><button aria-label={'افزودن '+product.name+' به سبد'} disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}><Plus size={16}/></button></div></div>
             </article>)}
           </div>:<div className="mahgold-arrivals-empty">{dataStatus==='error'?'برای نمایش محصولات، اتصال فروشگاه را بررسی کنید.':'محصول تازه‌ای برای نمایش ثبت نشده است.'}</div>}
         </div>
@@ -562,7 +562,7 @@ export default function App() {
       <section className="scroll-mt-16 bg-sand-gradient py-16 md:py-24" id="shop">
         <div className="mx-auto max-w-7xl px-4 md:px-7">
           <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div><div className="eyebrow text-gold-deep">THE CURATED EDIT</div><h2 className="mt-2 text-2xl font-semibold md:text-3xl">منتخب‌های مه‌گلد</h2>{quote&&<p className="mt-2 text-xs text-muted-foreground">{quote.title||'آخرین نرخ ثبت‌شده طلا'}: <b className="text-gold-deep">{money(quote.price_toman)} تومان</b> <span className="mr-1 text-[10px]">{isFreshLiveQuote(quote)?'نرخ زنده و به‌روز':quote.is_live?'آخرین نرخ · قدیمی':'ثبت دستی · غیرزنده'}</span></p>}</div>
+            <div><div className="eyebrow text-gold-deep">THE CURATED EDIT</div><h2 className="mt-2 text-2xl font-semibold md:text-3xl">منتخب‌های مه‌گلد</h2>{quote&&<p className="mt-2 text-xs text-muted-foreground">{quote.title||'آخرین نرخ ثبت‌شده طلا'}: <b className="text-gold-deep">{money(quote.price_toman)} تومان</b> <span className="mr-1 text-[10px]">{isFreshGoldQuote(quote)?(quote.source==='manual'?'نرخ دستی تازه':'نرخ زنده و به‌روز'):quote.source==='manual'?'نرخ دستی · قدیمی':'آخرین نرخ · قدیمی'}</span></p>}</div>
             <label className="flex h-10 w-full items-center gap-2 rounded-full border border-border bg-card px-4 text-muted-foreground md:w-72">
               <Search size={16}/><input aria-label="جست‌وجوی محصول" className="w-full bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground" value={query} onChange={e=>setQuery(e.target.value)} placeholder="نام محصول را جستجو کنید..."/>
             </label>
@@ -645,7 +645,7 @@ export default function App() {
           <>
             <div>{cart.map(item=><div className="ref-cart-line" key={item.id}>
               <ProductImage product={item}/>
-              <div><h4>{item.name}</h4><strong>{item.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'نیازمند نرخ معتبر':<>{money(item.price_toman)} تومان</>}</strong><div className="ref-qty">
+              <div><h4>{item.name}</h4><strong>{item.pricing_mode==='auto'&&!isFreshGoldQuote(quote)?'نیازمند نرخ معتبر':<>{money(item.price_toman)} تومان</>}</strong><div className="ref-qty">
                 <button aria-label="کاهش تعداد" onClick={()=>changeQuantity(item.id,-1)}><Minus size={13}/></button><span className="text-xs">{money(item.qty)}</span><button aria-label="افزایش تعداد" onClick={()=>changeQuantity(item.id,1)}><Plus size={13}/></button>
               </div></div>
               <button className="ref-remove" aria-label="حذف محصول" onClick={()=>setCart(old=>old.filter(p=>p.id!==item.id))}><X size={15}/></button>
@@ -694,7 +694,7 @@ export default function App() {
           {selectedProduct.description&&<p className="mahgold-product-description">{selectedProduct.description}</p>}
           <div className="mahgold-product-price-panel">
             <small>قیمت محصول</small>
-            <strong>{selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'قیمت روز در حال به‌روزرسانی است':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</strong>
+            <strong>{selectedProduct.pricing_mode==='auto'&&!isFreshGoldQuote(quote)?'قیمت روز در حال به‌روزرسانی است':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</strong>
             <span>قیمت نهایی پیش از ثبت سفارش بررسی می‌شود.</span>
           </div>
           <div className="mahgold-product-spec-panel">
