@@ -38,7 +38,7 @@ export default function AdminPanel(){
   if(!supabase){setNotice('اتصال پایگاه داده در دسترس نیست.');return '';}
   if(!['image/jpeg','image/png','image/webp','image/avif'].includes(file.type)){setNotice('فقط تصویر JPG، PNG، WebP یا AVIF مجاز است.');return '';}
   if(file.size>8*1024*1024){setNotice('حداکثر حجم فایل اولیه ۸ مگابایت است.');return '';}
-  setUploading(true);setUploadStats(null);
+  setUploading(true);
   try{
    const limits={products:1200,slides:1920,tiles:900,story:1400,brand:1400};
    const maxEdge=limits[folder]||1200;
@@ -66,7 +66,6 @@ export default function AdminPanel(){
    const {data}=supabase.storage.from('product-images').getPublicUrl(path);
    if(!data?.publicUrl)throw new Error('نشانی عمومی تصویر ساخته نشد.');
    const saved=Math.max(0,Math.round((1-optimized.size/file.size)*100));
-   setUploadStats({before:file.size,after:optimized.size,saved,width,height});
    setNotice('تصویر به WebP تبدیل و بهینه شد: '+formatBytes(file.size)+' ← '+formatBytes(optimized.size)+' ('+saved+'٪ کاهش حجم). برای ثبت نهایی تغییرات، دکمه ذخیره را بزنید.');
    return data.publicUrl;
   }catch(error){setNotice('بهینه‌سازی/بارگذاری تصویر ناموفق بود: '+(error?.message||'خطای ناشناخته'));return '';}
