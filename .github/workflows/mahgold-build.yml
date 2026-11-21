@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - mahgold-admin-repair-2026-11-15
+      - fix/admin-order-state-guard-2026-11-22
   pull_request:
     branches:
       - mahgold-admin-repair-2026-11-15
