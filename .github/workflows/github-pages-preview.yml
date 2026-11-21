@@ -54,6 +54,12 @@ jobs:
         run: |
           cp Mahgold_Footer_Premium_Quality.html dist/index.html
           cp Mahgold_Footer_Premium_Quality.html dist/404.html
+          node scripts/remove-lovable-assets.mjs
+          test -s dist/mahgold-header.webp
+          test -s dist/mahgold-brand-masthead.jpg
+          ! grep -qi 'lovable.app' dist/index.html
+          ! grep -qi 'lovable.app' dist/404.html
+          ! grep -qi 'lovable.app' dist/admin/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
