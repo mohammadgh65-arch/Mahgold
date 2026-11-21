@@ -7,7 +7,7 @@ const sections = [
   ['overview','نمای کلی'],['products','محصولات'],['orders','سفارش‌ها'],['quotes','نرخ طلا'],
   ['categories','دسته‌بندی‌ها'],['customers','مشتریان'],['content','محتوای سایت'],['settings','تنظیمات']
 ];
-const money = n => new Intl.NumberFormat('fa-IR').format(Number(n||0));
+const money = n => new Intl.NumberFormat('fa-IR').format(Number(n||0));\nconst formatBytes = bytes => bytes<1024*1024?Math.round(bytes/1024)+' KB':(bytes/(1024*1024)).toFixed(2)+' MB';
 const quoteIsFresh = q => {const t=Date.parse(q?.observed_at||'');return Number.isFinite(t)&&t<=Date.now()+60000&&Date.now()-t<=300000&&((q?.source==='manual'&&q?.is_live===false)||q?.is_live===true);};
 const blankProduct = {name:'',category:'طلای زینتی',description:'',image_url:'',weight_grams:0,karat:18,price_toman:0,pricing_mode:'manual',markup_percent:0,stock:0,is_active:true,tag:''};
 export default function AdminPanel(){
@@ -19,7 +19,7 @@ export default function AdminPanel(){
  const [category,setCategory]=useState({name:'',slug:'',description:'',icon:'✧',sort_order:0,is_active:true});
  const [settings,setSettings]=useState({store_name:'مه‌گلد',currency:'تومان',default_markup_percent:0,price_provider_status:'not_configured'});
  const [content,setContent]=useState('{}');
- const [uploading,setUploading]=useState(false);
+ const [uploading,setUploading]=useState(false);\n const [uploadStats,setUploadStats]=useState(null);
  const [deletingProductId,setDeletingProductId]=useState(null);
  useEffect(()=>{let active=true;let subscription=null;if(!supabase){setNotice('اتصال Supabase در نسخه فعلی پیکربندی نشده است.');setChecking(false);return()=>{active=false;};}supabase.auth.getSession().then(({data,error})=>{if(!active)return;if(error)setNotice('بازیابی نشست ناموفق بود: '+error.message);setSession(data?.session||null);setChecking(false);}).catch(error=>{if(active){setNotice('خطا در بررسی نشست: '+(error?.message||'خطای ناشناخته'));setChecking(false);}});const {data}=supabase.auth.onAuthStateChange((_e,s)=>{if(active)setSession(s);});subscription=data?.subscription;return()=>{active=false;subscription?.unsubscribe();};},[]);
  useEffect(()=>{let active=true;(async()=>{if(!session){setAdminOk(false);setCheckingAdmin(false);return;}setCheckingAdmin(true);try{const [profileResult,adminResult]=await Promise.all([supabase.from('profiles').select('role').eq('id',session.user.id).maybeSingle(),supabase.from('store_admins').select('user_id').eq('user_id',session.user.id).maybeSingle()]);if(active)setAdminOk(!profileResult.error&&!adminResult.error&&profileResult.data?.role==='admin'&&!!adminResult.data);}catch{if(active)setAdminOk(false);}finally{if(active)setCheckingAdmin(false);}})();return()=>{active=false;};},[session]);
@@ -33,7 +33,45 @@ export default function AdminPanel(){
   supabase.from('site_content').select('*').eq('id',1).maybeSingle()
  ]);const names=['محصولات','سفارش‌ها','نرخ‌ها','دسته‌بندی‌ها','مشتریان','تنظیمات','محتوای سایت'];const next={};jobs.forEach((r,i)=>{if(i<5)next[['products','orders','quotes','categories','customers'][i]]=r.data||[];});setData(d=>({...d,...next,settings:jobs[5].data||d.settings,content:jobs[6].data||d.content}));if(jobs[5].data)setSettings({...{store_name:'مه‌گلد',currency:'تومان',default_markup_percent:0,price_provider_status:'not_configured'},...jobs[5].data});if(jobs[6].data){const raw=jobs[6].data.content;setContent(JSON.stringify(raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{},null,2));}const errors=jobs.map((r,i)=>r.error?names[i]+': '+r.error.message:null).filter(Boolean);if(errors.length){setConnectionState('warning');setNotice('بخشی از اطلاعات دریافت نشد: '+errors.join(' | '));}else{setConnectionState('ok');setNotice('اطلاعات پنل با موفقیت به‌روزرسانی شد.');}}catch(error){setConnectionState('error');setNotice('دریافت اطلاعات پنل ناموفق بود: '+(error?.message||'خطای ناشناخته'));}finally{setLoading(false);}}
  useEffect(()=>{load();},[adminOk]);
- async function uploadImage(file,folder='products'){if(!file)return '';if(!supabase){setNotice('اتصال پایگاه داده در دسترس نیست.');return '';}if(!['image/jpeg','image/png','image/webp','image/avif'].includes(file.type)){setNotice('فقط تصویر JPG، PNG، WebP یا AVIF مجاز است.');return '';}if(file.size>8*1024*1024){setNotice('حداکثر حجم هر تصویر ۸ مگابایت است.');return '';}setUploading(true);try{const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';const path=folder+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;const {error}=await supabase.storage.from('product-images').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type});if(error)throw error;const {data}=supabase.storage.from('product-images').getPublicUrl(path);if(!data?.publicUrl)throw new Error('نشانی عمومی تصویر ساخته نشد.');setNotice('تصویر بارگذاری شد؛ برای ثبت نهایی تغییرات، دکمه ذخیره را بزنید.');return data.publicUrl;}catch(error){setNotice('بارگذاری تصویر ناموفق بود: '+(error?.message||'خطای ناشناخته'));return '';}finally{setUploading(false);}}
+ async function uploadImage(file,folder='products'){
+  if(!file)return '';
+  if(!supabase){setNotice('اتصال پایگاه داده در دسترس نیست.');return '';}
+  if(!['image/jpeg','image/png','image/webp','image/avif'].includes(file.type)){setNotice('فقط تصویر JPG، PNG، WebP یا AVIF مجاز است.');return '';}
+  if(file.size>8*1024*1024){setNotice('حداکثر حجم فایل اولیه ۸ مگابایت است.');return '';}
+  setUploading(true);setUploadStats(null);
+  try{
+   const limits={products:1200,slides:1920,tiles:900,story:1400,brand:1400};
+   const maxEdge=limits[folder]||1200;
+   const bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});
+   let scale=Math.min(1,maxEdge/Math.max(bitmap.width,bitmap.height));
+   let width=Math.max(1,Math.round(bitmap.width*scale)),height=Math.max(1,Math.round(bitmap.height*scale));
+   const canvas=document.createElement('canvas');const ctx=canvas.getContext('2d',{alpha:true});
+   if(!ctx)throw new Error('مرورگر امکان پردازش تصویر را فراهم نکرد.');
+   let blob=null;
+   for(let attempt=0;attempt<7;attempt++){
+    canvas.width=width;canvas.height=height;
+    ctx.clearRect(0,0,width,height);ctx.drawImage(bitmap,0,0,width,height);
+    const quality=[0.84,0.80,0.76,0.72,0.68,0.64,0.60][attempt];
+    blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',quality));
+    if(!blob||blob.type!=='image/webp')throw new Error('تبدیل تصویر به WebP در این مرورگر پشتیبانی نمی‌شود؛ فایل اصلی ارسال نشد.');
+    if(blob.size<=1500*1024)break;
+    if(attempt>=3){width=Math.max(1,Math.round(width*0.88));height=Math.max(1,Math.round(height*0.88));}
+   }
+   bitmap.close?.();
+   if(!blob||blob.size>2*1024*1024)throw new Error('حجم تصویر پس از بهینه‌سازی هنوز بیش از حد مجاز است؛ فایل بارگذاری نشد.');
+   const optimized=new File([blob],(file.name.replace(/\.[^.]+$/,'')||'image')+'.webp',{type:'image/webp',lastModified:Date.now()});
+   const path=folder+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.webp';
+   const {error}=await supabase.storage.from('product-images').upload(path,optimized,{cacheControl:'31536000',upsert:false,contentType:'image/webp'});
+   if(error)throw error;
+   const {data}=supabase.storage.from('product-images').getPublicUrl(path);
+   if(!data?.publicUrl)throw new Error('نشانی عمومی تصویر ساخته نشد.');
+   const saved=Math.max(0,Math.round((1-optimized.size/file.size)*100));
+   setUploadStats({before:file.size,after:optimized.size,saved,width,height});
+   setNotice('تصویر به WebP تبدیل و بهینه شد: '+formatBytes(file.size)+' ← '+formatBytes(optimized.size)+' ('+saved+'٪ کاهش حجم). برای ثبت نهایی تغییرات، دکمه ذخیره را بزنید.');
+   return data.publicUrl;
+  }catch(error){setNotice('بهینه‌سازی/بارگذاری تصویر ناموفق بود: '+(error?.message||'خطای ناشناخته'));return '';}
+  finally{setUploading(false);}
+ }
  async function handleProductImage(file){const url=await uploadImage(file);if(url)setProduct(p=>({...p,image_url:url}));}
  async function saveProduct(){if(!product.name?.trim()){setNotice('نام محصول را وارد کنید.');return;}const payload={...product,name:product.name.trim(),weight_grams:Number(product.weight_grams),karat:Number(product.karat),price_toman:Number(product.price_toman),stock:Number(product.stock),markup_percent:Number(product.markup_percent)};if(payload.weight_grams<0||payload.karat<=0||payload.karat>24||payload.price_toman<0||payload.stock<0||payload.markup_percent<0){setNotice('مقادیر عددی محصول معتبر نیستند.');return;}setSaving(true);try{const q=product.id?supabase.from('products').update(payload).eq('id',product.id):supabase.from('products').insert(payload);const {error}=await q;if(error)throw error;setModal(null);setNotice('محصول با موفقیت ذخیره شد.');await load();}catch(error){setNotice('ذخیره محصول ناموفق بود: '+(error?.message||'خطای ناشناخته'));}finally{setSaving(false);}}
  async function removeProduct(id){const target=data.products.find(p=>p.id===id);if(!target||deletingProductId)return;const approved=confirm('محصول «'+target.name+'» از ویترین فروشگاه حذف و غیرفعال شود؟\n\nاین عملیات حذف فیزیکی نیست؛ سابقه سفارش‌ها، اطلاعات مالی و ارجاعات رزرو حفظ می‌شوند. محصول از فروش به مشتریان جدید خارج می‌شود و مدیر می‌تواند بعداً آن را دوباره فعال کند.');if(!approved)return;setDeletingProductId(id);try{const {data:updated,error}=await supabase.from('products').update({is_active:false,updated_at:new Date().toISOString()}).eq('id',id).select('id,is_active').maybeSingle();if(error)throw error;if(!updated){setNotice('محصول تغییر نکرد؛ ممکن است قبلاً حذف شده یا دسترسی مدیریت کافی نباشد. فهرست را تازه‌سازی کنید.');return;}setNotice('محصول از ویترین حذف شد و غیرفعال است؛ سوابق سفارش و اطلاعات مرتبط حفظ شده‌اند.');await load();}catch(error){setNotice('حذف از ویترین ناموفق بود: '+(error?.message||'خطای ناشناخته'));}finally{setDeletingProductId(null);}}
