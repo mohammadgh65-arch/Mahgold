@@ -7,7 +7,8 @@ const sections = [
   ['overview','نمای کلی'],['products','محصولات'],['orders','سفارش‌ها'],['quotes','نرخ طلا'],
   ['categories','دسته‌بندی‌ها'],['customers','مشتریان'],['content','محتوای سایت'],['settings','تنظیمات']
 ];
-const money = n => new Intl.NumberFormat('fa-IR').format(Number(n||0));\nconst formatBytes = bytes => bytes<1024*1024?Math.round(bytes/1024)+' KB':(bytes/(1024*1024)).toFixed(2)+' MB';
+const money = n => new Intl.NumberFormat('fa-IR').format(Number(n||0));
+const formatBytes = bytes => bytes<1024*1024?Math.round(bytes/1024)+' KB':(bytes/(1024*1024)).toFixed(2)+' MB';
 const quoteIsFresh = q => {const t=Date.parse(q?.observed_at||'');return Number.isFinite(t)&&t<=Date.now()+60000&&Date.now()-t<=300000&&((q?.source==='manual'&&q?.is_live===false)||q?.is_live===true);};
 const blankProduct = {name:'',category:'طلای زینتی',description:'',image_url:'',weight_grams:0,karat:18,price_toman:0,pricing_mode:'manual',markup_percent:0,stock:0,is_active:true,tag:''};
 export default function AdminPanel(){
