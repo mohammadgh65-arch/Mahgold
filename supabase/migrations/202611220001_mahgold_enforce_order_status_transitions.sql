@@ -1,5 +1,6 @@
 -- Enforce a server-side order lifecycle. The admin UI is not a security boundary.
--- Existing payment guard remains authoritative: no client/admin can mark an order paid.
+-- Service-role calls must obey the same lifecycle and release reservations too.
+-- Payment status remains blocked by mahgold_block_unverified_paid_status.
 create or replace function public.mahgold_enforce_order_status_transition()
 returns trigger
 language plpgsql
@@ -13,13 +14,7 @@ begin
     return new;
   end if;
 
-  -- Trusted server-side integrations may advance status after verifying external events.
-  -- The separate paid-status guard remains in force until payment verification is enabled.
-  if v_jwt_role = 'service_role' then
-    return new;
-  end if;
-
-  if not public.zarin_is_admin() then
+  if v_jwt_role <> 'service_role' and not public.zarin_is_admin() then
     raise exception 'تغییر وضعیت سفارش فقط برای مدیر مجاز است';
   end if;
 
