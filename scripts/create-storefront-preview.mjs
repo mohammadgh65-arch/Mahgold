@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, basename } from 'node:path';
+import { createHash } from 'node:crypto';
 
 const out = 'dist';
 const assetDir = join(out, 'assets');
@@ -21,6 +22,7 @@ html = html.replace(/<link[^>]*href=["']((?:\/[^"']*)?\/assets\/[^"']+\.css)["']
   const file = join(assetDir, basename(href));
   return '<style>\n' + readFileSync(file, 'utf8').replaceAll('/mahgold-logo.webp', logo) + '\n</style>';
 });
+html = html.replaceAll('/Mahgold/mahgold-app-icon.svg', logo);
 html = html.replaceAll('/mahgold-app-icon.svg', logo);
 
 if (/<script[^>]+src=["'](?:\/[^"']*)?\/assets\/|<link[^>]+href=["'](?:\/[^"']*)?\/assets\/[^"']+\.css/.test(html)) {
