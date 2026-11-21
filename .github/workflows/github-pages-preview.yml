@@ -1,4 +1,4 @@
-name: Deploy Mahgold GitHub Pages preview
+name: Deploy Mahgold HTML preview
 
 on:
   push:
@@ -16,38 +16,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
+    environment:
+      name: github-pages-preview
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout preview branch
         uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
-      - name: Build storefront and admin
-        env:
-          VITE_SUPABASE_URL: https://nzvvvpbwavaodhxrnkdr.supabase.co
-          VITE_SUPABASE_ANON_KEY: sb_publishable_8UgFkQuDJNNeez2O1CNv3Q_Jf44PrL9
-        run: npm run build -- --mode github-pages
-      - name: Prepare GitHub Pages SPA fallback
-        run: cp dist/index.html dist/404.html
+      - name: Prepare the approved standalone storefront
+        run: |
+          mkdir -p dist
+          cp Mahgold_Footer_Premium_Quality.html dist/index.html
+          cp Mahgold_Footer_Premium_Quality.html dist/404.html
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
-  deploy:
-    environment:
-      name: github-pages-preview
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
       - name: Deploy preview
         id: deployment
         uses: actions/deploy-pages@v4
