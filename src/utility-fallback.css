@@ -202,3 +202,27 @@ button,input,select,textarea{font:inherit}
 .duration-500{transition-duration:500ms}
 .shadow-soft{box-shadow:0 1px 3px 0 rgb(0 0 0 / .1),0 1px 2px -1px rgb(0 0 0 / .1)}
 @keyframes mahgold-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* Precision overrides for compound Tailwind spacing and sizing utilities. */
+.px-1{padding-left:.25rem;padding-right:.25rem}
+.px-2{padding-left:.5rem;padding-right:.5rem}
+.px-3{padding-left:.75rem;padding-right:.75rem}
+.px-4{padding-left:1rem;padding-right:1rem}
+.px-5{padding-left:1.25rem;padding-right:1.25rem}
+.px-6{padding-left:1.5rem;padding-right:1.5rem}
+.px-7{padding-left:1.75rem;padding-right:1.75rem}
+.py-1{padding-top:.25rem;padding-bottom:.25rem}
+.py-2{padding-top:.5rem;padding-bottom:.5rem}
+.py-4{padding-top:1rem;padding-bottom:1rem}
+.py-8{padding-top:2rem;padding-bottom:2rem}
+.mx-auto{margin-left:auto;margin-right:auto}
+.my-4{margin-top:1rem;margin-bottom:1rem}
+.min-h-screen{min-height:100vh}
+.min-h-\\[60vh\\]{min-height:60vh}
+.max-w-7xl{max-width:80rem}
+.max-w-md{max-width:28rem}
+.min-w-5{min-width:1.25rem}
+.max-h-64{max-height:16rem}
+.md\\:px-\\[10\\%\\]{}
+@media(min-width:768px){.md\\:px-\\[10\\%\\]{padding-left:10%;padding-right:10%}}
+@media(min-width:768px){.md\\:h-\\[72px\\]{height:72px}}
