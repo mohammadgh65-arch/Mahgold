@@ -30,5 +30,11 @@ if (/<script[^>]+src=["'](?:\/[^"']*)?\/assets\/|<link[^>]+href=["'](?:\/[^"']*)
 }
 if (!html.includes('data:image/svg+xml;base64')) throw new Error('Embedded SVG logo is missing.');
 if (!html.includes('درخششِ طلا') && !html.includes('مه‌گلد')) throw new Error('Storefront content is missing.');
+// Keep CSP strict while authorizing only the exact bundled inline application script.
+const scriptHashes = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)]
+  .map(match => "'sha256-" + createHash('sha256').update(match[1]).digest('base64') + "'");
+if (!scriptHashes.length) throw new Error('No inline application scripts found.');
+html = html.replace(/script-src ([^;"]+)/, (_match, policy) => 'script-src ' + policy + ' ' + scriptHashes.join(' '));
+if (/href=["']\/Mahgolddata:image/.test(html)) throw new Error('Malformed embedded app icon URL remains.');
 writeFileSync(join(out, 'index.html'), html, 'utf8');
 console.log('Standalone admin preview created:', Buffer.byteLength(html), 'bytes');
