@@ -10,7 +10,7 @@ let html = readFileSync(join(out, 'index.html'), 'utf8').replaceAll('\\n', '\n')
 html = html.replace(/<link[^>]*rel=["']modulepreload["'][^>]*>/g, '');
 html = html.replace(/<link[^>]*rel=["']manifest["'][^>]*>/g, '');
 let bundledScripts = 0;
-html = html.replace(/<script[^>]*src=["']((?:\/|\.\/)?assets\/[^"']+\.js)["'][^>]*>\s*<\/script>/g, (_tag, src) => {
+html = html.replace(/<script[^>]*src=["']((?:\/[^"']*)?\/assets\/[^"']+\.js)["'][^>]*>\s*<\/script>/g, (_tag, src) => {
   const file = join(assetDir, basename(src));
   const code = readFileSync(file, 'utf8').replaceAll('/mahgold-app-icon.svg', logo);
   bundledScripts++;
@@ -18,13 +18,13 @@ html = html.replace(/<script[^>]*src=["']((?:\/|\.\/)?assets\/[^"']+\.js)["'][^>
 });
 if (bundledScripts !== 1) throw new Error('Expected exactly one JavaScript bundle; found ' + bundledScripts);
 
-html = html.replace(/<link[^>]*href=["']((?:\/|\.\/)?assets\/[^"']+\.css)["'][^>]*>/g, (_tag, href) => {
+html = html.replace(/<link[^>]*href=["']((?:\/[^"']*)?\/assets\/[^"']+\.css)["'][^>]*>/g, (_tag, href) => {
   const file = join(assetDir, basename(href));
   return '<style>\n' + readFileSync(file, 'utf8').replaceAll('/mahgold-logo.webp', logo) + '\n</style>';
 });
 html = html.replaceAll('/mahgold-app-icon.svg', logo);
 
-if (/<script[^>]+src=["'](?:\/|\.\/)?assets\/|<link[^>]+href=["'](?:\/|\.\/)?assets\/[^"']+\.css/.test(html)) {
+if (/<script[^>]+src=["'](?:\/[^"']*)?\/assets\/|<link[^>]+href=["'](?:\/[^"']*)?\/assets\/[^"']+\.css/.test(html)) {
   throw new Error('External local JS/CSS reference remains in standalone HTML.');
 }
 if (!html.includes('data:image/svg+xml;base64')) throw new Error('Embedded SVG logo is missing.');
