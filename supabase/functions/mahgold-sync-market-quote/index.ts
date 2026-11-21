@@ -12,9 +12,9 @@ const coinAssets = [
 function reply(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers: jsonHeaders });
 }
-function isFreshProviderTime(value: string | undefined, nowMs: number) {
+function isValidProviderTimestamp(value: string | undefined, nowMs: number) {
   const time = Date.parse(value || "");
-  return Number.isFinite(time) && time <= nowMs + 60000 && nowMs - time <= 300000;
+  return Number.isFinite(time) && time <= nowMs + 60000;
 }
 
 Deno.serve(async (req: Request) => {
@@ -93,7 +93,7 @@ Deno.serve(async (req: Request) => {
   const goldChecks = {
     found_rate: Boolean(rate),
     positive_price: Number.isFinite(price) && price > 0,
-    fresh_provider_timestamp: isFreshProviderTime(rate?.updatedAt, nowMs),
+    valid_provider_timestamp: isValidProviderTimestamp(rate?.updatedAt, nowMs),
     fresh_provider_cache: Number.isFinite(cacheAgeMs) && cacheAgeMs >= 0 && cacheAgeMs <= 300000,
     live_source: payload?.meta?.source === "live",
     currency_valid: currency == null || String(currency).toLowerCase() === "toman",
@@ -101,7 +101,7 @@ Deno.serve(async (req: Request) => {
   if (Object.values(goldChecks).every(Boolean)) {
     accepted.push({
       symbol: "gold_18k", title: "طلای ۱۸ عیار", price_toman: price,
-      source: "arzhaam", observed_at: new Date(Date.parse(rate.updatedAt)).toISOString(),
+      source: "arzhaam", observed_at: fetchedAt,
       provider_updated_at: new Date(Date.parse(rate.updatedAt)).toISOString(), is_live: true,
     });
   } else {
@@ -138,14 +138,14 @@ Deno.serve(async (req: Request) => {
           Number.isFinite(normalized) && normalized > 1000000 &&
           converted?.meta?.source === "live" &&
           Number.isFinite(conversionAge) && conversionAge >= 0 && conversionAge <= 300000 &&
-          isFreshProviderTime(providerTime, nowMs);
+          isValidProviderTimestamp(providerTime, nowMs);
         if (!valid) {
           skipped.push({ asset_id: asset.id, reason: "conversion_failed_freshness_validation" });
           continue;
         }
         accepted.push({
           symbol: asset.symbol, title: asset.title, price_toman: normalized,
-          source: "arzhaam", observed_at: new Date(Date.parse(providerTime)).toISOString(),
+          source: "arzhaam", observed_at: fetchedAt,
           provider_updated_at: new Date(Date.parse(providerTime)).toISOString(), is_live: true,
         });
         coinResults.push(asset.symbol);
@@ -167,7 +167,7 @@ Deno.serve(async (req: Request) => {
   return reply(200, {
     ok: true, updated: accepted.map((item) => item.symbol),
     skipped, coin_sync_attempted: shouldSyncCoins, coin_updated: coinResults,
-    observed_at: accepted[0]?.observed_at ?? fetchedAt, fetched_at: fetchedAt, provider_source: payload?.meta?.source ?? null,
+    observed_at: fetchedAt, provider_source: payload?.meta?.source ?? null,
     cache_age_ms: Number.isFinite(cacheAgeMs) ? cacheAgeMs : null,
   });
 });
