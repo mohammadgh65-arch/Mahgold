@@ -7,7 +7,7 @@ security definer
 set search_path = ''
 as $function$
 declare
-  v_jwt_role text := coalesce(auth.role(), '');
+  v_jwt_role text := coalesce(current_setting('request.jwt.claim.role', true), '');
 begin
   if new.status is not distinct from old.status then
     return new;
