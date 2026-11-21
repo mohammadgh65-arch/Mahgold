@@ -553,7 +553,7 @@ export default function App() {
           {dataStatus==='loading'?<div className="mahgold-arrivals-empty">در حال دریافت محصولات…</div>:newArrivals.length>0?<div className="mahgold-arrivals-grid">
             {newArrivals.map(product=><article className="mahgold-arrival-card" key={product.id}>
               <button className="mahgold-arrival-image" onClick={()=>openProduct(product)} aria-label={'مشاهده '+product.name}><ProductImage product={product}/></button>
-              <div className="mahgold-arrival-info"><span>{product.category}</span><button onClick={()=>openProduct(product)}>{product.name}</button><small>{product.weight_grams?gram(product.weight_grams):'جزئیات محصول'}</small><div><strong>{product.pricing_mode==='auto'&&!isFreshGoldQuote(quote)?'نیازمند نرخ معتبر':<>{money(product.price_toman)} <small>تومان</small></>}</strong><button aria-label={'افزودن '+product.name+' به سبد'} disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}><Plus size={16}/></button></div></div>
+              <div className="mahgold-arrival-info"><span>{product.category}</span><button onClick={()=>openProduct(product)}>{product.name}</button><small>{product.weight_grams?gram(product.weight_grams):'جزئیات محصول'}</small><div><strong>{product.pricing_mode==='auto'&&!isFreshGoldQuote(quote)?'نیازمند نرخ معتبر':<>{money(product.price_toman)} <small>تومان</small></>}</strong><button aria-label={'افزودن '+product.name+' به سبد'} disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshGoldQuote(quote))} onClick={()=>addToCart(product)}><Plus size={16}/></button></div></div>
             </article>)}
           </div>:<div className="mahgold-arrivals-empty">{dataStatus==='error'?'برای نمایش محصولات، اتصال فروشگاه را بررسی کنید.':'محصول تازه‌ای برای نمایش ثبت نشده است.'}</div>}
         </div>
@@ -589,8 +589,8 @@ export default function App() {
                 <button className="ref-product-name line-clamp-1 text-right" onClick={()=>openProduct(product)}>{product.name}</button>
                 <div className="ref-product-karat">{product.karat?money(product.karat)+' عیار':'جزئیات و مشخصات محصول'}</div>
                 <div className="ref-product-bottom ref-product-select-bottom">
-                  <div className="ref-product-price-wrap"><small>قیمت محصول</small><strong>{product.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'در انتظار نرخ':<>{money(product.price_toman)} <small>تومان</small></>}</strong></div>
-                  <button aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button ref-product-add-glow" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>addToCart(product)}><Plus size={18}/></button>
+                  <div className="ref-product-price-wrap"><small>قیمت محصول</small><strong>{product.pricing_mode==='auto'&&!isFreshGoldQuote(quote)?'در انتظار نرخ':<>{money(product.price_toman)} <small>تومان</small></>}</strong></div>
+                  <button aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button ref-product-add-glow" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!isFreshGoldQuote(quote))} onClick={()=>addToCart(product)}><Plus size={18}/></button>
                 </div>
               </div>
             </article>)}
@@ -704,7 +704,7 @@ export default function App() {
             </tbody></table>
           </div>
           <div className="mahgold-product-page-actions">
-            <button type="button" className="mahgold-premium-action mahgold-finalize-action" disabled={Number(selectedProduct.stock||0)<1||dataStatus!=='connected'||(selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote))} onClick={()=>{addToCart(selectedProduct);closeProduct();setCartOpen(true);}}>
+            <button type="button" className="mahgold-premium-action mahgold-finalize-action" disabled={Number(selectedProduct.stock||0)<1||dataStatus!=='connected'||(selectedProduct.pricing_mode==='auto'&&!isFreshGoldQuote(quote))} onClick={()=>{addToCart(selectedProduct);closeProduct();setCartOpen(true);}}>
               <ShoppingBag size={19}/> افزودن به سبد خرید
             </button>
             <span><ShieldCheck size={15}/> ثبت سفارش با بررسی قیمت و موجودی</span>
