@@ -1,18 +1,18 @@
 {
-  "id": "/",
+  "id": "/Mahgold/",
   "name": "مدیریت و فروشگاه مه‌گلد",
   "short_name": "مه‌گلد",
   "description": "فروشگاه و پنل مدیریت مه‌گلد",
   "lang": "fa",
   "dir": "rtl",
-  "start_url": "/admin",
-  "scope": "/",
+  "start_url": "/Mahgold/",
+  "scope": "/Mahgold/",
   "display": "standalone",
   "background_color": "#17130d",
   "theme_color": "#17130d",
   "icons": [
     {
-      "src": "/mahgold-app-icon.svg",
+      "src": "/Mahgold/mahgold-app-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
