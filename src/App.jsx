@@ -221,7 +221,8 @@ export default function App() {
     const syncAdminRoute=()=>{
       if(forceAdminPreview){setIsAdminPage(true);return;}
       setIsAdminPage(
-      (window.location.pathname.replace(/\\/+$/, '').endsWith('/admin'))||
+      window.location.pathname.endsWith('/admin')||
+      window.location.pathname.endsWith('/admin/')||
       window.location.pathname==='/admin'||
       window.location.pathname==='/admin/'||
       window.location.hash==='#mahgold-control'
