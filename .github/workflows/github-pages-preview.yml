@@ -47,6 +47,7 @@ jobs:
           grep -q 'نمای کلی' dist/index.html
           mkdir -p dist/admin
           cp dist/index.html dist/admin/index.html
+          cp public/mahgold-logo.webp dist/admin/mahgold-logo.webp
           sed -i 's#</head>#<meta name="robots" content="noindex,nofollow"></head>#' dist/admin/index.html
 
       - name: Prepare the approved standalone storefront
