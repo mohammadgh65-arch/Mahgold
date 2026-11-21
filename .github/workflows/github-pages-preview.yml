@@ -31,7 +31,7 @@ jobs:
       - name: Build storefront and admin
         env:
           VITE_SUPABASE_URL: https://nzvvvpbwavaodhxrnkdr.supabase.co
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_ANON_KEY: sb_publishable_8UgFkQuDJNNeez2O1CNv3Q_Jf44PrL9
         run: npm run build -- --mode github-pages
       - name: Prepare GitHub Pages SPA fallback
         run: cp dist/index.html dist/404.html
