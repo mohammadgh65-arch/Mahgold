@@ -101,7 +101,7 @@ Deno.serve(async (req: Request) => {
   if (Object.values(goldChecks).every(Boolean)) {
     accepted.push({
       symbol: "gold_18k", title: "طلای ۱۸ عیار", price_toman: price,
-      source: "arzhaam", observed_at: fetchedAt,
+      source: "arzhaam", observed_at: new Date(Date.parse(rate.updatedAt)).toISOString(),
       provider_updated_at: new Date(Date.parse(rate.updatedAt)).toISOString(), is_live: true,
     });
   } else {
@@ -145,7 +145,7 @@ Deno.serve(async (req: Request) => {
         }
         accepted.push({
           symbol: asset.symbol, title: asset.title, price_toman: normalized,
-          source: "arzhaam", observed_at: fetchedAt,
+          source: "arzhaam", observed_at: new Date(Date.parse(providerTime)).toISOString(),
           provider_updated_at: new Date(Date.parse(providerTime)).toISOString(), is_live: true,
         });
         coinResults.push(asset.symbol);
@@ -167,7 +167,7 @@ Deno.serve(async (req: Request) => {
   return reply(200, {
     ok: true, updated: accepted.map((item) => item.symbol),
     skipped, coin_sync_attempted: shouldSyncCoins, coin_updated: coinResults,
-    observed_at: fetchedAt, provider_source: payload?.meta?.source ?? null,
+    observed_at: accepted[0]?.observed_at ?? fetchedAt, fetched_at: fetchedAt, provider_source: payload?.meta?.source ?? null,
     cache_age_ms: Number.isFinite(cacheAgeMs) ? cacheAgeMs : null,
   });
 });
