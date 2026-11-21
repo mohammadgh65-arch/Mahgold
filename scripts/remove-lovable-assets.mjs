@@ -20,7 +20,7 @@ for (const file of files) {
   if (!existsSync(file)) continue;
   let html = readFileSync(file, 'utf8');
   for (const [from, to] of replacements) html = html.replaceAll(from, to);
-  if (/growth-and-advancement-garden\\.lovable\\.app/i.test(html) || /lovable\\.app/i.test(html)) {
+  if (/growth-and-advancement-garden\.lovable\.app/i.test(html) || /lovable\.app/i.test(html)) {
     throw new Error(`Lovable-hosted asset reference remains in ${file}`);
   }
   writeFileSync(file, html, 'utf8');
