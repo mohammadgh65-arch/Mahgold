@@ -19,7 +19,7 @@ body{font-family:'Shabnam',Tahoma,sans-serif;background:var(--ink);color:#f4f0e8
 .primary-btn{background:var(--gold);color:#171512;border:1px solid var(--gold);border-radius:2px;font-family:inherit;font-weight:700;box-shadow:none}
 .primary-btn:hover{background:var(--gold2);color:#171512}
 .hero .text-link,.story-link{color:var(--gold2)}
-.hero-visual{min-height:440px;background:#211e19 url('https://growth-and-advancement-garden.lovable.app/assets/slide-necklace-Bn1Ooa9V.jpg') center/cover no-repeat;border:1px solid var(--line);position:relative;overflow:hidden}
+.hero-visual{min-height:440px;background:#211e19 url('/mahgold-header.webp') center/cover no-repeat;border:1px solid var(--line);position:relative;overflow:hidden}
 .hero-visual:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,18,15,.1),rgba(20,18,15,.05) 45%,rgba(20,18,15,.35))}
 .hero-halo,.hero-pendant,.hero-chain,.hero-stamp,.hero-side-note{display:none}
 .hero-index{color:var(--gold)}
@@ -36,10 +36,10 @@ body{font-family:'Shabnam',Tahoma,sans-serif;background:var(--ink);color:#f4f0e8
 .category-tile:before{content:'';position:absolute;inset:0;background-size:cover;background-position:center;z-index:-2;transition:transform .5s}
 .category-tile:after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(16,14,11,.82),rgba(16,14,11,.04) 85%);z-index:-1}
 .category-tile:hover:before{transform:scale(1.05)}
-.cat-0:before{background-image:url('https://growth-and-advancement-garden.lovable.app/assets/jewelry-CwLx7kUY.jpg')}
-.cat-1:before{background-image:url('https://growth-and-advancement-garden.lovable.app/assets/slide-necklace-Bn1Ooa9V.jpg')}
-.cat-2:before{background-image:url('https://growth-and-advancement-garden.lovable.app/assets/slide-gift-CrjacK5c.jpg')}
-.cat-3:before{background-image:url('https://growth-and-advancement-garden.lovable.app/assets/slide-invest-CIEhMTDg.jpg')}
+.cat-0:before{background-image:url('/mahgold-header.webp')}
+.cat-1:before{background-image:url('/mahgold-header.webp')}
+.cat-2:before{background-image:url('/mahgold-brand-masthead.jpg')}
+.cat-3:before{background-image:url('/mahgold-header.webp')}
 .category-icon{color:var(--gold2);font-size:24px}.category-tile b{font-size:19px}.category-tile small{color:#e0d2b7}
 .featured-section{background:#eee8dc}
 .filter-tabs button{color:#655b4c;border-color:#d6c9b3}.filter-tabs button.selected{background:#211e19;color:var(--gold2);border-color:#211e19}
