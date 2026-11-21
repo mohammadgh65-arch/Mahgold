@@ -9,14 +9,14 @@ import { supabase, isSupabaseConfigured } from './lib/supabase';
 import AdminPanel from './Admin.jsx';
 
 const forceAdminPreview = import.meta.env.VITE_ADMIN_PREVIEW === 'true';
-const BASE = 'https://growth-and-advancement-garden.lovable.app/assets/';
+const BASE = './';
 const slides = [
   {
     eyebrow: 'MAHGOLD · FINE JEWELRY',
     title: 'درخششِ طلا، امضایِ استایلِ شما',
     description: 'زیبایی در سادگی‌ست؛ انتخاب‌هایی ظریف و ماندگار برای لحظه‌هایی که ارزش، معنا پیدا می‌کند.',
     button: 'کشف مجموعه مه‌گلد',
-    image: BASE + 'slide-necklace-Bn1Ooa9V.jpg',
+    image: BASE + 'mahgold-header.webp',
     category: 'طلای زینتی'
   },
   {
@@ -24,7 +24,7 @@ const slides = [
     title: 'هدیه‌ای که همیشه می‌ماند',
     description: 'انگشترها و زیورآلات منتخب، با بسته‌بندی ویژه مه‌گلد.',
     button: 'مشاهده طلای زینتی',
-    image: BASE + 'slide-gift-CrjacK5c.jpg',
+    image: BASE + 'mahgold-brand-masthead.jpg',
     category: 'طلای زینتی'
   },
   {
@@ -32,15 +32,15 @@ const slides = [
     title: 'سکه و شمش، انتخابی مطمئن',
     description: 'سرمایه‌ای آشنا با خلوص و ارزش ماندگار.',
     button: 'مشاهده سکه و شمش',
-    image: BASE + 'slide-invest-CIEhMTDg.jpg',
+    image: BASE + 'mahgold-header.webp',
     category: 'سکه'
   }
 ];
 const tiles = [
-  {name:'طلای زینتی',desc:'زیورآلات برای هر روز و هر occasion',image:BASE+'jewelry-CwLx7kUY.jpg'},
-  {name:'طلای آب‌شده',desc:'انتخابی برای نگاه سرمایه‌ای',image:BASE+'melted-nOWRYhbE.jpg'},
-  {name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:BASE+'coin-CsyrnHPB.jpg'},
-  {name:'شمش',desc:'خلوص در ساده‌ترین شکل',image:BASE+'bar-B0yyIRPP.jpg'}
+  {name:'طلای زینتی',desc:'زیورآلات برای هر روز و هر occasion',image:BASE+'mahgold-header.webp'},
+  {name:'طلای آب‌شده',desc:'انتخابی برای نگاه سرمایه‌ای',image:BASE+'mahgold-brand-masthead.jpg'},
+  {name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:BASE+'mahgold-header.webp'},
+  {name:'شمش',desc:'خلوص در ساده‌ترین شکل',image:BASE+'mahgold-brand-masthead.jpg'}
 ];
 const displayTileDefaults = tiles;
 const presetCategories = [
