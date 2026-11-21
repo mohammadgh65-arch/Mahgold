@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, basename } from 'node:path';
+import { createHash } from 'node:crypto';
 
 const out = 'dist';
 const assetDir = join(out, 'assets');
@@ -22,6 +23,7 @@ html = html.replace(/<link[^>]*href=["']((?:\/[^"']*)?\/assets\/[^"']+\.css)["']
   const file = join(assetDir, basename(href));
   return '<style>\n' + readFileSync(file, 'utf8').replaceAll('/mahgold-logo.webp', logo) + '\n</style>';
 });
+html = html.replaceAll('/Mahgold/mahgold-app-icon.svg', logo);
 html = html.replaceAll('/mahgold-app-icon.svg', logo);
 
 if (/<script[^>]+src=["'](?:\/[^"']*)?\/assets\/|<link[^>]+href=["'](?:\/[^"']*)?\/assets\/[^"']+\.css/.test(html)) {
@@ -32,5 +34,12 @@ if (!html.includes('ورود مدیریت مه‌گلد')) throw new Error('Admi
 const embeddedStorefront = JSON.stringify(storefrontHtml).replace(/</g, '\\u003c');
 html = html.replace('</head>', '<script>window.__MAHGOLD_STORE_PREVIEW_HTML=' + embeddedStorefront + ';</script></head>');
 if (!html.includes('__MAHGOLD_STORE_PREVIEW_HTML')) throw new Error('Embedded storefront preview is missing.');
+// Inline bundles are required for the downloadable single-file preview. Authorize
+// their exact SHA-256 hashes instead of weakening CSP with unsafe-inline.
+const scriptHashes = [...html.matchAll(/<script\\b[^>]*>([\\s\\S]*?)<\\/script>/gi)]
+  .map(match => "'sha256-" + createHash('sha256').update(match[1]).digest('base64') + "'");
+if (!scriptHashes.length) throw new Error('No inline application scripts found.');
+html = html.replace(/script-src ([^;"]+)/, (_match, policy) => 'script-src ' + policy + ' ' + scriptHashes.join(' '));
+if (/href=["']\\/Mahgolddata:image/.test(html)) throw new Error('Malformed embedded app icon URL remains.');
 writeFileSync(join(out, 'index.html'), html, 'utf8');
 console.log('Standalone admin preview created:', Buffer.byteLength(html), 'bytes');
