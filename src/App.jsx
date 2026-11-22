@@ -492,6 +492,9 @@ export default function App() {
         <span className="inline-flex items-center gap-1.5"><Phone className="size-3.5 text-gold"/> شماره تماس: به‌زودی</span>
         <span className="inline-flex items-center gap-1.5"><MapPin className="size-3.5 text-gold"/> نشانی: به‌زودی اعلام می‌شود</span>
       </div>
+      <nav className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px]">
+        <a href="./privacy.html" className="transition hover:text-gold-light">حریم خصوصی و حفاظت از اطلاعات</a>
+      </nav>
       <div className="mt-3 text-[11px] opacity-60">© ۱۴۰۵ فروشگاه آنلاین مه‌گلد · زیورآلات طلا</div>
     </footer>
 
