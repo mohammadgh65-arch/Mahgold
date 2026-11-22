@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - github-pages-preview
+      - fix/published-admin-logo-content-only-2026-11-22
   workflow_dispatch:
 
 permissions:
