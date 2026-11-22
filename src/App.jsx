@@ -29,18 +29,16 @@ const slides = [
   },
   {
     eyebrow: 'INVEST IN GOLD',
-    title: 'سکه و شمش، انتخابی مطمئن',
-    description: 'سرمایه‌ای آشنا با خلوص و ارزش ماندگار.',
-    button: 'مشاهده سکه و شمش',
+    title: 'سکه، انتخابی آشنا و ماندگار',
+    description: 'نمایش قیمت روز انواع سکه در مه‌گلد.',
+    button: 'مشاهده سکه‌ها',
     image: BASE + 'mahgold-header.webp',
     category: 'سکه'
   }
 ];
 const tiles = [
   {name:'طلای زینتی',desc:'زیورآلات برای هر روز و هر occasion',image:BASE+'mahgold-header.webp'},
-  {name:'طلای آب‌شده',desc:'انتخابی برای نگاه سرمایه‌ای',image:BASE+'mahgold-brand-masthead.jpg'},
-  {name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:BASE+'mahgold-header.webp'},
-  {name:'شمش',desc:'خلوص در ساده‌ترین شکل',image:BASE+'mahgold-brand-masthead.jpg'}
+  {name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:BASE+'mahgold-header.webp'}
 ];
 const displayTileDefaults = tiles;
 const presetCategories = [
