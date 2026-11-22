@@ -136,3 +136,61 @@
 .admin-pricing-preview{display:grid;gap:6px;border:1px solid #dce7df;background:#fff;border-radius:10px;padding:12px;font-size:11px;color:#52695b}.admin-pricing-preview b{color:#24513a;font-size:11px}.admin-pricing-preview strong{border-top:1px solid #dce7df;padding-top:8px;color:#1c5538;font-size:14px}
 .admin-optional-fields{border:1px solid #dce7df;border-radius:10px;padding:11px}.admin-optional-fields summary{cursor:pointer;color:#52695b;font-size:11px;font-weight:700}
 @media(max-width:640px){.admin-product-core{grid-template-columns:1fr}}
+
+
+/* Overview dashboard: clear hierarchy, compact metadata and responsive readiness cards */
+.admin-price-health,
+.admin-readiness-panel,
+.admin-payment-health{
+  margin:0 0 18px;
+  border:1px solid var(--admin-line);
+  border-radius:18px;
+  background:var(--admin-card);
+  box-shadow:var(--admin-shadow);
+}
+.admin-price-health{padding:20px 22px;position:relative;overflow:hidden}
+.admin-price-health:before{content:"";position:absolute;inset:0 0 0 auto;width:4px;background:var(--admin-green)}
+.admin-price-health-main{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.admin-price-health-main>div{display:grid;gap:9px;min-width:0}
+.admin-price-health-main span,
+.admin-payment-health>div>span{font-size:12px;color:var(--admin-muted);font-weight:700}
+.admin-price-health-main strong{display:inline-flex;align-items:center;gap:7px;width:max-content;max-width:100%;padding:6px 11px;border-radius:999px;font-size:12px;line-height:1.7}
+.admin-price-health-main strong:before{content:"";width:7px;height:7px;flex:none;border-radius:50%;background:currentColor}
+.admin-price-health-main strong.is-live{background:#e8f5ed;color:#23734c}
+.admin-price-health-main strong.is-stale{background:#fff3df;color:#94651d}
+.admin-price-health-main>b{font-size:clamp(21px,3vw,29px);font-weight:800;color:var(--admin-green);white-space:nowrap;font-variant-numeric:tabular-nums}
+.admin-price-health-meta{display:flex;align-items:center;gap:8px 22px;flex-wrap:wrap;margin-top:17px;padding-top:13px;border-top:1px solid var(--admin-line)}
+.admin-price-health-meta span{font-size:11px;line-height:1.9;color:var(--admin-muted);overflow-wrap:anywhere}
+.admin-readiness-panel{padding:21px}
+.admin-readiness-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:17px}
+.admin-readiness-head>div{min-width:0}
+.admin-readiness-head h2{font-size:16px;line-height:1.8;margin:0 0 4px;color:var(--admin-ink)}
+.admin-readiness-head p{font-size:11px;line-height:1.9;margin:0;color:var(--admin-muted)}
+.admin-readiness-head>strong{flex:none;padding:7px 12px;border-radius:10px;background:#edf4ef;color:var(--admin-green);font-size:13px;white-space:nowrap}
+.admin-readiness-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.admin-readiness-grid>div{display:flex;align-items:flex-start;gap:11px;min-width:0;padding:13px;border:1px solid var(--admin-line);border-radius:12px;background:var(--admin-bg)}
+.admin-readiness-grid>div>span{display:grid;place-items:center;width:25px;height:25px;flex:none;border-radius:50%;font-size:13px;font-weight:800}
+.admin-readiness-grid>div>div{display:grid;gap:5px;min-width:0}
+.admin-readiness-grid b{font-size:12px;line-height:1.8;color:var(--admin-ink)}
+.admin-readiness-grid small{font-size:10px;line-height:1.9;color:var(--admin-muted);overflow-wrap:anywhere}
+.admin-readiness-grid .is-ready>span{background:#dff1e6;color:#21734b}
+.admin-readiness-grid .is-pending>span{background:#fff0d9;color:#99691e}
+.admin-readiness-grid .is-ready{border-color:#d5e9dc}
+.admin-readiness-grid .is-pending{border-color:#eadfc9}
+.admin-payment-health{padding:18px 21px;background:#fffaf0;border-color:#eadfc9}
+.admin-payment-health>div{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.admin-payment-health>div>strong{font-size:12px;line-height:1.8;color:#94651d}
+.admin-payment-health>div>strong:before{content:"!";display:inline-grid;place-items:center;width:19px;height:19px;margin-left:7px;border-radius:50%;background:#f6e6c7;color:#94651d;font-size:12px}
+.admin-payment-health p{margin:9px 0 0;font-size:11px;line-height:2.1;color:#766b58}
+@media(max-width:640px){
+ .admin-price-health{padding:16px}
+ .admin-price-health-main{align-items:flex-start;flex-direction:column;gap:13px}
+ .admin-price-health-main>b{font-size:24px}
+ .admin-price-health-meta{display:grid;grid-template-columns:1fr;gap:3px;margin-top:13px;padding-top:10px}
+ .admin-readiness-panel{padding:16px}
+ .admin-readiness-head{flex-direction:column;gap:10px}
+ .admin-readiness-head>strong{align-self:flex-start}
+ .admin-readiness-grid{grid-template-columns:1fr;gap:8px}
+ .admin-readiness-grid>div{padding:11px}
+ .admin-payment-health{padding:15px}
+}
