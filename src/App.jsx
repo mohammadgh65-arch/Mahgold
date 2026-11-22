@@ -194,6 +194,7 @@ export default function App() {
   const [products,setProducts]=useState([]);
   const [dbCategories,setDbCategories]=useState([]);
   const [quote,setQuote]=useState(null);
+  const [coinQuotes,setCoinQuotes]=useState([]);
   const [clockNow,setClockNow]=useState(()=>Date.now());
   const [siteContent,setSiteContent]=useState(null);
   const [dataStatus,setDataStatus]=useState(isSupabaseConfigured?'loading':'error');
@@ -207,12 +208,17 @@ export default function App() {
   useEffect(()=>{
     if(!supabase)return;
     let active=true;
-    const refreshGoldQuote=async()=>{
+    const refreshMarketQuotes=async()=>{
       const {data,error}=await supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
-        .eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle();
-      if(active&&!error)setQuote(data||null);
+        .in('symbol',['gold_18k','coin_emami','coin_bahar','coin_nim','coin_rob','coin_gerami']);
+      if(active&&!error){
+        const rows=data||[];
+        setQuote(rows.find(row=>row.symbol==='gold_18k')||null);
+        setCoinQuotes(rows.filter(row=>row.symbol.startsWith('coin_')));
+      }
     };
-    const timer=setInterval(refreshGoldQuote,60000);
+    refreshMarketQuotes();
+    const timer=setInterval(refreshMarketQuotes,60000);
     return()=>{active=false;clearInterval(timer);};
   },[]);
   useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%displaySlides.length),6000);return()=>clearInterval(timer);},[displaySlides.length]);
@@ -247,7 +253,7 @@ export default function App() {
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
             .eq('is_active',true).order('sort_order',{ascending:true}),
           supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
-            .eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle()
+            .in('symbol',['gold_18k','coin_emami','coin_bahar','coin_nim','coin_rob','coin_gerami'])
         ]);
         if(!active)return;
         if(productResult.error){setDataStatus('error');setProducts([]);setDataMessage('دریافت محصولات ناموفق بود؛ برای جلوگیری از نمایش قیمت نادرست، اطلاعات نمونه نمایش داده نمی‌شود.');}
@@ -257,7 +263,11 @@ export default function App() {
           setDataMessage(rows.length?'محصولات و قیمت‌ها مستقیماً از پایگاه داده مه‌گلد دریافت می‌شوند.':'اتصال برقرار است؛ هنوز محصول فعالی برای نمایش ثبت نشده است.');
         }
         if(!categoryResult.error)setDbCategories(categoryResult.data||[]);
-        if(!quoteResult.error&&quoteResult.data)setQuote(quoteResult.data);
+        if(!quoteResult.error){
+          const quoteRows=quoteResult.data||[];
+          setQuote(quoteRows.find(row=>row.symbol==='gold_18k')||null);
+          setCoinQuotes(quoteRows.filter(row=>row.symbol.startsWith('coin_')));
+        }
       }catch{
         if(!active)return;
         setDataStatus('error');setProducts([]);setDataMessage('ارتباط با پایگاه داده برقرار نشد.');
@@ -269,12 +279,13 @@ export default function App() {
   useEffect(()=>{setCheckoutRequestKey(null);},[cart,customer]);
 
   const categories=useMemo(()=>{
-    const rows=dbCategories.map(row=>row.name).filter(Boolean);
-    const extras=rows.filter(name=>!presetCategories.includes(name));
-    return [...presetCategories,...extras];
+    const allowed=['همه محصولات','طلای زینتی','سکه','انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'];
+    const extras=dbCategories.map(row=>row.name).filter(name=>name&&!allowed.includes(name)&&isJewelryCategory(name));
+    return [...allowed,...extras];
   },[dbCategories]);
   const filtered=useMemo(()=>{
     const rows=products.filter(p=>
+      (isJewelryCategory(p.category)||p.category==='سکه')&&
       (category==='همه محصولات'||p.category===category||p.name?.includes(category))&&
       (!query.trim()||p.name?.toLocaleLowerCase('fa').includes(query.trim().toLocaleLowerCase('fa')))
     );
@@ -289,6 +300,15 @@ export default function App() {
   const quoteObservedAt=quote?.observed_at?Date.parse(quote.observed_at):NaN;
   const quoteIsManual=quote?.source==='manual'&&quote?.is_live===false;
   const quoteFresh=(quote?.is_live===true||quoteIsManual)&&Number.isFinite(quoteObservedAt)&&quoteObservedAt<=clockNow+60000&&clockNow-quoteObservedAt<=300000;
+  const coinQuoteSymbols=['coin_emami','coin_bahar','coin_nim','coin_rob','coin_gerami'];
+  const getProductPrice=product=>{
+    const symbol=product?.attributes?.market_quote_symbol;
+    if(product?.category!=='سکه'||!coinQuoteSymbols.includes(symbol))return Number(product?.price_toman||0);
+    const q=coinQuotes.find(item=>item.symbol===symbol);
+    const age=q?.observed_at?clockNow-Date.parse(q.observed_at):Infinity;
+    const fresh=Number.isFinite(age)&&age>=-60000&&age<=70*60*1000&&q?.is_live===true&&q?.source==='arzhaam'&&Number(q?.price_toman)>0;
+    return fresh?Number(q.price_toman):null;
+  };
 
   const addToCart=product=>{
     if(!supabase||dataStatus!=='connected'||!product.id){setCheckoutError('اتصال فروشگاه برقرار نیست.');return;}
@@ -366,21 +386,18 @@ export default function App() {
         </a>
         <nav className="ref-primary-nav">
           <a className="active" href="#home">خانه</a>
-          <button type="button" onClick={()=>setAccountOpen(true)}>پیگیری سفارش</button>
+          <a href="#shop">مشاهده قیمت‌ها</a>
           <a href="#categories" onClick={()=>setCategory('طلای زینتی')}>طلای زینتی</a>
-          <a href="#categories" onClick={()=>setCategory('طلای آب‌شده')}>طلای آب‌شده</a>
           <a href="#categories" onClick={()=>setCategory('سکه')}>سکه</a>
-          <a href="#categories" onClick={()=>setCategory('شمش')}>شمش</a>
         </nav>
         <label className="ref-header-search"><Search size={16}/><input aria-label="جستجوی محصولات" value={query} onChange={e=>setQuery(e.target.value)} placeholder="جستجو در محصولات..."/></label>
         <div className="ref-header-actions">
           <button aria-label="حساب کاربری" onClick={()=>setAccountOpen(true)}><UserRound size={20}/></button>
-          <button aria-label="سبد خرید" className="ref-header-cart" onClick={()=>setCartOpen(true)}><ShoppingBag size={20}/>{cartCount>0&&<b>{money(cartCount)}</b>}</button>
+
         </div>
       </div>
       {menuOpen&&<nav className="ref-mobile-links flex flex-col gap-4 border-t border-border bg-background px-5 py-4 text-sm text-muted-foreground md:hidden">
-        <a href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a><a href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a><a href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a><button className="text-right" onClick={()=>{setAccountOpen(true);setMenuOpen(false);}}>پیگیری سفارش</button>
-        <button className="text-right" onClick={()=>{setAccountOpen(true);setMenuOpen(false);}}>ورود / ثبت‌نام</button>
+        <a href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a><a href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a><a href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a><a href="#categories" onClick={()=>setMenuOpen(false)}>طلای زینتی و سکه</a>
       </nav>}
     </header>
 
@@ -461,8 +478,8 @@ export default function App() {
                 <button className="ref-product-name line-clamp-1 text-right" onClick={()=>setSelectedProduct(product)}>{product.name}</button>
                 <div className="mt-0.5 text-[11px] text-muted-foreground">{[product.weight_grams?gram(product.weight_grams):null,product.karat?money(product.karat)+' عیار':null].filter(Boolean).join(' · ')}</div>
                 <div className="ref-product-bottom">
-                  <strong>{money(product.price_toman)} <small>تومان</small></strong>
-                  <button aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(product)}><Plus size={17}/></button>
+                  <strong>{getProductPrice(product)===null?'نرخ فعلاً در دسترس نیست':<>{money(getProductPrice(product))} <small>تومان</small></>}</strong>
+                  <span className="text-[10px] text-muted-foreground">مشاهده جزئیات محصول</span>
                 </div>
               </div>
             </article>)}
@@ -501,7 +518,7 @@ export default function App() {
     <nav className="ref-mobile-nav fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background/95 px-2 pt-1 backdrop-blur-xl md:hidden">
       <button className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium" onClick={()=>setAccountOpen(true)}><Headphones size={21}/>پشتیبانی</button>
       <a className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium" href="#categories"><Gift size={21}/>اصالت کالا</a>
-      <button className="relative flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium" onClick={()=>setCartOpen(true)}><ShieldCheck size={21}/>خرید امن{cartCount>0&&<b className="absolute right-1/2 top-0 translate-x-5 rounded-full bg-gold px-1 text-[9px] text-ink">{money(cartCount)}</b>}</button>
+      <a className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium" href="#shop"><ShieldCheck size={21}/>قیمت روز</a>
     </nav>
 
     {accountOpen&&<div className="ref-overlay" onClick={()=>setAccountOpen(false)}>
@@ -557,8 +574,8 @@ export default function App() {
             <h2>{selectedProduct.name}</h2>
             <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
             <div className="grid gap-2 text-xs text-muted-foreground"><span>وزن: {gram(selectedProduct.weight_grams)}</span><span>عیار: {money(selectedProduct.karat||18)}</span><span>موجودی: {money(selectedProduct.stock||0)}</span></div>
-            <strong className="ref-detail-price">{money(selectedProduct.price_toman)} تومان</strong>
-            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1||(selectedProduct.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
+            <strong className="ref-detail-price">{getProductPrice(selectedProduct)===null?'نرخ فعلاً در دسترس نیست':money(getProductPrice(selectedProduct))+' تومان'}</strong>
+            {selectedProduct.category==='سکه'&&<small className="text-muted-foreground">قیمت بر اساس آخرین نرخ ثبت‌شده بازار است؛ زمان به‌روزرسانی در بخش نرخ‌ها قابل مشاهده است.</small>}
           </div>
         </div>
       </section>
