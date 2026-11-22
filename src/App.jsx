@@ -248,7 +248,7 @@ export default function App() {
     (async()=>{
       try{
         const [productResult,categoryResult,quoteResult]=await Promise.all([
-          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,created_at,tag,pricing_mode')
+          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,created_at,tag,pricing_mode,attributes')
             .eq('is_active',true).order('created_at',{ascending:false}),
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
             .eq('is_active',true).order('sort_order',{ascending:true}),
@@ -283,6 +283,16 @@ export default function App() {
     const extras=dbCategories.map(row=>row.name).filter(name=>name&&!allowed.includes(name)&&isJewelryCategory(name));
     return [...allowed,...extras];
   },[dbCategories]);
+  const coinQuoteSymbols=['coin_emami','coin_bahar','coin_nim','coin_rob','coin_gerami'];
+  const getCoinQuote=product=>coinQuotes.find(item=>item.symbol===product?.attributes?.market_quote_symbol)||null;
+  const getProductPrice=product=>{
+    const symbol=product?.attributes?.market_quote_symbol;
+    if(product?.category!=='سکه'||!coinQuoteSymbols.includes(symbol))return Number(product?.price_toman||0);
+    const q=getCoinQuote(product);
+    const age=q?.observed_at?clockNow-Date.parse(q.observed_at):Infinity;
+    const fresh=Number.isFinite(age)&&age>=-60000&&age<=70*60*1000&&q?.is_live===true&&q?.source==='arzhaam'&&Number(q?.price_toman)>0;
+    return fresh?Number(q.price_toman):null;
+  };
   const filtered=useMemo(()=>{
     const rows=products.filter(p=>
       (isJewelryCategory(p.category)||p.category==='سکه')&&
@@ -290,26 +300,16 @@ export default function App() {
       (!query.trim()||p.name?.toLocaleLowerCase('fa').includes(query.trim().toLocaleLowerCase('fa')))
     );
     return rows.sort((a,b)=>{
-      if(sortMode==='cheap')return Number(a.price_toman||0)-Number(b.price_toman||0);
-      if(sortMode==='expensive')return Number(b.price_toman||0)-Number(a.price_toman||0);
+      if(sortMode==='cheap')return (getProductPrice(a)??Number.MAX_SAFE_INTEGER)-(getProductPrice(b)??Number.MAX_SAFE_INTEGER);
+      if(sortMode==='expensive')return (getProductPrice(b)??-1)-(getProductPrice(a)??-1);
       return new Date(b.created_at||0)-new Date(a.created_at||0);
     });
-  },[products,category,query,sortMode]);
+  },[products,category,query,sortMode,coinQuotes,clockNow]);
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const cartTotal=cart.reduce((sum,item)=>sum+Number(item.price_toman||0)*Number(item.qty||0),0);
   const quoteObservedAt=quote?.observed_at?Date.parse(quote.observed_at):NaN;
   const quoteIsManual=quote?.source==='manual'&&quote?.is_live===false;
   const quoteFresh=(quote?.is_live===true||quoteIsManual)&&Number.isFinite(quoteObservedAt)&&quoteObservedAt<=clockNow+60000&&clockNow-quoteObservedAt<=300000;
-  const coinQuoteSymbols=['coin_emami','coin_bahar','coin_nim','coin_rob','coin_gerami'];
-  const getProductPrice=product=>{
-    const symbol=product?.attributes?.market_quote_symbol;
-    if(product?.category!=='سکه'||!coinQuoteSymbols.includes(symbol))return Number(product?.price_toman||0);
-    const q=coinQuotes.find(item=>item.symbol===symbol);
-    const age=q?.observed_at?clockNow-Date.parse(q.observed_at):Infinity;
-    const fresh=Number.isFinite(age)&&age>=-60000&&age<=70*60*1000&&q?.is_live===true&&q?.source==='arzhaam'&&Number(q?.price_toman)>0;
-    return fresh?Number(q.price_toman):null;
-  };
-
   const addToCart=product=>{
     if(!supabase||dataStatus!=='connected'||!product.id){setCheckoutError('اتصال فروشگاه برقرار نیست.');return;}
     if(product.pricing_mode==='auto'&&!quoteFresh){setCheckoutError('نرخ معتبر طلای ۱۸ عیار در دسترس نیست؛ نرخ دستی یا خودکار باید در ۵ دقیقه اخیر ثبت شده باشد.');return;}
@@ -479,7 +479,7 @@ export default function App() {
                 <div className="mt-0.5 text-[11px] text-muted-foreground">{[product.weight_grams?gram(product.weight_grams):null,product.karat?money(product.karat)+' عیار':null].filter(Boolean).join(' · ')}</div>
                 <div className="ref-product-bottom">
                   <strong>{getProductPrice(product)===null?'نرخ فعلاً در دسترس نیست':<>{money(getProductPrice(product))} <small>تومان</small></>}</strong>
-                  <span className="text-[10px] text-muted-foreground">مشاهده جزئیات محصول</span>
+                  <span className="text-[10px] text-muted-foreground">{product.category==='سکه'?(getCoinQuote(product)?.observed_at&&getProductPrice(product)!==null?'آخرین دریافت: '+new Date(getCoinQuote(product).observed_at).toLocaleTimeString('fa-IR'):'نرخ بازار قدیمی یا ناموجود'):'مشاهده جزئیات محصول'}</span>
                 </div>
               </div>
             </article>)}
@@ -524,7 +524,7 @@ export default function App() {
     {accountOpen&&<div className="ref-overlay" onClick={()=>setAccountOpen(false)}>
       <section className="ref-dialog" onClick={e=>e.stopPropagation()}>
         <div className="ref-dialog-head"><div><div className="eyebrow text-gold-deep">MAHGOLD</div><h2>حساب کاربری مه‌گلد</h2></div><button className="ref-close" aria-label="بستن" onClick={()=>setAccountOpen(false)}><X/></button></div>
-        <AccountContent notice={accountNotice} onAuthenticated={()=>{setAccountOpen(false);setAccountNotice('');setCartOpen(true);}} onClose={()=>{setAccountOpen(false);setAccountNotice('');}}/>
+        <AccountContent notice={accountNotice} onAuthenticated={()=>{setAccountOpen(false);setAccountNotice('');}} onClose={()=>{setAccountOpen(false);setAccountNotice('');}}/>
       </section>
     </div>}
 
@@ -575,7 +575,7 @@ export default function App() {
             <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
             <div className="grid gap-2 text-xs text-muted-foreground"><span>وزن: {gram(selectedProduct.weight_grams)}</span><span>عیار: {money(selectedProduct.karat||18)}</span><span>موجودی: {money(selectedProduct.stock||0)}</span></div>
             <strong className="ref-detail-price">{getProductPrice(selectedProduct)===null?'نرخ فعلاً در دسترس نیست':money(getProductPrice(selectedProduct))+' تومان'}</strong>
-            {selectedProduct.category==='سکه'&&<small className="text-muted-foreground">قیمت بر اساس آخرین نرخ ثبت‌شده بازار است؛ زمان به‌روزرسانی در بخش نرخ‌ها قابل مشاهده است.</small>}
+            {selectedProduct.category==='سکه'&&<small className="text-muted-foreground">{getCoinQuote(selectedProduct)?.observed_at&&getProductPrice(selectedProduct)!==null?'آخرین دریافت نرخ: '+new Date(getCoinQuote(selectedProduct).observed_at).toLocaleString('fa-IR'):'نرخ معتبر بازار در دسترس نیست'} · منبع: arzhaam</small>}
           </div>
         </div>
       </section>
