@@ -47,6 +47,7 @@ const presetCategories = [
   'همه محصولات','طلای زینتی','طلای آب‌شده','سکه','شمش','انگشتر','گردنبند',
   'دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'
 ];
+const jewelryProductCategories = new Set(['طلای زینتی','انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات']);
 const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85';
 const money = value => new Intl.NumberFormat('fa-IR').format(Number(value || 0));
 const gram = value => new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(Number(value || 0)) + ' گرم';
@@ -273,7 +274,7 @@ export default function App() {
   },[dbCategories]);
   const filtered=useMemo(()=>{
     const rows=products.filter(p=>
-      (category==='همه محصولات'||p.category===category||p.name?.includes(category))&&
+      (category==='همه محصولات'||(category==='طلای زینتی'?jewelryProductCategories.has(p.category):p.category===category)||p.name?.includes(category))&&
       (!query.trim()||p.name?.toLocaleLowerCase('fa').includes(query.trim().toLocaleLowerCase('fa')))
     );
     return rows.sort((a,b)=>{
