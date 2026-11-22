@@ -118,3 +118,18 @@
 .admin-toolbar input,.admin-form input,.admin-form select,.admin-form textarea,.admin-modal input,.admin-modal select,.admin-modal textarea{background:#fffaf0;border-color:#e5d8c2;color:#29251e}
 .admin-login{background:linear-gradient(160deg,#fffaf0,#f3ead9);border-color:#d8bd85}
 @media(max-width:640px){.admin-side{background:linear-gradient(170deg,#17140d,#153327);border:0;border-bottom:1px solid #b88e4e}}
+
+/* Smart product pricing form */
+.admin-product-core,.admin-optional-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.admin-price-preview{display:grid;gap:8px;padding:16px;border:1px solid #d8c08b;border-radius:14px;background:linear-gradient(135deg,#fff8e8,#f5ecd8);color:#263c30}
+.admin-price-preview-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.admin-price-preview-head span{font-size:10px;border-radius:20px;padding:5px 9px;background:#f8e8c6;color:#795b20}
+.admin-price-preview-head span.fresh{background:#e2f3e8;color:#17633b}
+.admin-price-preview-head span.stale{background:#fae8e5;color:#9b3429}
+.admin-price-preview p,.admin-price-preview>small{margin:0;color:#6f6a5c;font-size:11px;line-height:1.8}
+.admin-price-preview>strong{font-size:25px;color:#986d20;font-variant-numeric:tabular-nums}
+.admin-price-preview>strong small{font-size:11px}
+.admin-optional-fields{border:1px solid var(--admin-line);border-radius:12px;padding:12px}
+.admin-optional-fields summary{cursor:pointer;font-size:12px;font-weight:700;color:#315440}
+.admin-hint{padding:11px 13px;border:1px solid #e6d6ad;border-radius:10px;background:#fbf5e8;color:#725a2b;font-size:11px;line-height:1.9}
+@media(max-width:520px){.admin-product-core,.admin-optional-fields{grid-template-columns:1fr}}
