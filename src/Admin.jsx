@@ -11,7 +11,7 @@ const money = n => new Intl.NumberFormat('fa-IR').format(Number(n||0));
 const quoteIsFresh = q => {const t=Date.parse(q?.observed_at||'');return Number.isFinite(t)&&t<=Date.now()+60000&&Date.now()-t<=300000&&((q?.source==='manual'&&q?.is_live===false)||q?.is_live===true);};
 const jewelryCategories=['طلای زینتی','انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'];
 const isAutoPricedCategory=category=>jewelryCategories.includes(category);
-const blankProduct = {name:'',category:'طلای زینتی',description:'',image_url:'',weight_grams:'',karat:18,price_toman:0,pricing_mode:'auto',labor_mode:'percent',labor_value:0,seller_profit_percent:0,commission_percent:0,vat_percent:10,stock:1,is_active:true,tag:''};
+const blankProduct = {name:'',category:'طلای زینتی',description:'',image_url:'',weight_grams:'',karat:18,price_toman:0,pricing_mode:'auto',labor_mode:'percent',labor_value:0,seller_profit_percent:null,commission_percent:0,vat_percent:10,stock:1,is_active:true,tag:''};
 export default function AdminPanel(){
  const [session,setSession]=useState(null),[checking,setChecking]=useState(true),[checkingAdmin,setCheckingAdmin]=useState(false),[adminOk,setAdminOk]=useState(false);
  const [section,setSection]=useState('overview'),[data,setData]=useState({products:[],orders:[],quotes:[],categories:[],customers:[],settings:null,content:null});
