@@ -8,6 +8,7 @@ on:
       - fix/admin-order-state-guard-2026-11-22
       - fix/admin-header-content-preview-2026-11-22
       - fix/admin-published-visual-baseline-2026-11-22
+      - fix/admin-smart-products-categories-delete-2026-11-22
   workflow_dispatch:
 
 permissions:
