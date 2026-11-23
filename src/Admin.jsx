@@ -55,7 +55,7 @@ export class AdminErrorBoundary extends React.Component {
 }
 export default function AdminPanel(){
  const [session,setSession]=useState(null),[checking,setChecking]=useState(true),[checkingAdmin,setCheckingAdmin]=useState(false),[adminOk,setAdminOk]=useState(false);
- const [mfaRequired,setMfaRequired]=useState(false),[mfaFactorId,setMfaFactorId]=useState(''),[mfaChallengeId,setMfaChallengeId]=useState(''),[mfaQr,setMfaQr]=useState(''),[mfaSecret,setMfaSecret]=useState(''),[mfaCode,setMfaCode]=useState(''),[mfaMode,setMfaMode]=useState('');
+ const [aal2Ok,setAal2Ok]=useState(false),[pendingSection,setPendingSection]=useState(''),[mfaRequired,setMfaRequired]=useState(false),[mfaFactorId,setMfaFactorId]=useState(''),[mfaChallengeId,setMfaChallengeId]=useState(''),[mfaQr,setMfaQr]=useState(''),[mfaSecret,setMfaSecret]=useState(''),[mfaCode,setMfaCode]=useState(''),[mfaMode,setMfaMode]=useState('');
  const [section,setSection]=useState('content'),[data,setData]=useState({products:[],orders:[],quotes:[],categories:[],customers:[],settings:null,content:null});
  const [loading,setLoading]=useState(false),[notice,setNotice]=useState(''),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[connectionState,setConnectionState]=useState('idle');
  const [modal,setModal]=useState(null),[saving,setSaving]=useState(false),[search,setSearch]=useState(''),[modalError,setModalError]=useState('');
