@@ -66,7 +66,7 @@ export default function AdminPanel(){
  const [uploading,setUploading]=useState(false),[previewVersion,setPreviewVersion]=useState(0);
  useEffect(()=>{let active=true;let subscription=null;if(!supabase){setNotice('اتصال Supabase در نسخه فعلی پیکربندی نشده است.');setChecking(false);return()=>{active=false;};}supabase.auth.getSession().then(({data,error})=>{if(!active)return;if(error)setNotice('بازیابی نشست ناموفق بود: '+error.message);setSession(data?.session||null);setChecking(false);}).catch(error=>{if(active){setNotice('خطا در بررسی نشست: '+(error?.message||'خطای ناشناخته'));setChecking(false);}});const {data}=supabase.auth.onAuthStateChange((_e,s)=>{if(active)setSession(s);});subscription=data?.subscription;return()=>{active=false;subscription?.unsubscribe();};},[]);
  useEffect(()=>{let active=true;(async()=>{
-  if(!session){setAdminOk(false);setMfaRequired(false);setCheckingAdmin(false);return;}
+  if(!session){setAdminOk(false);setAal2Ok(false);setMfaRequired(false);setCheckingAdmin(false);return;}
   setCheckingAdmin(true);
   try{
    const [profileResult,adminResult]=await Promise.all([
@@ -75,47 +75,60 @@ export default function AdminPanel(){
    ]);
    const isStoreAdmin=!profileResult.error&&!adminResult.error&&profileResult.data?.role==='admin'&&!!adminResult.data;
    if(!active)return;
-   if(!isStoreAdmin){setAdminOk(false);setMfaRequired(false);return;}
+   if(!isStoreAdmin){setAdminOk(false);setAal2Ok(false);setMfaRequired(false);return;}
    const {data:assurance,error:assuranceError}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
    if(assuranceError)throw assuranceError;
-   if(assurance?.currentLevel!=='aal2'){
-    setAdminOk(false);setMfaRequired(true);
-    const {data:factors,error:factorError}=await supabase.auth.mfa.listFactors();
-    if(factorError)throw factorError;
-    const verified=factors?.totp?.find(f=>f.status==='verified');
-    const pending=factors?.totp?.find(f=>f.status==='unverified');
-    const factor=verified||pending;
-    if(factor){
-     setMfaFactorId(factor.id);setMfaMode(verified?'challenge':'pending');
-     const {data:challenge,error:challengeError}=await supabase.auth.mfa.challenge({factorId:factor.id});
-     if(challengeError)throw challengeError;
-     if(active)setMfaChallengeId(challenge.id);
-    }else{
-     const {data:enrolled,error:enrollError}=await supabase.auth.mfa.enroll({factorType:'totp',friendlyName:'Mahgold Admin'});
-     if(enrollError)throw enrollError;
-     if(!active)return;
-     setMfaFactorId(enrolled.id);setMfaQr(enrolled.totp?.qr_code||'');setMfaSecret(enrolled.totp?.secret||'');setMfaMode('enroll');
-     const {data:challenge,error:challengeError}=await supabase.auth.mfa.challenge({factorId:enrolled.id});
-     if(challengeError)throw challengeError;
-     if(active)setMfaChallengeId(challenge.id);
-    }
-    return;
-   }
-   if(active){setMfaRequired(false);setMfaFactorId('');setMfaChallengeId('');setMfaQr('');setMfaSecret('');setMfaMode('');setAdminOk(true);}
-  }catch(error){if(active){setAdminOk(false);setMfaRequired(true);setNotice('بررسی احراز هویت دومرحله‌ای ناموفق بود: '+(error?.message||'لطفاً دوباره تلاش کنید.'));}}
+   if(active){setAdminOk(true);setAal2Ok(assurance?.currentLevel==='aal2');setMfaRequired(false);}
+  }catch(error){if(active){setAdminOk(false);setAal2Ok(false);setNotice('بررسی مجوز مدیر ناموفق بود: '+(error?.message||'لطفاً دوباره وارد شوید.'));}}
   finally{if(active)setCheckingAdmin(false);}
  })();return()=>{active=false;};},[session]);
- async function load(){if(!supabase||!adminOk)return;setLoading(true);setConnectionState('checking');try{const jobs=await Promise.all([
-  supabase.from('products').select('*').order('created_at',{ascending:false}),
-  supabase.from('orders').select('*, order_items(*)').order('created_at',{ascending:false}).limit(200),
-  supabase.from('market_quotes').select('*').order('observed_at',{ascending:false}),
-  supabase.from('categories').select('*').order('sort_order'),
-  supabase.from('profiles').select('id,full_name,phone,role,created_at').order('created_at',{ascending:false}).limit(300),
-  supabase.from('store_settings').select('*').eq('id',1).maybeSingle(),
-  supabase.from('site_content').select('*').eq('id',1).maybeSingle()
- ]);const names=['محصولات','سفارش‌ها','نرخ‌ها','دسته‌بندی‌ها','مشتریان','تنظیمات','محتوای سایت'];const next={};jobs.forEach((r,i)=>{if(i<5&&!r.error)next[['products','orders','quotes','categories','customers'][i]]=r.data||[];});setData(d=>({...d,...next,settings:jobs[5].data||d.settings,content:jobs[6].data||d.content}));if(jobs[5].data&&typeof jobs[5].data==='object'&&!Array.isArray(jobs[5].data))setSettings({...{store_name:'مه‌گلد',currency:'تومان',default_markup_percent:7,price_provider_status:'not_configured'},...jobs[5].data});
-   if(jobs[6].data){const raw=jobs[6].data.content;setContent(JSON.stringify(raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{},null,2));}const errors=jobs.map((r,i)=>r.error?names[i]+': '+r.error.message:null).filter(Boolean);if(errors.length){setConnectionState('warning');setNotice('بخشی از اطلاعات دریافت نشد: '+errors.join(' | '));}else{setConnectionState('ok');setNotice('اطلاعات پنل با موفقیت به‌روزرسانی شد.');}}catch(error){setConnectionState('error');setNotice('دریافت اطلاعات پنل ناموفق بود: '+(error?.message||'خطای ناشناخته'));}finally{setLoading(false);}}
- useEffect(()=>{load();},[adminOk]);
+ async function beginAdminMfa(targetSection){
+  setPendingSection(targetSection);setMfaRequired(true);setMfaCode('');setNotice('');
+  try{
+   const {data:factors,error:factorError}=await supabase.auth.mfa.listFactors();
+   if(factorError)throw factorError;
+   const verified=factors?.totp?.find(f=>f.status==='verified');
+   const pending=factors?.totp?.find(f=>f.status==='unverified');
+   const factor=verified||pending;
+   if(factor){
+    setMfaFactorId(factor.id);setMfaMode(verified?'challenge':'pending');
+    const {data:challenge,error}=await supabase.auth.mfa.challenge({factorId:factor.id});
+    if(error)throw error;setMfaChallengeId(challenge.id);
+   }else{
+    const {data:enrolled,error}=await supabase.auth.mfa.enroll({factorType:'totp',friendlyName:'Mahgold Admin'});
+    if(error)throw error;
+    setMfaFactorId(enrolled.id);setMfaQr(enrolled.totp?.qr_code||'');setMfaSecret(enrolled.totp?.secret||'');setMfaMode('enroll');
+    const {data:challenge,error:challengeError}=await supabase.auth.mfa.challenge({factorId:enrolled.id});
+    if(challengeError)throw challengeError;setMfaChallengeId(challenge.id);
+   }
+  }catch(error){setNotice('آماده‌سازی تأیید دومرحله‌ای ناموفق بود: '+(error?.message||'لطفاً دوباره تلاش کنید.'));}
+ }
+ async function load(){if(!supabase||!adminOk)return;setLoading(true);setConnectionState('checking');try{
+  const basicJobs=await Promise.all([
+   supabase.from('categories').select('*').order('sort_order'),
+   supabase.from('site_content').select('*').eq('id',1).maybeSingle()
+  ]);
+  if(basicJobs[0].error)throw basicJobs[0].error;
+  setData(d=>({...d,categories:basicJobs[0].data||[],content:basicJobs[1].data||d.content}));
+  if(basicJobs[1].data){const raw=basicJobs[1].data.content;setContent(JSON.stringify(raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{},null,2));}
+  if(aal2Ok){
+   const jobs=await Promise.all([
+    supabase.from('products').select('*').order('created_at',{ascending:false}),
+    supabase.from('orders').select('*, order_items(*)').order('created_at',{ascending:false}).limit(200),
+    supabase.from('market_quotes').select('*').order('observed_at',{ascending:false}),
+    supabase.from('profiles').select('id,full_name,phone,role,created_at').order('created_at',{ascending:false}).limit(300),
+    supabase.from('store_settings').select('*').eq('id',1).maybeSingle()
+   ]);
+   const names=['محصولات','سفارش‌ها','نرخ‌ها','مشتریان','تنظیمات'];
+   const next={};jobs.forEach((r,i)=>{if(!r.error)next[['products','orders','quotes','customers'][i]]=r.data||[];});
+   setData(d=>({...d,...next,settings:jobs[4].data||d.settings}));
+   if(jobs[4].data&&typeof jobs[4].data==='object'&&!Array.isArray(jobs[4].data))setSettings({...{store_name:'مه‌گلد',currency:'تومان',default_markup_percent:7,price_provider_status:'not_configured'},...jobs[4].data});
+   const errors=jobs.map((r,i)=>r.error?names[i]+': '+r.error.message:null).filter(Boolean);
+   if(errors.length){setConnectionState('warning');setNotice('بخشی از اطلاعات دریافت نشد: '+errors.join(' | '));}
+   else{setConnectionState('ok');setNotice('اطلاعات مدیریتی با احراز هویت دومرحله‌ای دریافت شد.');}
+  }else{setConnectionState(basicJobs[1].error?'warning':'ok');setNotice('دسترسی پایه فعال است؛ اطلاعات حساس فقط پس از تأیید دومرحله‌ای نمایش داده می‌شوند.');}
+ }catch(error){setConnectionState('error');setNotice('دریافت اطلاعات پنل ناموفق بود: '+(error?.message||'خطای ناشناخته'));}finally{setLoading(false);}}
+ useEffect(()=>{load();},[adminOk,aal2Ok]);
  useEffect(()=>{window.history.pushState({mahgoldAdmin:true,section:'overview'},'',window.location.href);const onBack=event=>{if(event.state?.mahgoldAdmin){setSection(event.state.section||'overview');return;}setModal(null);window.location.assign(window.location.pathname.replace(/admin\/?$/,'')||'/');};window.addEventListener('popstate',onBack);return()=>window.removeEventListener('popstate',onBack);},[]);
  async function compressImage(file){
   if(!['image/jpeg','image/png','image/webp','image/avif'].includes(file.type))throw new Error('فقط تصویر JPG، PNG، WebP یا AVIF مجاز است.');
@@ -202,7 +215,7 @@ async function saveQuote(){if(!quote.title?.trim()||!quote.symbol?.trim()||Numbe
  async function saveSettings(){if(!settings.store_name?.trim()||!settings.currency?.trim()){setNotice('نام فروشگاه و واحد پول را کامل کنید.');return;}if(Number(settings.default_markup_percent)<0){setNotice('درصد اجرت/سود نمی‌تواند منفی باشد.');return;}setSaving(true);try{const payload={...settings,id:1,default_markup_percent:Number(settings.default_markup_percent),updated_at:new Date().toISOString()};const {error}=await supabase.from('store_settings').upsert(payload,{onConflict:'id'});if(error)throw error;setSettings(payload);setNotice('تنظیمات فروشگاه ذخیره شد.');}catch(error){setNotice('ذخیره تنظیمات ناموفق بود: '+(error?.message||'خطای ناشناخته'));}finally{setSaving(false);}}
  async function saveContent(){let parsed;try{parsed=JSON.parse(content);}catch{setNotice('ساختار محتوای سایت معتبر نیست.');return;}if(!parsed||Array.isArray(parsed)||typeof parsed!=='object'){setNotice('ساختار محتوای سایت باید یک شیء معتبر باشد.');return;}if(Array.isArray(parsed.slides)){parsed.specials=parsed.slides.map(s=>({title:s.title||'',kicker:s.eyebrow||'',sub:s.description||'',category:s.category||'طلای زینتی',image:s.image||''}));}setSaving(true);try{const payload={id:1,content:parsed,updated_at:new Date().toISOString(),updated_by:session?.user?.id||null};const {error}=await supabase.from('site_content').upsert(payload,{onConflict:'id'});if(error)throw error;setData(d=>({...d,content:payload}));setNotice('محتوای سایت ذخیره شد.');setPreviewVersion(v=>v+1);}catch(error){setNotice('ذخیره محتوای سایت ناموفق بود: '+(error?.message||'خطای ناشناخته'));}finally{setSaving(false);}}
  async function login(e){e.preventDefault();setNotice('');setSaving(true);try{const {error}=await supabase.auth.signInWithPassword({email:email.trim(),password});if(error)throw error;}catch(error){setNotice('ورود ناموفق بود: '+(error?.message||'ایمیل یا گذرواژه را بررسی کنید.'));}finally{setSaving(false);}}
- async function verifyAdminMfa(e){e?.preventDefault?.();if(!mfaFactorId||!mfaChallengeId||!/^\d{6,8}$/.test(mfaCode.trim())){setNotice('کد یک‌بارمصرف معتبر را وارد کنید.');return;}setSaving(true);try{const {error}=await supabase.auth.mfa.verify({factorId:mfaFactorId,challengeId:mfaChallengeId,code:mfaCode.trim()});if(error)throw error;const {data,error:sessionError}=await supabase.auth.getSession();if(sessionError)throw sessionError;setSession(data.session||null);setMfaCode('');setMfaRequired(false);setNotice('احراز هویت دومرحله‌ای تأیید شد.');}catch(error){setNotice('تأیید کد دومرحله‌ای ناموفق بود: '+(error?.message||'کد را بررسی کنید.'));}finally{setSaving(false);}}
+ async function verifyAdminMfa(e){e?.preventDefault?.();if(!mfaFactorId||!mfaChallengeId||!/^\d{6,8}$/.test(mfaCode.trim())){setNotice('کد یک‌بارمصرف معتبر را وارد کنید.');return;}setSaving(true);try{const {error}=await supabase.auth.mfa.verify({factorId:mfaFactorId,challengeId:mfaChallengeId,code:mfaCode.trim()});if(error)throw error;const {data,error:sessionError}=await supabase.auth.getSession();if(sessionError)throw sessionError;setSession(data.session||null);setAal2Ok(true);setMfaCode('');setMfaRequired(false);setSection(pendingSection||'overview');setPendingSection('');setNotice('احراز هویت دومرحله‌ای تأیید شد.');}catch(error){setNotice('تأیید کد دومرحله‌ای ناموفق بود: '+(error?.message||'کد را بررسی کنید.'));}finally{setSaving(false);}}
  async function restartAdminMfa(){setSaving(true);setNotice('');try{if(mfaFactorId&&mfaMode==='pending'){const {error}=await supabase.auth.mfa.unenroll({factorId:mfaFactorId});if(error)throw error;}const {data:enrolled,error}=await supabase.auth.mfa.enroll({factorType:'totp',friendlyName:'Mahgold Admin'});if(error)throw error;setMfaFactorId(enrolled.id);setMfaQr(enrolled.totp?.qr_code||'');setMfaSecret(enrolled.totp?.secret||'');setMfaMode('enroll');const {data:challenge,error:challengeError}=await supabase.auth.mfa.challenge({factorId:enrolled.id});if(challengeError)throw challengeError;setMfaChallengeId(challenge.id);setMfaCode('');}catch(error){setNotice('شروع مجدد تنظیم MFA انجام نشد: '+(error?.message||'در صورت تداوم خطا با پشتیبانی تماس بگیرید.'));}finally{setSaving(false);}}
  const contentObject=(()=>{try{const parsed=typeof content==='string'?JSON.parse(content||'{}'):content;return parsed&&typeof parsed==='object'&&!Array.isArray(parsed)?parsed:{};}catch{return {};}})();
  const slideRows=Array.isArray(contentObject.slides)?contentObject.slides:(Array.isArray(contentObject.specials)?contentObject.specials.map(item=>({active:true,eyebrow:item?.kicker||'',title:item?.title||'',description:item?.sub||'',button:'مشاهده محصولات',image:item?.image||'',category:item?.category||'طلای زینتی'})):[]);
@@ -244,7 +257,7 @@ async function saveQuote(){if(!quote.title?.trim()||!quote.symbol?.trim()||Numbe
   {label:'حفاظت گذرواژه افشاشده',done:false,note:'فعال‌سازی در تنظیمات Supabase Auth'}
  ];
  const readinessCompleted=readinessItems.filter(item=>item.done).length;
- return <div className="admin-shell" dir="rtl"><aside className="admin-side"><img src={contentObject.logo_url||MAHGOLD_LOGO} onError={e=>{e.currentTarget.onerror=null;e.currentTarget.src=MAHGOLD_LOGO;}} alt="لوگوی مه‌گلد"/><small>مرکز کنترل فروشگاه</small><nav>{sections.map(([id,label])=><button className={section===id?'active':''} key={id} onClick={()=>{window.history.pushState({mahgoldAdmin:true,section:id},'',window.location.href);setSection(id);setSearch('');}}>{label}</button>)}</nav><button className="admin-logout" onClick={()=>supabase.auth.signOut()}>خروج امن</button></aside><main className="admin-main"><header><div><span>MAHGOLD CONTROL CENTER</span><h1>{sections.find(x=>x[0]===section)?.[1]}</h1></div><div className="admin-user">{session.user.email}<button onClick={load}>↻ بروزرسانی</button></div></header>{notice&&<div className="admin-notice" role="status" onClick={()=>setNotice('')}>{notice}<button type="button" aria-label="بستن پیام" onClick={e=>{e.stopPropagation();setNotice('');}}>×</button></div>}
+ return <div className="admin-shell" dir="rtl"><aside className="admin-side"><img src={contentObject.logo_url||MAHGOLD_LOGO} onError={e=>{e.currentTarget.onerror=null;e.currentTarget.src=MAHGOLD_LOGO;}} alt="لوگوی مه‌گلد"/><small>مرکز کنترل فروشگاه</small><nav>{sections.map(([id,label])=><button className={section===id?'active':''} key={id} onClick={()=>{if(['overview','products','orders','quotes','customers','settings'].includes(id)&&!aal2Ok){beginAdminMfa(id);return;}window.history.pushState({mahgoldAdmin:true,section:id},'',window.location.href);setSection(id);setSearch('');}}>{label}{['overview','products','orders','quotes','customers','settings'].includes(id)&&!aal2Ok?' 🔒':''}</button>)}</nav><button className="admin-logout" onClick={()=>supabase.auth.signOut()}>خروج امن</button></aside><main className="admin-main"><header><div><span>MAHGOLD CONTROL CENTER</span><h1>{sections.find(x=>x[0]===section)?.[1]}</h1></div><div className="admin-user">{session.user.email}<button onClick={load}>↻ بروزرسانی</button></div></header>{notice&&<div className="admin-notice" role="status" onClick={()=>setNotice('')}>{notice}<button type="button" aria-label="بستن پیام" onClick={e=>{e.stopPropagation();setNotice('');}}>×</button></div>}
  {section==='overview'&&<><div className="admin-stats">{[['محصولات','products'],['سفارش‌ها','orders'],['دسته‌بندی‌ها','categories'],['مشتریان','customers']].map(([l,k])=><article key={k}><small>{l}</small><b>{count(k)}</b></article>)}</div><section className="admin-price-health"><div className="admin-price-health-main"><div><span>سلامت نرخ بازار</span><strong className={goldQuoteFresh?'is-live':'is-stale'}>{goldQuoteFresh?(goldQuote?.source==='manual'?'نرخ دستی تازه و معتبر':'نرخ زنده و معتبر'):'نرخ قدیمی / در انتظار دریافت'}</strong></div><b>{goldQuote?money(goldQuote.price_toman)+' تومان':'—'}</b></div><div className="admin-price-health-meta"><span>آخرین دریافت: {goldQuote?.observed_at?new Date(goldQuote.observed_at).toLocaleString('fa-IR'):'ثبت نشده'}</span><span>منبع: {goldQuote?.source||'—'}</span><span>{Number.isFinite(goldQuoteAgeMs)?'سن داده: '+money(Math.max(0,Math.floor(goldQuoteAgeMs/60000)))+' دقیقه':'زمان داده نامشخص'}</span></div></section><section className="admin-readiness-panel"><div className="admin-readiness-head"><div><h2>چک‌لیست آمادگی بهره‌برداری</h2><p>موارد تکمیل‌نشده پیش از شروع فروش عمومی باید بررسی شوند.</p></div><strong>{money(readinessCompleted)} از {money(readinessItems.length)} مورد</strong></div><div className="admin-readiness-grid">{readinessItems.map(item=><div className={item.done?'is-ready':'is-pending'} key={item.label}><span>{item.done?'✓':'!'}</span><div><b>{item.label}</b><small>{item.done?'تکمیل شده':item.note}</small></div></div>)}</div></section><section className="admin-payment-health"><div><span>وضعیت پرداخت آنلاین</span><strong>درگاه پرداخت هنوز متصل نشده است</strong></div><p>ثبت سفارش و رزرو موجودی فعال است؛ دریافت وجه آنلاین تا اتصال درگاه و تأیید وب‌هوک پرداخت انجام نمی‌شود.</p></section><section className="admin-panel"><h2>آخرین سفارش‌ها</h2><Orders rows={data.orders.slice(0,6)} update={updateOrder}/></section><section className="admin-panel"><h2>وضعیت اتصال</h2><div className={"admin-connection-state "+connectionState}><span className="admin-connection-dot"></span><div><b>{connectionState==='ok'?'اتصال پایگاه داده برقرار است':connectionState==='warning'?'اتصال برقرار است؛ دریافت بعضی داده‌ها ناموفق بود':connectionState==='error'?'خطا در دریافت اطلاعات':'در حال بررسی اتصال'}</b><p>{connectionState==='ok'?'اطلاعات اصلی پنل از Supabase دریافت شده است.':connectionState==='warning'?'پیام خطا در بالای پنل نمایش داده شده است.':connectionState==='error'?'ارتباط را بررسی و دوباره تلاش کنید.':'پس از ورود، اتصال و سطح دسترسی بررسی می‌شود.'}</p></div></div></section></>}
  {section==='products'&&<><Toolbar search={search} setSearch={setSearch} add={()=>{setProduct({...blankProduct,seller_profit_percent:Number(settings.default_markup_percent??7)});setModalError('');setModal('product');}} label="افزودن محصول"/><div className="admin-toolbar"><span>{showInactiveProducts?'نمایش محصولات غیرفعال':'نمایش محصولات فعال'}</span><button type="button" className="secondary" onClick={()=>setShowInactiveProducts(v=>!v)}>{showInactiveProducts?'مشاهده محصولات فعال':'مشاهده محصولات حذف‌شده'}</button></div><div className="admin-panel"><div className="admin-table-wrap"><table><thead><tr><th>تصویر</th><th>محصول</th><th>دسته</th><th>قیمت</th><th>موجودی</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody>{productRows.map(p=><tr key={p.id}><td><div className="admin-product-thumb">{p.image_url?<img src={p.image_url} alt={p.name} loading="lazy" onError={e=>{e.currentTarget.style.visibility='hidden';}}/>:<span>بدون تصویر</span>}</div></td><td>{p.name}</td><td>{p.category}</td><td>{p.category==='سکه'?(data.quotes.find(q=>q.symbol===p.attributes?.market_quote_symbol&&q.is_live===true&&q.source==='arzhaam'&&Date.now()-Date.parse(q.observed_at)<=70*60*1000)?.price_toman?money(data.quotes.find(q=>q.symbol===p.attributes?.market_quote_symbol).price_toman):'نرخ ناموجود'):money(p.price_toman)}</td><td>{p.stock}</td><td>{p.is_active?'فعال':'غیرفعال'}</td><td>{p.is_active?<><button onClick={()=>{setProduct(prepareProductForEdit(p));setModalError('');setModal('product');}}>ویرایش</button><button className="danger" disabled={saving} onClick={()=>removeProduct(p.id)}>حذف از فروشگاه</button></>:<button onClick={async()=>{try{const {data:restored,error}=await supabase.from('products').update({is_active:true,updated_at:new Date().toISOString()}).eq('id',p.id).eq('is_active',false).select('id');if(error)throw error;if(!restored?.length)throw new Error('محصول بازیابی نشد؛ مجوز یا وضعیت آن را بررسی کنید.');setNotice('محصول دوباره فعال شد.');await load();}catch(error){setNotice('بازیابی محصول ناموفق بود: '+(error?.message||'خطای نامشخص'));}}}>بازیابی محصول</button>}</td></tr>)}{!productRows.length&&<tr><td colSpan="7" className="admin-empty-cell">{showInactiveProducts?'محصول غیرفعالی وجود ندارد.':'محصول فعالی برای نمایش وجود ندارد.'}</td></tr>}</tbody></table></div></div></>}
  {section==='orders'&&<><div className="admin-toolbar"><div><b>{showArchivedOrders?'سفارش‌های بایگانی‌شده':'سفارش‌های فعال'}</b><small>{showArchivedOrders?'سوابق سفارش‌های تکمیل‌شده و پرداخت‌شده':'سفارش‌های جاری و لغوشده'}</small></div><button type="button" onClick={()=>{setShowArchivedOrders(v=>!v);setSearch('');}}>{showArchivedOrders?'نمایش سفارش‌های فعال':'مشاهده بایگانی'}</button></div><div className="admin-panel"><Orders rows={filtered} update={updateOrder} archive={setOrderArchive} remove={deleteCancelledOrder} archivedView={showArchivedOrders} busy={saving}/></div></>}
