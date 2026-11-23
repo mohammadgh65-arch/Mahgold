@@ -9,6 +9,7 @@ import { supabase, isSupabaseConfigured } from './lib/supabase';
 import AdminPanel from './Admin.jsx';
 
 const forceAdminPreview = import.meta.env.VITE_ADMIN_PREVIEW === 'true';
+const commerceEnabled = import.meta.env.VITE_COMMERCE_ENABLED === 'true';
 const BASE = 'https://growth-and-advancement-garden.lovable.app/assets/';
 const slides = [
   {
@@ -318,6 +319,7 @@ export default function App() {
   };
   const submitOrder=async event=>{
     event.preventDefault();setCheckoutError('');
+    if(!commerceEnabled){setCheckoutError('ثبت سفارش آنلاین تا تکمیل مجوزها و راه‌اندازی درگاه پرداخت امن غیرفعال است.');return;}
     if(!supabase||!cart.length||checkoutBusy)return;
     const {data:authData}=await supabase.auth.getSession();
     if(!authData.session?.user){
@@ -526,7 +528,7 @@ export default function App() {
             </div>)}</div>
             <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{money(cartTotal)} تومان</b></div>
             <p className="mb-4 text-[11px] leading-7 text-muted-foreground">مبلغ نهایی و موجودی هنگام ثبت سفارش در سرور دوباره بررسی می‌شود.</p>
-            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" onClick={async()=>{const {data}=await supabase.auth.getSession();if(!data.session?.user){setAccountNotice('برای ثبت سفارش ابتدا حساب کاربری بسازید یا وارد شوید.');setAccountOpen(true);setCartOpen(false);}else setCheckoutOpen(true);}}>ادامه و ثبت سفارش <ArrowLeft className="mr-2 inline" size={16}/></button>
+            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={!commerceEnabled} onClick={async()=>{const {data}=await supabase.auth.getSession();if(!data.session?.user){setAccountNotice('برای ثبت سفارش ابتدا حساب کاربری بسازید یا وارد شوید.');setAccountOpen(true);setCartOpen(false);}else setCheckoutOpen(true);}}>{commerceEnabled?'ادامه و ثبت سفارش':'ثبت سفارش پس از فعال‌سازی مجوز و درگاه'} <ArrowLeft className="mr-2 inline" size={16}/></button>
           </>}
       </aside>
     </div>}
