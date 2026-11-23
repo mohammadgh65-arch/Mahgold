@@ -35,6 +35,8 @@ jobs:
           fi
       - name: Verify clean lockfile installation
         run: npm ci --no-audit --no-fund
+      - name: Audit dependency vulnerabilities
+        run: npm audit --audit-level=high
       - name: Build React application
         env:
           VITE_SUPABASE_URL: https://nzvvvpbwavaodhxrnkdr.supabase.co
