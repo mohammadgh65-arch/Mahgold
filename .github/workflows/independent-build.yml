@@ -41,6 +41,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mahgold-private-preview
-          path: dist/index.html
+          path: |
+            dist/index.html
+            package-lock.json
           if-no-files-found: error
           retention-days: 14
