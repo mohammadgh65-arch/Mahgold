@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - mahgold-independent-react
+      - mahgold-production-hardening-20261123
   workflow_dispatch:
 
 permissions:
