@@ -209,9 +209,14 @@ export default function App() {
     if(!supabase)return;
     let active=true;
     const refreshGoldQuote=async()=>{
-      const {data,error}=await supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
-        .eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle();
-      if(active&&!error)setQuote(data||null);
+      const [quoteResult,productResult]=await Promise.all([
+        supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
+          .eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle(),
+        supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,created_at,tag,pricing_mode')
+          .eq('is_active',true).order('created_at',{ascending:false})
+      ]);
+      if(active&&!quoteResult.error)setQuote(quoteResult.data||null);
+      if(active&&!productResult.error)setProducts(productResult.data||[]);
     };
     const timer=setInterval(refreshGoldQuote,60000);
     return()=>{active=false;clearInterval(timer);};
