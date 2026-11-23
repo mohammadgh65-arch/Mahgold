@@ -87,16 +87,31 @@ Deno.serve(async (req: Request) => {
     const authClient = createClient(supabaseUrl, anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data, error } = await authClient.auth.getUser(bearer);
     if (error || !data.user) return response(401, { error: "Authentication token is invalid" });
+    if (!data.user.email_confirmed_at && !data.user.phone_confirmed_at) {
+      return response(403, { error: "A verified customer account is required" });
+    }
     customerId = data.user.id;
   }
+  if (!customerId) return response(401, { error: "Please sign in with a verified customer account before ordering" });
 
-  const ip = req.headers.get("cf-connecting-ip") || "unknown";
-  const ipHash = await sha256(ip);
+  const authMethod = body.auth_method === "phone" ? "phone" : "email";
+  // This endpoint is called directly from browsers; a proxy IP header is not guaranteed.
+  // Rate-limit by the verified Supabase user to avoid putting every shopper in one "unknown" bucket.
+  const rateLimitKey = `customer:${customerId}`;
+  const ipHash = await sha256(rateLimitKey);
   const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 
   const { data: allowed, error: rateError } = await admin.rpc("mahgold_consume_order_rate_limit", { p_ip_hash: ipHash });
   if (rateError) return response(503, { error: "Order service is temporarily unavailable" });
   if (allowed !== true) return response(429, { error: "Too many order attempts. Please try again later." });
+
+  const { error: profileError } = await admin.from("profiles").upsert({
+    id: customerId,
+    full_name: customerName,
+    phone: customerPhone,
+    preferred_auth_method: authMethod,
+  }, { onConflict: "id" });
+  if (profileError) return response(500, { error: "Customer profile could not be prepared. Please try again later." });
 
   const { data, error } = await admin.rpc("mahgold_create_order_idempotent", {
     p_customer_name: customerName,
