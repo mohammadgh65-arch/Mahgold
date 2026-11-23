@@ -56,7 +56,7 @@ export class AdminErrorBoundary extends React.Component {
 export default function AdminPanel(){
  const [session,setSession]=useState(null),[checking,setChecking]=useState(true),[checkingAdmin,setCheckingAdmin]=useState(false),[adminOk,setAdminOk]=useState(false);
  const [mfaRequired,setMfaRequired]=useState(false),[mfaFactorId,setMfaFactorId]=useState(''),[mfaChallengeId,setMfaChallengeId]=useState(''),[mfaQr,setMfaQr]=useState(''),[mfaSecret,setMfaSecret]=useState(''),[mfaCode,setMfaCode]=useState(''),[mfaMode,setMfaMode]=useState('');
- const [section,setSection]=useState('overview'),[data,setData]=useState({products:[],orders:[],quotes:[],categories:[],customers:[],settings:null,content:null});
+ const [section,setSection]=useState('content'),[data,setData]=useState({products:[],orders:[],quotes:[],categories:[],customers:[],settings:null,content:null});
  const [loading,setLoading]=useState(false),[notice,setNotice]=useState(''),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[connectionState,setConnectionState]=useState('idle');
  const [modal,setModal]=useState(null),[saving,setSaving]=useState(false),[search,setSearch]=useState(''),[modalError,setModalError]=useState('');
  const [product,setProduct]=useState(blankProduct),[quote,setQuote]=useState({symbol:'gold_18k',title:'طلای ۱۸ عیار',price_toman:0,source:'manual',is_live:false});
@@ -129,7 +129,7 @@ export default function AdminPanel(){
   }else{setConnectionState(basicJobs[1].error?'warning':'ok');setNotice('دسترسی پایه فعال است؛ اطلاعات حساس فقط پس از تأیید دومرحله‌ای نمایش داده می‌شوند.');}
  }catch(error){setConnectionState('error');setNotice('دریافت اطلاعات پنل ناموفق بود: '+(error?.message||'خطای ناشناخته'));}finally{setLoading(false);}}
  useEffect(()=>{load();},[adminOk,aal2Ok]);
- useEffect(()=>{window.history.pushState({mahgoldAdmin:true,section:'overview'},'',window.location.href);const onBack=event=>{if(event.state?.mahgoldAdmin){setSection(event.state.section||'overview');return;}setModal(null);window.location.assign(window.location.pathname.replace(/admin\/?$/,'')||'/');};window.addEventListener('popstate',onBack);return()=>window.removeEventListener('popstate',onBack);},[]);
+ useEffect(()=>{window.history.pushState({mahgoldAdmin:true,section:'content'},'',window.location.href);const onBack=event=>{if(event.state?.mahgoldAdmin){setSection(event.state.section||'overview');return;}setModal(null);window.location.assign(window.location.pathname.replace(/admin\/?$/,'')||'/');};window.addEventListener('popstate',onBack);return()=>window.removeEventListener('popstate',onBack);},[]);
  async function compressImage(file){
   if(!['image/jpeg','image/png','image/webp','image/avif'].includes(file.type))throw new Error('فقط تصویر JPG، PNG، WebP یا AVIF مجاز است.');
   if(file.size>25*1024*1024)throw new Error('حجم عکس انتخابی نباید بیشتر از ۲۵ مگابایت باشد.');
