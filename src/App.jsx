@@ -273,7 +273,9 @@ export default function App() {
     return [...presetCategories,...extras];
   },[dbCategories]);
   const filtered=useMemo(()=>{
+    // Products without a positive sale price are kept in Admin but never exposed for sale.
     const rows=products.filter(p=>
+      Number(p.price_toman)>0&&
       (category==='همه محصولات'||(category==='طلای زینتی'?jewelryProductCategories.has(p.category):p.category===category)||p.name?.includes(category))&&
       (!query.trim()||p.name?.toLocaleLowerCase('fa').includes(query.trim().toLocaleLowerCase('fa')))
     );
@@ -413,7 +415,7 @@ export default function App() {
                 <div className="ref-quote-strip">
           <div className="ref-quote-title"><span className="ref-quote-bars">▥</span><div><b>قیمت لحظه‌ای طلای ۱۸ عیار</b><small>{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'به‌روزرسانی لحظه‌ای'):quoteIsManual?'نرخ دستی منقضی‌شده':quote?.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'در انتظار نرخ معتبر'}</small></div></div>
           <strong>{quote?money(quote.price_toman)+' تومان':'— تومان'}</strong>
-          <span className="ref-quote-live"><i/> بروزرسانی لحظه‌ای</span>
+          <span className="ref-quote-live"><i/> {quoteFresh?'نرخ معتبر':'بدون نرخ تازه'}</span>
         </div>
 
       <section className="mx-auto max-w-7xl scroll-mt-20 px-4 py-5 md:px-7 md:py-6" id="categories">
