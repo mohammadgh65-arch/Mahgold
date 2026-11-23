@@ -43,10 +43,11 @@ const tiles = [
 const displayTileDefaults = tiles;
 const presetCategories = [
   'همه محصولات','طلای زینتی','طلای آب‌شده','سکه','شمش','انگشتر','گردنبند',
-  'دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'
+  'دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','نیم ست','سایر زیورآلات'
 ];
 const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85';
 const money = value => new Intl.NumberFormat('fa-IR').format(Number(value || 0));
+const isJewelryCategory = category => ['طلای زینتی','انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','نیم ست','سایر زیورآلات'].includes(category);
 const gram = value => new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(Number(value || 0)) + ' گرم';
 const toLatinDigits = value => value.replace(/[۰-۹٠-٩]/g, d => {
   const fa='۰۱۲۳۴۵۶۷۸۹', ar='٠١٢٣٤٥٦٧٨٩';
@@ -277,8 +278,8 @@ export default function App() {
   useEffect(()=>{setCheckoutRequestKey(null);},[cart,customer]);
 
   const categories=useMemo(()=>{
-    const allowed=['همه محصولات','طلای زینتی','سکه','انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'];
-    const extras=dbCategories.map(row=>row.name).filter(name=>name&&!allowed.includes(name)&&isJewelryCategory(name));
+    const allowed=['همه محصولات','طلای زینتی','سکه','انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','نیم ست','سایر زیورآلات'];
+    const extras=dbCategories.map(row=>row.name).filter(name=>name&&!allowed.includes(name));
     return [...allowed,...extras];
   },[dbCategories]);
   const coinQuoteSymbols=['coin_emami','coin_bahar','coin_nim','coin_rob','coin_gerami'];
@@ -293,7 +294,7 @@ export default function App() {
   };
   const filtered=useMemo(()=>{
     const rows=products.filter(p=>
-      (isJewelryCategory(p.category)||p.category==='سکه')&&
+      (isJewelryCategory(p.category)||p.category==='سکه'||dbCategories.some(row=>row.name===p.category))&&
       (category==='همه محصولات'||p.category===category||p.name?.includes(category))&&
       (!query.trim()||p.name?.toLocaleLowerCase('fa').includes(query.trim().toLocaleLowerCase('fa')))
     );
