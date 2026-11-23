@@ -55,6 +55,7 @@ export class AdminErrorBoundary extends React.Component {
 }
 export default function AdminPanel(){
  const [session,setSession]=useState(null),[checking,setChecking]=useState(true),[checkingAdmin,setCheckingAdmin]=useState(false),[adminOk,setAdminOk]=useState(false);
+ const [mfaRequired,setMfaRequired]=useState(false),[mfaFactorId,setMfaFactorId]=useState(''),[mfaChallengeId,setMfaChallengeId]=useState(''),[mfaQr,setMfaQr]=useState(''),[mfaSecret,setMfaSecret]=useState(''),[mfaCode,setMfaCode]=useState(''),[mfaMode,setMfaMode]=useState('');
  const [section,setSection]=useState('overview'),[data,setData]=useState({products:[],orders:[],quotes:[],categories:[],customers:[],settings:null,content:null});
  const [loading,setLoading]=useState(false),[notice,setNotice]=useState(''),[email,setEmail]=useState(''),[password,setPassword]=useState(''),[connectionState,setConnectionState]=useState('idle');
  const [modal,setModal]=useState(null),[saving,setSaving]=useState(false),[search,setSearch]=useState(''),[modalError,setModalError]=useState('');
@@ -64,7 +65,46 @@ export default function AdminPanel(){
  const [content,setContent]=useState('{}'),[showInactiveProducts,setShowInactiveProducts]=useState(false),[showArchivedOrders,setShowArchivedOrders]=useState(false);
  const [uploading,setUploading]=useState(false),[previewVersion,setPreviewVersion]=useState(0);
  useEffect(()=>{let active=true;let subscription=null;if(!supabase){setNotice('اتصال Supabase در نسخه فعلی پیکربندی نشده است.');setChecking(false);return()=>{active=false;};}supabase.auth.getSession().then(({data,error})=>{if(!active)return;if(error)setNotice('بازیابی نشست ناموفق بود: '+error.message);setSession(data?.session||null);setChecking(false);}).catch(error=>{if(active){setNotice('خطا در بررسی نشست: '+(error?.message||'خطای ناشناخته'));setChecking(false);}});const {data}=supabase.auth.onAuthStateChange((_e,s)=>{if(active)setSession(s);});subscription=data?.subscription;return()=>{active=false;subscription?.unsubscribe();};},[]);
- useEffect(()=>{let active=true;(async()=>{if(!session){setAdminOk(false);setCheckingAdmin(false);return;}setCheckingAdmin(true);try{const [profileResult,adminResult]=await Promise.all([supabase.from('profiles').select('role').eq('id',session.user.id).maybeSingle(),supabase.from('store_admins').select('user_id').eq('user_id',session.user.id).maybeSingle()]);if(active)setAdminOk(!profileResult.error&&!adminResult.error&&profileResult.data?.role==='admin'&&!!adminResult.data);}catch{if(active)setAdminOk(false);}finally{if(active)setCheckingAdmin(false);}})();return()=>{active=false;};},[session]);
+ useEffect(()=>{let active=true;(async()=>{
+  if(!session){setAdminOk(false);setMfaRequired(false);setCheckingAdmin(false);return;}
+  setCheckingAdmin(true);
+  try{
+   const [profileResult,adminResult]=await Promise.all([
+    supabase.from('profiles').select('role').eq('id',session.user.id).maybeSingle(),
+    supabase.from('store_admins').select('user_id').eq('user_id',session.user.id).maybeSingle()
+   ]);
+   const isStoreAdmin=!profileResult.error&&!adminResult.error&&profileResult.data?.role==='admin'&&!!adminResult.data;
+   if(!active)return;
+   if(!isStoreAdmin){setAdminOk(false);setMfaRequired(false);return;}
+   const {data:assurance,error:assuranceError}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+   if(assuranceError)throw assuranceError;
+   if(assurance?.currentLevel!=='aal2'){
+    setAdminOk(false);setMfaRequired(true);
+    const {data:factors,error:factorError}=await supabase.auth.mfa.listFactors();
+    if(factorError)throw factorError;
+    const verified=factors?.totp?.find(f=>f.status==='verified');
+    const pending=factors?.totp?.find(f=>f.status==='unverified');
+    const factor=verified||pending;
+    if(factor){
+     setMfaFactorId(factor.id);setMfaMode(verified?'challenge':'pending');
+     const {data:challenge,error:challengeError}=await supabase.auth.mfa.challenge({factorId:factor.id});
+     if(challengeError)throw challengeError;
+     if(active)setMfaChallengeId(challenge.id);
+    }else{
+     const {data:enrolled,error:enrollError}=await supabase.auth.mfa.enroll({factorType:'totp',friendlyName:'Mahgold Admin'});
+     if(enrollError)throw enrollError;
+     if(!active)return;
+     setMfaFactorId(enrolled.id);setMfaQr(enrolled.totp?.qr_code||'');setMfaSecret(enrolled.totp?.secret||'');setMfaMode('enroll');
+     const {data:challenge,error:challengeError}=await supabase.auth.mfa.challenge({factorId:enrolled.id});
+     if(challengeError)throw challengeError;
+     if(active)setMfaChallengeId(challenge.id);
+    }
+    return;
+   }
+   if(active){setMfaRequired(false);setMfaFactorId('');setMfaChallengeId('');setMfaQr('');setMfaSecret('');setMfaMode('');setAdminOk(true);}
+  }catch(error){if(active){setAdminOk(false);setMfaRequired(true);setNotice('بررسی احراز هویت دومرحله‌ای ناموفق بود: '+(error?.message||'لطفاً دوباره تلاش کنید.'));}}
+  finally{if(active)setCheckingAdmin(false);}
+ })();return()=>{active=false;};},[session]);
  async function load(){if(!supabase||!adminOk)return;setLoading(true);setConnectionState('checking');try{const jobs=await Promise.all([
   supabase.from('products').select('*').order('created_at',{ascending:false}),
   supabase.from('orders').select('*, order_items(*)').order('created_at',{ascending:false}).limit(200),
@@ -162,6 +202,8 @@ async function saveQuote(){if(!quote.title?.trim()||!quote.symbol?.trim()||Numbe
  async function saveSettings(){if(!settings.store_name?.trim()||!settings.currency?.trim()){setNotice('نام فروشگاه و واحد پول را کامل کنید.');return;}if(Number(settings.default_markup_percent)<0){setNotice('درصد اجرت/سود نمی‌تواند منفی باشد.');return;}setSaving(true);try{const payload={...settings,id:1,default_markup_percent:Number(settings.default_markup_percent),updated_at:new Date().toISOString()};const {error}=await supabase.from('store_settings').upsert(payload,{onConflict:'id'});if(error)throw error;setSettings(payload);setNotice('تنظیمات فروشگاه ذخیره شد.');}catch(error){setNotice('ذخیره تنظیمات ناموفق بود: '+(error?.message||'خطای ناشناخته'));}finally{setSaving(false);}}
  async function saveContent(){let parsed;try{parsed=JSON.parse(content);}catch{setNotice('ساختار محتوای سایت معتبر نیست.');return;}if(!parsed||Array.isArray(parsed)||typeof parsed!=='object'){setNotice('ساختار محتوای سایت باید یک شیء معتبر باشد.');return;}if(Array.isArray(parsed.slides)){parsed.specials=parsed.slides.map(s=>({title:s.title||'',kicker:s.eyebrow||'',sub:s.description||'',category:s.category||'طلای زینتی',image:s.image||''}));}setSaving(true);try{const payload={id:1,content:parsed,updated_at:new Date().toISOString(),updated_by:session?.user?.id||null};const {error}=await supabase.from('site_content').upsert(payload,{onConflict:'id'});if(error)throw error;setData(d=>({...d,content:payload}));setNotice('محتوای سایت ذخیره شد.');setPreviewVersion(v=>v+1);}catch(error){setNotice('ذخیره محتوای سایت ناموفق بود: '+(error?.message||'خطای ناشناخته'));}finally{setSaving(false);}}
  async function login(e){e.preventDefault();setNotice('');setSaving(true);try{const {error}=await supabase.auth.signInWithPassword({email:email.trim(),password});if(error)throw error;}catch(error){setNotice('ورود ناموفق بود: '+(error?.message||'ایمیل یا گذرواژه را بررسی کنید.'));}finally{setSaving(false);}}
+ async function verifyAdminMfa(e){e?.preventDefault?.();if(!mfaFactorId||!mfaChallengeId||!/^\\d{6,8}$/.test(mfaCode.trim())){setNotice('کد یک‌بارمصرف معتبر را وارد کنید.');return;}setSaving(true);try{const {error}=await supabase.auth.mfa.verify({factorId:mfaFactorId,challengeId:mfaChallengeId,code:mfaCode.trim()});if(error)throw error;const {data,error:sessionError}=await supabase.auth.getSession();if(sessionError)throw sessionError;setSession(data.session||null);setMfaCode('');setMfaRequired(false);setNotice('احراز هویت دومرحله‌ای تأیید شد.');}catch(error){setNotice('تأیید کد دومرحله‌ای ناموفق بود: '+(error?.message||'کد را بررسی کنید.'));}finally{setSaving(false);}}
+ async function restartAdminMfa(){setSaving(true);setNotice('');try{if(mfaFactorId&&mfaMode==='pending'){const {error}=await supabase.auth.mfa.unenroll({factorId:mfaFactorId});if(error)throw error;}const {data:enrolled,error}=await supabase.auth.mfa.enroll({factorType:'totp',friendlyName:'Mahgold Admin'});if(error)throw error;setMfaFactorId(enrolled.id);setMfaQr(enrolled.totp?.qr_code||'');setMfaSecret(enrolled.totp?.secret||'');setMfaMode('enroll');const {data:challenge,error:challengeError}=await supabase.auth.mfa.challenge({factorId:enrolled.id});if(challengeError)throw challengeError;setMfaChallengeId(challenge.id);setMfaCode('');}catch(error){setNotice('شروع مجدد تنظیم MFA انجام نشد: '+(error?.message||'در صورت تداوم خطا با پشتیبانی تماس بگیرید.'));}finally{setSaving(false);}}
  const contentObject=(()=>{try{const parsed=typeof content==='string'?JSON.parse(content||'{}'):content;return parsed&&typeof parsed==='object'&&!Array.isArray(parsed)?parsed:{};}catch{return {};}})();
  const slideRows=Array.isArray(contentObject.slides)?contentObject.slides:(Array.isArray(contentObject.specials)?contentObject.specials.map(item=>({active:true,eyebrow:item?.kicker||'',title:item?.title||'',description:item?.sub||'',button:'مشاهده محصولات',image:item?.image||'',category:item?.category||'طلای زینتی'})):[]);
  function changeSiteContent(mutator){const next={...contentObject};mutator(next);setContent(JSON.stringify(next,null,2));}
@@ -182,7 +224,8 @@ async function saveQuote(){if(!quote.title?.trim()||!quote.symbol?.trim()||Numbe
  const productRows=filtered.filter(p=>showInactiveProducts?p.is_active===false:p.is_active!==false);
  if(checking)return <div className="admin-gate">در حال بررسی نشست امن…</div>;
  if(!session)return <div className="admin-gate"><form className="admin-login" onSubmit={login}><img src={MAHGOLD_LOGO} alt="لوگوی مه‌گلد"/><h1>ورود مدیریت مه‌گلد</h1><p>برای ورود، حساب مدیر فروشگاه را وارد کنید.</p><input type="email" required placeholder="ایمیل مدیر" value={email} onChange={e=>setEmail(e.target.value)}/><input type="password" required placeholder="رمز عبور" value={password} onChange={e=>setPassword(e.target.value)}/><button disabled={saving}>{saving?"در حال ورود…":"ورود امن"}</button>{notice&&<small>{notice}</small>}<a href="#home">بازگشت به فروشگاه</a></form></div>;
- if(checkingAdmin)return <div className="admin-gate">در حال بررسی مجوز مدیریت…</div>;
+ if(checkingAdmin)return <div className="admin-gate">در حال بررسی مجوز مدیریت و احراز هویت دومرحله‌ای…</div>;
+ if(mfaRequired)return <div className="admin-gate"><form className="admin-login" onSubmit={verifyAdminMfa}><img src={MAHGOLD_LOGO} alt="لوگوی مه‌گلد"/><h1>تأیید دومرحله‌ای مدیر</h1><p>{mfaMode==='enroll'?'کد QR را با برنامه Authenticator اسکن کنید؛ سپس کد ۶ رقمی را وارد کنید.':mfaMode==='pending'?'یک تنظیم احراز هویت نیمه‌کاره پیدا شد. اگر کلید قبلی را در برنامه Authenticator ذخیره کرده‌اید، کد آن را وارد کنید؛ در غیر این صورت تنظیم را از نو آغاز کنید.':'کد جاری برنامه Authenticator را برای ورود مدیر وارد کنید.'}</p>{mfaQr&&<img src={mfaQr} alt="QR احراز هویت دومرحله‌ای" style={{width:220,height:220,margin:'12px auto',background:'#fff',padding:10,borderRadius:12}}/>}{mfaSecret&&<p style={{direction:'ltr',wordBreak:'break-all',fontSize:12}}>کلید دستی: {mfaSecret}</p>}<input inputMode="numeric" autoComplete="one-time-code" maxLength={8} required placeholder="کد یک‌بارمصرف" value={mfaCode} onChange={e=>setMfaCode(e.target.value.replace(/\D/g,'').slice(0,8))}/><button disabled={saving||!mfaChallengeId}>{saving?'در حال تأیید…':'تأیید و ورود به پنل'}</button>{mfaMode==='pending'&&<button type="button" disabled={saving} onClick={restartAdminMfa}>شروع مجدد تنظیم احراز هویت</button>}{notice&&<small>{notice}</small>}<button type="button" onClick={()=>supabase.auth.signOut()}>خروج از حساب</button></form></div>;
  if(!adminOk)return <div className="admin-gate"><div className="admin-login"><h2>دسترسی مجاز نیست</h2><p>این حساب هم‌زمان باید نقش مدیر و مجوز مدیریتی فروشگاه را داشته باشد.</p><button onClick={()=>supabase.auth.signOut()}>خروج از حساب</button></div></div>;
  const count=(key)=>money(key==='customers'?(data[key]||[]).filter(x=>x.role==='customer').length:(data[key]?.length||0));
  const goldQuote=data.quotes.find(q=>q.symbol==='gold_18k');
