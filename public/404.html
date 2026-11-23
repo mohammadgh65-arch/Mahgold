@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>در حال انتقال به مه‌گلد…</title>
+</head>
+<body>
+  <p>در حال باز کردن صفحه مه‌گلد…</p>
+  <script>
+    (function () {
+      var locationRef = window.location;
+      var requestedPath = locationRef.pathname + locationRef.search;
+      locationRef.replace(locationRef.origin + '/?p=' + encodeURIComponent(requestedPath) + locationRef.hash);
+    })();
+  </script>
+</body>
+</html>
