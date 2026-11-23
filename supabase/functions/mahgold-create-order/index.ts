@@ -41,6 +41,12 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return response(405, { error: "Method not allowed" });
 
+  // Fail closed: new orders remain disabled until licensing and a verified payment
+  // gateway callback are ready. Enable only by setting MAHGOLD_ORDERS_ENABLED=true.
+  if (Deno.env.get("MAHGOLD_ORDERS_ENABLED") !== "true") {
+    return response(503, { error: "ثبت سفارش آنلاین تا تکمیل مجوزها و راه‌اندازی پرداخت امن غیرفعال است." });
+  }
+
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
