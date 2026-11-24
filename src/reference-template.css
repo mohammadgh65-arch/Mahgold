@@ -643,3 +643,62 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 .ref-primary-nav{justify-content:flex-start}
 .ref-primary-nav a{display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .ref-primary-nav a svg{flex:none;color:#8b682d}
+
+
+/* MAHGOLD LOGO FIT — consistent, uncropped brand artwork on desktop and mobile */
+.ref-brand-masthead{
+  height:clamp(150px,20vw,220px)!important;
+  background:#031b12!important;
+}
+.ref-brand-masthead img{
+  width:100%!important;
+  height:100%!important;
+  max-width:1440px!important;
+  margin-inline:auto!important;
+  padding:8px 14px!important;
+  box-sizing:border-box!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  image-rendering:auto!important;
+}
+.ref-footer-brand{
+  height:clamp(150px,20vw,220px)!important;
+  background:#062719!important;
+}
+.ref-footer-brand img{
+  width:100%!important;
+  height:100%!important;
+  max-width:1440px!important;
+  margin-inline:auto!important;
+  padding:8px 14px!important;
+  box-sizing:border-box!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  image-rendering:auto!important;
+}
+@media(max-width:767px){
+  .ref-brand-masthead,.ref-footer-brand{
+    height:clamp(118px,34vw,158px)!important;
+  }
+  .ref-brand-masthead img,.ref-footer-brand img{
+    padding:7px 10px!important;
+    object-fit:contain!important;
+    object-position:center!important;
+  }
+  /* Keep the Home item anchored to the right edge on mobile. */
+  .ref-primary-nav{
+    display:flex!important;
+    order:0!important;
+    flex:0 0 auto!important;
+    min-width:0!important;
+    margin-left:auto!important;
+    margin-right:0!important;
+    justify-content:flex-start!important;
+  }
+  .ref-primary-nav a{
+    padding:10px 12px 8px!important;
+    white-space:nowrap!important;
+  }
+  .ref-mobile-menu{order:1!important}
+  .ref-header-actions{order:2!important}
+}
