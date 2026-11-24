@@ -234,7 +234,7 @@ export default function App() {
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
   const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||window.location.pathname==='/admin'||window.location.pathname==='/admin/'||window.location.hash==='#mahgold-control');
 
-  const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})),[siteContent]);
+  const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})).filter(tile=>!['طلای آب‌شده','شمش'].includes(tile.name)),[siteContent]);
   const offerItems=useMemo(()=>{
     const excludedOfferItem=(category,title='')=>/شمش|آب\s*شده|آبشده/.test(`${category||''} ${title||''}`.replace(/ي/g,'ی'));
     const current=products.filter(product=>Number(product.price_toman)>0&&!excludedOfferItem(product.category,product.name)).slice(0,5).map(product=>({
@@ -424,11 +424,11 @@ export default function App() {
       <div className="ref-main-header mx-auto max-w-[1440px] px-4 md:px-6">
         <button aria-label="منو" className="ref-mobile-menu md:hidden" onClick={()=>setMenuOpen(v=>!v)}><Menu size={20}/></button>
         <a aria-label="مه‌گلد - صفحه اصلی" className="ref-brand" href="#home">
-          <img src={siteContent?.logo_url||MAHGOLD_LOGO} alt="لوگوی مه‌گلد"/>
+          <img src="/mahgold-logo.webp" alt="لوگوی مه‌گلد" fetchPriority="high"/>
           <span>مه‌گلد</span>
         </a>
         <nav className="ref-primary-nav" aria-label="منوی اصلی">
-          <a className="active" href="#home">خانه</a>
+          <a className="active" href="#home"><House size={16} strokeWidth={2.2} aria-hidden="true"/>خانه</a>
         </nav>
         <label className="ref-header-search"><Search size={16}/><input aria-label="جستجوی محصولات" value={query} onChange={e=>setQuery(e.target.value)} placeholder="جستجو در محصولات..."/></label>
         <div className="ref-header-actions">
