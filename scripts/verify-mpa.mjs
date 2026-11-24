@@ -24,6 +24,8 @@ for (const token of ["PAGE_SEO", "CATEGORY_COPY", "PUBLIC_ORIGIN", "application/
   if (!worker.includes(token)) failures.push("SEO implementation is missing: " + token);
 }
 if (!worker.includes("Disallow: /admin/") || !worker.includes("Disallow: /cart/") || !worker.includes("Disallow: /checkout/")) failures.push("Robots exclusions for private/transactional pages are missing.");
+const wrangler = await readFile("wrangler.jsonc", "utf8").catch(() => "");
+if (!wrangler.includes('"/robots.txt"') || !wrangler.includes('"/sitemap.xml"')) failures.push("SEO Worker endpoints are not configured to run before static assets.");
 if (!worker.includes("noindex, nofollow")) failures.push("Staging/private page noindex protection is missing.");
 const sharedCss = await readFile("assets/mpa.css", "utf8").catch(() => "");
 for (const token of [":focus-visible", "prefers-reduced-motion", "@media(max-width:620px)"]) {
