@@ -54,6 +54,7 @@ jobs:
         run: |
           cp Mahgold_Footer_Premium_Quality.html dist/index.html
           cp Mahgold_Footer_Premium_Quality.html dist/404.html
+          node --input-type=module -e "import{readFileSync,writeFileSync}from'node:fs';for(const f of ['dist/index.html','dist/404.html']){const s=readFileSync(f,'utf8');const css=readFileSync('src/mahgold-header-footer.css','utf8');if(!s.includes('</head>'))throw new Error('Missing head in '+f);writeFileSync(f,s.replace('</head>','<style id=\"mahgold-compact-brand-trim\">'+css+'</style></head>'))}"
           node scripts/remove-lovable-assets.mjs
           test -s dist/mahgold-header.webp
           test -s dist/mahgold-brand-masthead.jpg
