@@ -47,6 +47,24 @@ else {
   catch (error) { failures.push("Admin application JavaScript syntax error: " + error.message); }
 }
 if (!admin.includes("getAuthenticatorAssuranceLevel") || (admin.split("await Vn()").length - 1) !== 3) failures.push("Admin financial MFA must guard product pricing, market quote and store pricing settings.");
+const productModule = await readFile("assets/product.mjs", "utf8").catch(() => "");
+for (const token of ['attributes', 'function attrRows', 'specs.map', 'MahgoldCartUI?.add']) {
+  if (!productModule.includes(token)) failures.push("Product detail dynamic attributes/cart integration missing: " + token);
+}
+const adminAttributes = ['مشخصات اختصاصی این محصول', '＋ افزودن مشخصه', 'admin-product-attribute-row', 'حذف'];
+for (const token of adminAttributes) {
+  if (!admin.includes(token)) failures.push("Admin dynamic product attribute editor missing: " + token);
+}
+const cartUi = await readFile("assets/cart-ui.mjs", "utf8").catch(() => "");
+for (const token of ['localStorage.setItem(KEY', 'cart-count', 'cart-toast', 'aria-live', 'window.MahgoldCartUI']) {
+  if (!cartUi.includes(token)) failures.push("Cart counter/toast/persistence behavior missing: " + token);
+}
+const cartPage = await readFile("assets/cart.mjs", "utf8").catch(() => "");
+for (const token of ['data-inc', 'data-dec', 'data-del', 'localStorage.setItem("mahgold_cart"']) {
+  if (!cartPage.includes(token)) failures.push("Cart quantity/removal/persistence behavior missing: " + token);
+}
+const listing = await readFile("assets/products.mjs", "utf8").catch(() => "");
+if (!listing.includes('window.MahgoldCartUI.add(p)') || !listing.includes('data-add')) failures.push("Product listing add-to-cart integration is missing.");
 if (failures.length) {
   console.error(failures.join("\n"));
   process.exitCode = 1;
