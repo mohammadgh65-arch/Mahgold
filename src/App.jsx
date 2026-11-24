@@ -1,5 +1,5 @@
 import { MAHGOLD_LOGO } from './mahgold-brand';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn, ZoomOut,
   ShieldCheck, Gift, Headphones, Plus, Minus, UserRound, LogOut,
@@ -62,6 +62,34 @@ function ProductImage({product, className='', onClick}) {
   const src = !failed && product.image_url ? product.image_url : tiles.find(t=>t.name===product.category)?.image || tiles[0].image;
   return <div className={'ref-product-image ' + className} onClick={onClick} role={onClick?'button':undefined} tabIndex={onClick?0:undefined} onKeyDown={onClick?(e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick();}}):undefined}>
     <img src={src} alt={product.name || 'محصول مه‌گلد'} loading="lazy" onError={()=>setFailed(true)}/>
+  </div>;
+}
+
+
+function ProductDetailImage({product,onClick}) {
+  const [failed,setFailed]=useState(false);
+  const [lens,setLens]=useState(null);
+  const imageBox=useRef(null);
+  const touchGesture=useRef(false);
+  const src=!failed&&product.image_url?product.image_url:tiles.find(t=>t.name===product.category)?.image||tiles[0].image;
+  const updateLens=event=>{
+    const touch=event.touches?.[0];
+    const box=imageBox.current;
+    if(!touch||!box)return;
+    const rect=box.getBoundingClientRect();
+    const x=Math.max(0,Math.min(rect.width,touch.clientX-rect.left));
+    const y=Math.max(0,Math.min(rect.height,touch.clientY-rect.top));
+    setLens({x,y,px:rect.width?x/rect.width*100:50,py:rect.height?y/rect.height*100:50,width:rect.width,height:rect.height});
+  };
+  const startTouch=event=>{touchGesture.current=true;updateLens(event);};
+  const endTouch=()=>{setLens(null);window.setTimeout(()=>{touchGesture.current=false;},450);};
+  const handleClick=()=>{if(touchGesture.current)return;onClick?.();};
+  const lensLeft=lens?Math.max(8,Math.min(lens.width-158,lens.x-79)):0;
+  const lensTop=lens?Math.max(8,lens.y-184):0;
+  return <div ref={imageBox} className="ref-product-image ref-product-page-image ref-product-touch-image" onClick={handleClick} onTouchStart={startTouch} onTouchMove={updateLens} onTouchEnd={endTouch} onTouchCancel={endTouch} role="button" tabIndex={0} aria-label="برای مشاهده جزئیات تصویر، انگشت را روی آن حرکت دهید" onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick?.();}}}>
+    <img src={src} alt={product.name||'محصول مه‌گلد'} onError={()=>setFailed(true)} draggable="false"/>
+    <span className="ref-product-touch-hint">با حرکت انگشت، جزئیات طلا را بزرگ‌نمایی کنید</span>
+    {lens&&<span className="ref-product-touch-lens" style={{left:lensLeft,top:lensTop,backgroundImage:`url("${src}")`,backgroundPosition:`${lens.px}% ${lens.py}%`}} aria-hidden="true"/>}
   </div>;
 }
 
@@ -555,16 +583,22 @@ export default function App() {
     {selectedProduct&&<div className="ref-product-page">
       <div className="ref-product-page-top"><button className="ref-product-back" onClick={closeProduct}><ArrowLeft size={17}/> بازگشت به فروشگاه</button><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span></div>
       <div className="ref-product-page-grid">
-        <ProductImage product={selectedProduct} className="ref-product-page-image" onClick={()=>{setZoomScale(1);setZoomOpen(true);}}/>
+        <ProductDetailImage product={selectedProduct} onClick={()=>{setZoomScale(1);setZoomOpen(true);}}/>
         <div className="ref-product-page-copy">
-          <span className="text-xs text-muted-foreground">{selectedProduct.category}</span>
+          <div className="ref-product-detail-heading">
+            <span className="ref-product-detail-kicker">MAHGOLD · SELECTED PIECE</span>
+            <span className="ref-product-detail-category">{selectedProduct.category}</span>
+          </div>
           <h1>{selectedProduct.name}</h1>
           <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
-          <div className="ref-product-specs">
-            <div><span>وزن</span><b>{gram(selectedProduct.weight_grams)}</b></div>
-            <div><span>عیار</span><b>{money(selectedProduct.karat||18)}</b></div>
-            <div><span>موجودی</span><b>{money(selectedProduct.stock||0)} عدد</b></div>
-            {Object.entries(selectedProduct.attributes||{}).filter(([key,value])=>!hiddenProductAttributeKeys.has(String(key).trim())&&String(key).trim()&&String(value??'').trim()).map(([key,value])=><div key={key}><span>{String(key).trim()}</span><b>{String(value)}</b></div>)}
+          <div className="ref-product-specs-wrap">
+            <h2 className="ref-product-specs-title">مشخصات محصول</h2>
+            <div className="ref-product-specs">
+              <div><span>وزن</span><b>{gram(selectedProduct.weight_grams)}</b></div>
+              <div><span>عیار</span><b>{money(selectedProduct.karat||18)}</b></div>
+              <div><span>موجودی</span><b>{money(selectedProduct.stock||0)} عدد</b></div>
+              {Object.entries(selectedProduct.attributes||{}).filter(([key,value])=>!hiddenProductAttributeKeys.has(String(key).trim())&&String(key).trim()&&String(value??'').trim()).map(([key,value])=><div key={key}><span>{String(key).trim()}</span><b>{Array.isArray(value)?value.filter(Boolean).join('، '):typeof value==='object'?Object.entries(value).map(([k,v])=>k+': '+v).join(' · '):String(value)}</b></div>)}
+            </div>
           </div>
           <strong className="ref-product-page-price">{money(selectedProduct.price_toman)} <small>تومان</small></strong>
           <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1||(selectedProduct.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(selectedProduct)}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
