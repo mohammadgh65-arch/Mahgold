@@ -3,7 +3,7 @@ import { constants } from "node:fs";
 import { Script } from "node:vm";
 
 const pages = ["index.html","products/index.html","category/jewelry/index.html","category/melted-gold/index.html","category/coins/index.html","category/bars/index.html","product/index.html","cart/index.html","checkout/index.html","about/index.html","contact/index.html","admin/index.html","404.html"];
-const modules = ["assets/products.mjs","assets/category.mjs","assets/product.mjs","assets/cart.mjs","assets/checkout.mjs","assets/mpa.css","worker.js","wrangler.jsonc",".assetsignore","supabase/functions/mahgold-create-order/index.ts"];
+const modules = ["assets/products.mjs","assets/category.mjs","assets/product.mjs","assets/cart.mjs","assets/checkout.mjs","assets/cart-ui.mjs","assets/mpa.css","worker.js","wrangler.jsonc",".assetsignore","supabase/functions/mahgold-create-order/index.ts"];
 const failures = [];
 for (const path of [...pages, ...modules]) {
   try { await access(path, constants.R_OK); }
@@ -20,6 +20,11 @@ for (const path of pages) {
 }
 const worker = await readFile("worker.js", "utf8").catch(() => "");
 if (!worker.includes("env.ASSETS.fetch") || !worker.includes("/product/index.html")) failures.push("Worker product route resolver is missing.");
+for (const token of ["PAGE_SEO", "CATEGORY_COPY", "PUBLIC_ORIGIN", "application/ld+json", "schema.org/Product", "/robots.txt", "/sitemap.xml", "X-Robots-Tag"]) {
+  if (!worker.includes(token)) failures.push("SEO implementation is missing: " + token);
+}
+if (!worker.includes("Disallow: /admin/") || !worker.includes("Disallow: /cart/") || !worker.includes("Disallow: /checkout/")) failures.push("Robots exclusions for private/transactional pages are missing.");
+if (!worker.includes("noindex, nofollow")) failures.push("Staging/private page noindex protection is missing.");
 const sharedCss = await readFile("assets/mpa.css", "utf8").catch(() => "");
 for (const token of [":focus-visible", "prefers-reduced-motion", "@media(max-width:620px)"]) {
   if (!sharedCss.includes(token)) failures.push("Shared CSS accessibility/mobile rule missing: " + token);
