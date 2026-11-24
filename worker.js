@@ -76,6 +76,7 @@ function seoHead(response, url, seo, options = {}) {
         '<meta property="og:title" content="' + escapeHtml(title) + '">' +
         '<meta property="og:description" content="' + escapeHtml(description) + '">' +
         '<meta property="og:url" content="' + escapeHtml(canonical) + '">' +
+        (options.image ? '<meta property="og:image" content="' + escapeHtml(options.image) + '">' : "") +
         '<meta name="twitter:card" content="summary_large_image">' +
         '<meta name="twitter:title" content="' + escapeHtml(title) + '">' +
         '<meta name="twitter:description" content="' + escapeHtml(description) + '">' +
@@ -125,7 +126,7 @@ async function productDocument(request, env, url, productId) {
       priceCurrency: "IRR",
       price: String(Math.round(Number(product.price_toman) * 10)),
       seller: { "@type": "Organization", name: "مه‌گلد" },
-      availability: Number(product.stock) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      ...(product.stock != null ? { availability: Number(product.stock) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" } : {}),
       itemCondition: "https://schema.org/NewCondition"
     };
   }
@@ -136,7 +137,7 @@ async function productDocument(request, env, url, productId) {
     .on("#product-description", { element(element) { element.setInnerContent(description); } })
     .transform(template);
   const seoResponse = seoHead(transformed, url, { title: title + " | خرید و مشخصات محصول | مه‌گلد", description }, {
-    canonical, schema, ogType: "product", noindex: url.hostname.endsWith("workers.dev")
+    canonical, schema, image: product.image_url && /^https?:\/\//i.test(product.image_url) ? product.image_url : undefined, ogType: "product", noindex: url.hostname.endsWith("workers.dev")
   });
   const headers = new Headers(seoResponse.headers);
   headers.set("Cache-Control", "no-store");
@@ -206,11 +207,18 @@ export default {
     if (seo && response.headers.get("content-type")?.includes("text/html")) {
       const schema = route === "/" ? {
         "@context": "https://schema.org",
-        "@type": "Organization",
-        name: "مه‌گلد",
-        url: PUBLIC_ORIGIN,
-        description: PAGE_SEO["/"].description
-      } : undefined;
+        "@graph": [
+          { "@type": "Organization", name: "مه‌گلد", url: PUBLIC_ORIGIN, description: PAGE_SEO["/"].description },
+          { "@type": "WebSite", name: "مه‌گلد", url: PUBLIC_ORIGIN, inLanguage: "fa-IR" }
+        ]
+      } : (CATEGORY_COPY[route] ? {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: CATEGORY_COPY[route].heading,
+        description: PAGE_SEO[route].description,
+        url: absolute(route),
+        inLanguage: "fa-IR"
+      } : undefined);
       output = seoHead(output, url, seo, { schema, noindex: url.hostname.endsWith("workers.dev") });
     }
     const category = CATEGORY_COPY[route];
