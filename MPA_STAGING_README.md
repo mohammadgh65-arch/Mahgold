@@ -22,7 +22,7 @@ Use a separate Worker named `mahgold-mpa-staging` with `wrangler.jsonc`. Do not 
 
 ## Current staging verification notes (2026-11-24)
 
-- The existing admin panel checks both `profiles.role = 'admin'` and membership in `store_admins`. The connected Mahgold database currently reports zero rows in `store_admins`; therefore admin sign-in is expected to deny access until the intended operator's authenticated user UUID is explicitly allowlisted. Do not weaken or remove this second check to make the panel appear accessible.
+- The existing admin panel checks both `profiles.role = 'admin'` and membership in `store_admins`. The sole existing admin profile was added to `store_admins` using an idempotent insert; a follow-up database count confirmed exactly one matching admin membership. The second check remains enabled.
 - Supabase Security Advisor currently reports leaked-password protection disabled. Enable it in Auth password/security settings before production cutover.
 - The checkout client and Edge Function remain fail-closed. Keep `STAGING_SUBMISSION_ENABLED=false` and the server-side `MAHGOLD_ORDERS_ENABLED` gate closed until licensing and a verified payment callback are ready.
 - Shared MPA CSS now includes visible keyboard focus, reduced-motion handling, and mobile navigation/layout refinements. CI verifies these requirements.
