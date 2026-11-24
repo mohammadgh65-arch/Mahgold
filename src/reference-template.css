@@ -877,3 +877,64 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
     background-size:420% 420%!important;
   }
 }
+
+
+/* MAHGOLD BRAND LOCKUP — full artwork, edge-to-edge, uncropped, native image ratio */
+.ref-brand-masthead{
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  aspect-ratio:782 / 180;
+  padding:0!important;
+  margin:0!important;
+  overflow:hidden!important;
+  background:#062318!important;
+}
+.ref-brand-masthead:before,
+.ref-brand-masthead:after{display:none!important;content:none!important}
+.ref-brand-masthead img{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  max-width:none!important;
+  aspect-ratio:782 / 180;
+  object-fit:contain!important;
+  object-position:center!important;
+  transform:none!important;
+  filter:none!important;
+  mask-image:none!important;
+  -webkit-mask-image:none!important;
+  image-rendering:auto;
+}
+.ref-footer-brand{
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  height:auto!important;
+  aspect-ratio:782 / 180;
+  margin:0 auto 18px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#08271c!important;
+  box-shadow:none!important;
+}
+.ref-footer-brand img{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  aspect-ratio:782 / 180;
+  object-fit:contain!important;
+  object-position:center!important;
+  border:0!important;
+  border-radius:0!important;
+  image-rendering:auto;
+}
+footer.bg-ink{padding-top:0!important}
+@media(max-width:767px){
+  .ref-brand-masthead,
+  .ref-footer-brand{height:auto!important;min-height:0!important;aspect-ratio:782 / 180}
+  .ref-brand-masthead img,
+  .ref-footer-brand img{height:auto!important;object-fit:contain!important}
+}
