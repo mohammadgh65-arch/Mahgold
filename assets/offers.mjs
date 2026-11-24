@@ -127,10 +127,8 @@ async function initOffers() {
   return true;
 }
 
-let attempts = 0;
 const observer = new MutationObserver(() => {
-  if (initOffers()) observer.disconnect();
-  else if (++attempts > 100) observer.disconnect();
+  initOffers().then(mounted => { if (mounted) observer.disconnect(); }).catch(error => console.error("Mahgold offers:", error));
 });
 observer.observe(document.documentElement, { childList: true, subtree: true });
-if (initOffers()) observer.disconnect();
+initOffers().then(mounted => { if (mounted) observer.disconnect(); }).catch(error => console.error("Mahgold offers:", error));
