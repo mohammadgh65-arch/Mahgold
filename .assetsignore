@@ -1,8 +1,0 @@
-.git/
-.github/
-supabase/
-scripts/
-worker.js
-wrangler.jsonc
-*.md
-CNAME
