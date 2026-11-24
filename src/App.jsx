@@ -1,5 +1,5 @@
 import { MAHGOLD_LOGO } from './mahgold-brand';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn, ZoomOut,
   ShieldCheck, Gift, Headphones, Plus, Minus, UserRound, LogOut,
@@ -62,6 +62,34 @@ function ProductImage({product, className='', onClick}) {
   const src = !failed && product.image_url ? product.image_url : tiles.find(t=>t.name===product.category)?.image || tiles[0].image;
   return <div className={'ref-product-image ' + className} onClick={onClick} role={onClick?'button':undefined} tabIndex={onClick?0:undefined} onKeyDown={onClick?(e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick();}}):undefined}>
     <img src={src} alt={product.name || 'محصول مه‌گلد'} loading="lazy" onError={()=>setFailed(true)}/>
+  </div>;
+}
+
+
+function ProductDetailImage({product,onClick}) {
+  const [failed,setFailed]=useState(false);
+  const [lens,setLens]=useState(null);
+  const imageBox=useRef(null);
+  const touchGesture=useRef(false);
+  const src=!failed&&product.image_url?product.image_url:tiles.find(t=>t.name===product.category)?.image||tiles[0].image;
+  const updateLens=event=>{
+    const touch=event.touches?.[0];
+    const box=imageBox.current;
+    if(!touch||!box)return;
+    const rect=box.getBoundingClientRect();
+    const x=Math.max(0,Math.min(rect.width,touch.clientX-rect.left));
+    const y=Math.max(0,Math.min(rect.height,touch.clientY-rect.top));
+    setLens({x,y,px:rect.width?x/rect.width*100:50,py:rect.height?y/rect.height*100:50,width:rect.width,height:rect.height});
+  };
+  const startTouch=event=>{touchGesture.current=true;updateLens(event);};
+  const endTouch=()=>{setLens(null);window.setTimeout(()=>{touchGesture.current=false;},450);};
+  const handleClick=()=>{if(touchGesture.current)return;onClick?.();};
+  const lensLeft=lens?Math.max(8,Math.min(lens.width-148,lens.x-74)):0;
+  const lensTop=lens?Math.max(8,lens.y-184):0;
+  return <div ref={imageBox} className="ref-product-image ref-product-page-image ref-product-touch-image" onClick={handleClick} onTouchStart={startTouch} onTouchMove={updateLens} onTouchEnd={endTouch} onTouchCancel={endTouch} role="button" tabIndex={0} aria-label="برای مشاهده جزئیات تصویر، انگشت را روی آن حرکت دهید" onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick?.();}}}>
+    <img src={src} alt={product.name||'محصول مه‌گلد'} onError={()=>setFailed(true)} draggable="false"/>
+    <span className="ref-product-touch-hint">با حرکت انگشت، جزئیات طلا را بزرگ‌نمایی کنید</span>
+    {lens&&<span className="ref-product-touch-lens" style={{left:lensLeft,top:lensTop,backgroundImage:`url("${src}")`,backgroundPosition:`${lens.px}% ${lens.py}%`}} aria-hidden="true"/>}
   </div>;
 }
 
@@ -195,7 +223,8 @@ export default function App() {
   const [cartToast,setCartToast]=useState('');
   const [customer,setCustomer]=useState({name:'',phone:'',email:'',address:'',city:'',postalCode:'',note:''});
   const [menuOpen,setMenuOpen]=useState(false);
-  const [activeSlide,setActiveSlide]=useState(0);
+  const [activeOffer,setActiveOffer]=useState(0);
+  const [offerTransition,setOfferTransition]=useState(true);
   const [products,setProducts]=useState([]);
   const [dbCategories,setDbCategories]=useState([]);
   const [quote,setQuote]=useState(null);
@@ -205,9 +234,21 @@ export default function App() {
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
   const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||window.location.pathname==='/admin'||window.location.pathname==='/admin/'||window.location.hash==='#mahgold-control');
 
-  const displaySlides=useMemo(()=>{const rows=(siteContent?.slides||[]).filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
-  const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})),[siteContent]);
-  useEffect(()=>{setActiveSlide(index=>Math.min(index,displaySlides.length-1));},[displaySlides.length]);
+  const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})).filter(tile=>!['طلای آب‌شده','شمش'].includes(tile.name)),[siteContent]);
+  const offerItems=useMemo(()=>{
+    const excludedOfferItem=(category,title='')=>/شمش|آب\s*شده|آبشده/.test(`${category||''} ${title||''}`.replace(/ي/g,'ی'));
+    const current=products.filter(product=>Number(product.price_toman)>0&&!excludedOfferItem(product.category,product.name)).slice(0,5).map(product=>({
+      id:product.id,title:product.name,category:product.category,
+      image:product.image_url||tiles.find(tile=>tile.name===product.category)?.image||tiles[0].image,
+      product
+    }));
+    const fallback=[
+      ...slides.filter(slide=>!excludedOfferItem(slide.category,slide.title)).map(slide=>({title:slide.title,category:slide.category,image:slide.image,product:null})),
+      ...tiles.filter(tile=>!excludedOfferItem(tile.name,tile.desc)).map(tile=>({title:tile.name,category:tile.name,image:tile.image,product:null}))
+    ];
+    return [...current,...fallback.slice(0,Math.max(0,5-current.length))].slice(0,5);
+  },[products]);
+  const offerTrackItems=useMemo(()=>[...offerItems,...offerItems.slice(0,3)],[offerItems]);
   useEffect(()=>{const timer=setInterval(()=>setClockNow(Date.now()),15000);return()=>clearInterval(timer);},[]);
   useEffect(()=>{
     if(!supabase)return;
@@ -220,7 +261,21 @@ export default function App() {
     const timer=setInterval(refreshGoldQuote,60000);
     return()=>{active=false;clearInterval(timer);};
   },[]);
-  useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%displaySlides.length),6000);return()=>clearInterval(timer);},[displaySlides.length]);
+  useEffect(()=>{setActiveOffer(0);setOfferTransition(true);},[offerItems.length]);
+  useEffect(()=>{
+    if(offerItems.length<2)return;
+    const timer=setInterval(()=>setActiveOffer(index=>index+1),3700);
+    return()=>clearInterval(timer);
+  },[offerItems.length]);
+  useEffect(()=>{
+    if(activeOffer<offerItems.length)return;
+    const timer=setTimeout(()=>{
+      setOfferTransition(false);
+      setActiveOffer(0);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>setOfferTransition(true)));
+    },750);
+    return()=>clearTimeout(timer);
+  },[activeOffer,offerItems.length]);
   useEffect(()=>{if(!supabase)return;let active=true;supabase.from('site_content').select('content').eq('id',1).maybeSingle().then(({data})=>{if(active&&data?.content)setSiteContent(data.content);});return()=>{active=false;};},[]);
   useEffect(()=>{
     const syncAdminRoute=()=>{
@@ -369,16 +424,11 @@ export default function App() {
       <div className="ref-main-header mx-auto max-w-[1440px] px-4 md:px-6">
         <button aria-label="منو" className="ref-mobile-menu md:hidden" onClick={()=>setMenuOpen(v=>!v)}><Menu size={20}/></button>
         <a aria-label="مه‌گلد - صفحه اصلی" className="ref-brand" href="#home">
-          <img src={siteContent?.logo_url||MAHGOLD_LOGO} alt="لوگوی مه‌گلد"/>
+          <img src="/mahgold-logo.webp" alt="لوگوی مه‌گلد" fetchPriority="high"/>
           <span>مه‌گلد</span>
         </a>
-        <nav className="ref-primary-nav">
-          <a className="active" href="#home">خانه</a>
-          <button type="button" onClick={()=>setAccountOpen(true)}>پیگیری سفارش</button>
-          <a href="#categories" onClick={()=>setCategory('طلای زینتی')}>طلای زینتی</a>
-          <a href="#categories" onClick={()=>setCategory('طلای آب‌شده')}>طلای آب‌شده</a>
-          <a href="#categories" onClick={()=>setCategory('سکه')}>سکه</a>
-          <a href="#categories" onClick={()=>setCategory('شمش')}>شمش</a>
+        <nav className="ref-primary-nav" aria-label="منوی اصلی">
+          <a className="active" href="#home"><House size={16} strokeWidth={2.2} aria-hidden="true"/>خانه</a>
         </nav>
         <label className="ref-header-search"><Search size={16}/><input aria-label="جستجوی محصولات" value={query} onChange={e=>setQuery(e.target.value)} placeholder="جستجو در محصولات..."/></label>
         <div className="ref-header-actions">
@@ -386,37 +436,39 @@ export default function App() {
           <button aria-label="سبد خرید" className="ref-header-cart" onClick={()=>setCartOpen(true)}><ShoppingBag size={20}/>{cartCount>0&&<b>{money(cartCount)}</b>}</button>
         </div>
       </div>
-      {menuOpen&&<nav className="ref-mobile-links flex flex-col gap-4 border-t border-border bg-background px-5 py-4 text-sm text-muted-foreground md:hidden">
-        <a href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a><a href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a><a href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a><button className="text-right" onClick={()=>{setAccountOpen(true);setMenuOpen(false);}}>پیگیری سفارش</button>
-        <button className="text-right" onClick={()=>{setAccountOpen(true);setMenuOpen(false);}}>ورود / ثبت‌نام</button>
+      {menuOpen&&<nav aria-label="منوی موبایل" className="ref-mobile-links flex flex-col gap-4 border-t border-border bg-background px-5 py-4 text-sm text-muted-foreground md:hidden">
+        <a href="#home" onClick={()=>setMenuOpen(false)}>خانه</a>
       </nav>}
     </header>
 
     <main className="min-h-[60vh]" id="home">
-      <section aria-label="اسلایدهای مه‌گلد" aria-roledescription="carousel" className="ref-hero relative h-[330px] overflow-hidden bg-ink text-ink-foreground md:h-[390px]">
-        {displaySlides.map((slide,index)=><div key={slide.image} aria-hidden={activeSlide!==index} className={'absolute inset-0 transition-opacity duration-1000 '+(activeSlide===index?'z-10 opacity-100':'pointer-events-none z-0 opacity-0')}>
-          <img alt={slide.title} className="h-full w-full object-cover transition-transform duration-[7000ms] ease-out" src={slide.image} loading={index===0?'eager':'lazy'} style={{transform:activeSlide===index?'scale(1.05)':'scale(1)'}}/>
-          <div className="slide-shade absolute inset-0"/>
-          <div className="ref-hero-copy absolute inset-0 mx-auto flex max-w-7xl flex-col justify-center px-6 py-8 md:px-10">
-            <div className="max-w-[560px] text-right">
-              <div className="eyebrow animate-rise text-gold-light">{slide.eyebrow||'MAHGOLD'}</div>
-              <h1 className="animate-rise mt-3 text-[2.1rem] font-medium leading-[1.45] [animation-delay:120ms] md:text-6xl md:leading-[1.4]">{slide.title}</h1>
-              <p className="animate-rise mt-4 max-w-md text-sm leading-8 text-ink-muted [animation-delay:240ms] md:text-[15px]">{slide.description||''}</p>
-              <button className="mt-7 inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-gold-gradient px-7 text-sm font-bold text-ink shadow-gold transition-all hover:-translate-y-0.5 hover:brightness-110" onClick={()=>{setCategory(slide.category);document.getElementById('shop')?.scrollIntoView({behavior:'smooth'});}}>
-                {slide.button||'مشاهده محصولات'}<ArrowLeft size={16}/>
-              </button>
-            </div>
+      <section aria-label="پیشنهادات مه‌گلد" aria-roledescription="carousel" className="ref-offers-section">
+        <div className="ref-offers-heading">
+          <div>
+            <span className="ref-offers-eyebrow">MAHGOLD SELECTION</span>
+            <h1>پیشنهادات مه‌گلد</h1>
+            <p>انتخاب‌هایی چشم‌نواز از مجموعه مه‌گلد</p>
           </div>
-        </div>)}
-        <div className="absolute inset-x-0 bottom-7 z-20 flex justify-center gap-2">
-          {displaySlides.map((slide,index)=><button key={slide.image} aria-label={'اسلاید '+(index+1)} aria-current={activeSlide===index} className={'relative h-1.5 overflow-hidden rounded-full bg-ink-foreground/30 transition-all duration-500 '+(activeSlide===index?'w-10':'w-4 hover:bg-ink-foreground/60')} onClick={()=>setActiveSlide(index)}>
-            {activeSlide===index&&<span className="absolute inset-y-0 right-0 bg-gold" style={{width:'100%'}}/>}
-          </button>)}
+          <span className="ref-offers-count">۰۵ انتخاب منتخب</span>
         </div>
-        <div className="absolute bottom-6 left-8 z-20 hidden gap-2 md:flex">
-          <button aria-label="اسلاید قبلی" className="flex size-11 items-center justify-center rounded-full border border-ink-foreground/30 bg-ink/30 backdrop-blur transition hover:border-gold hover:text-gold-light" onClick={()=>setActiveSlide(i=>(i+displaySlides.length-1)%displaySlides.length)}><ChevronRight size={18}/></button>
-          <button aria-label="اسلاید بعدی" className="flex size-11 items-center justify-center rounded-full border border-ink-foreground/30 bg-ink/30 backdrop-blur transition hover:border-gold hover:text-gold-light" onClick={()=>setActiveSlide(i=>(i+1)%displaySlides.length)}><ChevronLeft size={18}/></button>
+        <div className="ref-offers-viewport">
+          <div className="ref-offers-track" style={{'--offer-index':activeOffer,transition:offerTransition?'transform 720ms cubic-bezier(.22,.75,.25,1)':'none'}}>
+            {offerTrackItems.map((item,index)=><button type="button" key={index} className="ref-offer-card" onClick={()=>{
+              if(item.product){openProduct(item.product);return;}
+              setCategory(item.category||'همه محصولات');
+              document.getElementById('shop')?.scrollIntoView({behavior:'smooth'});
+            }}>
+              <img src={item.image} alt={item.title} loading={index<3?'eager':'lazy'}/>
+              <span className="ref-offer-shade"/>
+              <span className="ref-offer-copy">
+                <small>{item.category||'منتخب مه‌گلد'}</small>
+                <b>{item.title}</b>
+                <em>{item.product?'مشاهده جزئیات محصول':'مشاهده مجموعه'} <ArrowLeft size={14}/></em>
+              </span>
+            </button>)}
+          </div>
         </div>
+        <div className="ref-offers-footer"><span>حرکت خودکار · هر ۳ ثانیه</span><span className="ref-offers-dots">{offerItems.map((item,index)=><i key={index} className={activeOffer%offerItems.length===index?'active':''}/>)}</span></div>
       </section>
 
                 <div className="ref-quote-strip">
@@ -555,16 +607,22 @@ export default function App() {
     {selectedProduct&&<div className="ref-product-page">
       <div className="ref-product-page-top"><button className="ref-product-back" onClick={closeProduct}><ArrowLeft size={17}/> بازگشت به فروشگاه</button><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span></div>
       <div className="ref-product-page-grid">
-        <ProductImage product={selectedProduct} className="ref-product-page-image" onClick={()=>{setZoomScale(1);setZoomOpen(true);}}/>
+        <ProductDetailImage product={selectedProduct} onClick={()=>{setZoomScale(1);setZoomOpen(true);}}/>
         <div className="ref-product-page-copy">
-          <span className="text-xs text-muted-foreground">{selectedProduct.category}</span>
+          <div className="ref-product-detail-heading">
+            <span className="ref-product-detail-kicker">MAHGOLD · SELECTED PIECE</span>
+            <span className="ref-product-detail-category">{selectedProduct.category}</span>
+          </div>
           <h1>{selectedProduct.name}</h1>
           <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
-          <div className="ref-product-specs">
-            <div><span>وزن</span><b>{gram(selectedProduct.weight_grams)}</b></div>
-            <div><span>عیار</span><b>{money(selectedProduct.karat||18)}</b></div>
-            <div><span>موجودی</span><b>{money(selectedProduct.stock||0)} عدد</b></div>
-            {Object.entries(selectedProduct.attributes||{}).filter(([key,value])=>!hiddenProductAttributeKeys.has(String(key).trim())&&String(key).trim()&&String(value??'').trim()).map(([key,value])=><div key={key}><span>{String(key).trim()}</span><b>{String(value)}</b></div>)}
+          <div className="ref-product-specs-wrap">
+            <h2 className="ref-product-specs-title">مشخصات محصول</h2>
+            <div className="ref-product-specs">
+              <div><span>وزن</span><b>{gram(selectedProduct.weight_grams)}</b></div>
+              <div><span>عیار</span><b>{money(selectedProduct.karat||18)}</b></div>
+              <div><span>موجودی</span><b>{money(selectedProduct.stock||0)} عدد</b></div>
+              {Object.entries(selectedProduct.attributes||{}).filter(([key,value])=>!hiddenProductAttributeKeys.has(String(key).trim())&&String(key).trim()&&String(value??'').trim()).map(([key,value])=><div key={key}><span>{String(key).trim()}</span><b>{Array.isArray(value)?value.filter(Boolean).join('، '):typeof value==='object'?Object.entries(value).map(([k,v])=>k+': '+v).join(' · '):String(value)}</b></div>)}
+            </div>
           </div>
           <strong className="ref-product-page-price">{money(selectedProduct.price_toman)} <small>تومان</small></strong>
           <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1||(selectedProduct.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(selectedProduct)}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
@@ -589,3 +647,5 @@ export default function App() {
     </div>}
   </div>;
 }
+
+// Build trigger: luxury dark-gold product specifications stylesheet update.

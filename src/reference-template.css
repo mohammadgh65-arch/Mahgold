@@ -440,3 +440,592 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 .ref-product-zoom-stage>.ref-product-zoom-image{display:none}
 .ref-product-zoom-stage>img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;transition:transform .18s ease;transform-origin:center}
 @media(max-width:700px){.ref-product-page{background:#f6efe2;padding:14px}.ref-product-page-image,.ref-product-page-image img{min-height:290px;max-height:390px}.ref-product-page-image img{padding:10px}.ref-product-page-image:after{font-size:9px}.ref-product-zoom{padding:12px}.ref-product-zoom-stage{width:96vw;height:78vh}.ref-product-zoom-tools{top:auto;bottom:18px;left:50%;transform:translateX(-50%)}.ref-product-zoom-close{top:12px;right:12px}}
+
+
+/* Mahgold product detail: touch magnifier + elegant specification table */
+.ref-product-page{
+  background:linear-gradient(155deg,#fbf7ee 0%,#f5eddf 58%,#eee2cd 100%);
+  color:#193629;
+}
+.ref-product-page-grid{gap:clamp(26px,4.5vw,58px);align-items:start}
+.ref-product-touch-image{
+  position:relative;isolation:isolate;overflow:hidden;touch-action:none;
+  border:1px solid #c6a15b;border-radius:20px;
+  background:radial-gradient(ellipse at 50% 42%,#315b43 0%,#173b2b 62%,#0d291e 100%);
+  box-shadow:0 18px 48px rgba(22,48,34,.17),inset 0 0 0 5px rgba(255,255,255,.035);
+  cursor:zoom-in;
+}
+.ref-product-touch-image>img{
+  display:block;width:100%;height:100%;min-height:460px;max-height:620px;
+  object-fit:contain;padding:18px;user-select:none;-webkit-user-drag:none;
+}
+.ref-product-touch-hint{
+  position:absolute;right:14px;bottom:14px;z-index:2;
+  padding:8px 13px;border:1px solid rgba(225,195,133,.55);border-radius:30px;
+  background:rgba(10,35,24,.86);color:#f3dfb5;font-size:11px;
+  box-shadow:0 5px 18px rgba(0,0,0,.16);pointer-events:none;
+}
+.ref-product-touch-lens{
+  position:absolute;z-index:5;width:158px;height:158px;border-radius:50%;
+  border:3px solid #e8c77f;
+  background-repeat:no-repeat;background-size:260% 260%;
+  box-shadow:0 8px 30px rgba(0,0,0,.42),0 0 0 5px rgba(255,247,222,.2);
+  pointer-events:none;
+}
+.ref-product-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ref-product-detail-kicker{font-size:10px;letter-spacing:.13em;color:#9b773c;font-weight:700}
+.ref-product-detail-category{
+  display:inline-flex;align-items:center;padding:6px 13px;border-radius:30px;
+  border:1px solid #d6bd8b;background:#fffaf0;color:#775a2b;font-size:11px;
+}
+.ref-product-page-copy h1{
+  margin:0;color:#173729;font-size:clamp(27px,3vw,39px);
+  font-weight:700;line-height:1.65;letter-spacing:-.02em;
+}
+.ref-product-page-copy>p{margin:0;color:#77705f;font-size:13px;line-height:2.25}
+.ref-product-specs-wrap{
+  padding:17px 18px 9px;border:1px solid #d9c69e;border-radius:17px;
+  background:linear-gradient(145deg,rgba(255,252,244,.96),rgba(248,240,224,.92));
+  box-shadow:0 9px 28px rgba(89,66,30,.055);
+}
+.ref-product-specs-title{
+  margin:0 0 9px;padding-bottom:10px;border-bottom:1px solid #dfcca3;
+  color:#80602c;font-size:14px;font-weight:800;
+}
+.ref-product-specs{display:flex;flex-direction:column;gap:0}
+.ref-product-specs>div{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  min-height:43px;padding:9px 5px;border:0;border-bottom:1px solid rgba(197,165,103,.25);
+  border-radius:0;background:transparent;font-size:12px;
+}
+.ref-product-specs>div:last-child{border-bottom:0}
+.ref-product-specs span{color:#81745f;flex:0 0 38%}
+.ref-product-specs b{
+  color:#1b3e2e;font-weight:700;text-align:left;overflow-wrap:anywhere;
+}
+.ref-product-page-price{
+  display:block;margin:0;padding:15px 18px;border:1px solid #d5bd8d;border-radius:14px;
+  background:linear-gradient(110deg,#fffaf0,#f1e4c9);
+  color:#896323;font-size:clamp(23px,2.5vw,30px);line-height:1.5;
+  box-shadow:inset 0 1px rgba(255,255,255,.9);
+}
+.ref-product-page-price small{color:#8c806b}
+@media(max-width:700px){
+  .ref-product-page{padding:13px 13px calc(28px + env(safe-area-inset-bottom))}
+  .ref-product-page-top{gap:12px;margin-bottom:15px}
+  .ref-product-page-grid{gap:15px}
+  .ref-product-touch-image,.ref-product-page-image{min-height:300px;max-height:390px}
+  .ref-product-touch-image>img{min-height:300px;max-height:390px;padding:12px}
+  .ref-product-touch-hint{right:9px;bottom:9px;padding:7px 10px;font-size:9px}
+  .ref-product-touch-lens{width:148px;height:148px}
+  .ref-product-detail-heading{margin-top:3px}
+  .ref-product-page-copy{gap:12px;padding:4px 1px}
+  .ref-product-page-copy h1{font-size:25px}
+  .ref-product-specs-wrap{padding:13px 13px 7px;border-radius:14px}
+  .ref-product-specs>div{min-height:40px;padding:8px 3px;font-size:11px}
+  .ref-product-page-price{padding:13px 15px;font-size:23px}
+}
+
+
+/* MAHGOLD LUXE SPECIFICATIONS — dark charcoal and luminous gold */
+.ref-product-specs-wrap{
+  position:relative;isolation:isolate;overflow:hidden;
+  padding:20px 21px 10px!important;
+  border:1px solid rgba(218,177,91,.78)!important;
+  border-radius:19px!important;
+  background:
+    radial-gradient(ellipse at 8% 0%,rgba(177,133,54,.17),transparent 48%),
+    linear-gradient(145deg,#17231e 0%,#0c1713 52%,#101d17 100%)!important;
+  box-shadow:
+    0 16px 38px rgba(4,17,12,.22),
+    inset 0 1px 0 rgba(255,226,164,.13),
+    inset 0 0 28px rgba(196,151,66,.055),
+    0 0 0 1px rgba(255,255,255,.025)!important;
+}
+.ref-product-specs-wrap:before{
+  content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;
+  background:linear-gradient(112deg,transparent 8%,rgba(255,224,158,.055) 34%,transparent 59%);
+}
+.ref-product-specs-title{
+  display:flex;align-items:center;gap:11px;
+  margin:0 0 11px!important;padding:0 0 14px!important;
+  border-bottom:1px solid rgba(218,177,91,.38)!important;
+  color:#f3d58e!important;font-size:16px!important;font-weight:850!important;
+  letter-spacing:.01em;text-shadow:0 0 14px rgba(238,193,99,.25);
+}
+.ref-product-specs-title:before{
+  content:"";width:4px;height:22px;flex:none;border-radius:5px;
+  background:linear-gradient(180deg,#fff0b8,#c08b35);
+  box-shadow:0 0 12px rgba(239,190,91,.48);
+}
+.ref-product-specs{
+  position:relative;display:flex!important;flex-direction:column!important;gap:0!important;
+}
+.ref-product-specs>div{
+  position:relative;display:flex!important;align-items:center;justify-content:space-between;
+  gap:16px;min-height:47px;padding:11px 12px!important;
+  border:0!important;border-bottom:1px solid rgba(210,171,91,.19)!important;
+  border-radius:8px!important;background:transparent!important;
+  font-size:12px!important;transition:background .22s ease,box-shadow .22s ease,transform .22s ease;
+}
+.ref-product-specs>div:nth-child(even){
+  background:linear-gradient(90deg,rgba(222,181,96,.075),rgba(222,181,96,.018))!important;
+}
+.ref-product-specs>div:last-child{border-bottom:0!important}
+.ref-product-specs>div:hover{
+  background:linear-gradient(90deg,rgba(229,188,101,.16),rgba(229,188,101,.045))!important;
+  box-shadow:inset 3px 0 0 #c99a4b,0 4px 16px rgba(0,0,0,.12);
+  transform:translateX(-2px);
+}
+.ref-product-specs span{
+  flex:0 0 38%;color:#c9b88f!important;font-weight:550!important;
+}
+.ref-product-specs b{
+  color:#f5d98f!important;font-weight:750!important;text-align:left;
+  overflow-wrap:anywhere;text-shadow:0 0 10px rgba(231,190,103,.13);
+}
+@media(max-width:700px){
+  .ref-product-specs-wrap{padding:16px 14px 8px!important;border-radius:16px!important}
+  .ref-product-specs-title{font-size:14px!important;padding-bottom:11px!important}
+  .ref-product-specs>div{min-height:43px;padding:10px 9px!important;font-size:11px!important}
+  .ref-product-specs span{flex-basis:36%}
+}
+@media(prefers-reduced-motion:reduce){
+  .ref-product-specs>div{transition:none}
+  .ref-product-specs>div:hover{transform:none}
+}
+
+
+/* MAHGOLD OFFERS — large-format, right-moving product carousel */
+.ref-offers-section{width:min(1480px,calc(100% - 28px));margin:0 auto;padding:38px 0 30px;overflow:hidden}
+.ref-offers-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:22px}
+.ref-offers-eyebrow{display:block;color:#98743a;font-size:9px;font-weight:700;letter-spacing:.19em;margin-bottom:7px}
+.ref-offers-heading h1{margin:0;color:#292319;font-size:clamp(22px,2.7vw,31px);font-weight:700;line-height:1.5}
+.ref-offers-heading p{margin:5px 0 0;color:#827765;font-size:12px;line-height:1.8}
+.ref-offers-count{flex:none;border:1px solid #dfcfaa;border-radius:999px;padding:7px 12px;color:#8d6b32;background:#f2e8d4;font-size:10px}
+.ref-offers-viewport{width:100%;overflow:hidden;direction:rtl}
+.ref-offers-track{--offer-step:calc(44% + 14px);display:flex;flex-wrap:nowrap;gap:14px;width:100%;direction:rtl;transform:translateX(calc(var(--offer-index)*var(--offer-step)));will-change:transform}
+.ref-offer-card{position:relative;display:block;flex:0 0 44%;height:430px;min-width:0;overflow:hidden;padding:0;border:1px solid #d8c59d;border-radius:19px;background:#211d16;text-align:right;box-shadow:0 12px 34px #261d0d1c;cursor:pointer}
+.ref-offer-card img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .75s ease}
+.ref-offer-card:hover img{transform:scale(1.045)}
+.ref-offer-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,12,8,.02) 22%,rgba(14,12,8,.14) 48%,rgba(14,12,8,.82) 100%)}
+.ref-offer-copy{position:absolute;right:22px;left:18px;bottom:20px;display:grid;gap:7px;color:#fff}
+.ref-offer-copy small{color:#ead39d;font-size:11px}
+.ref-offer-copy b{font-size:18px;font-weight:700;line-height:1.8;text-shadow:0 2px 8px #0007}
+.ref-offer-copy em{display:flex;align-items:center;gap:6px;color:#f1dcae;font-size:11px;font-style:normal}
+.ref-offers-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:15px;color:#988b75;font-size:10px}
+.ref-offers-dots{display:flex;align-items:center;gap:5px}
+.ref-offers-dots i{display:block;width:5px;height:5px;border-radius:50%;background:#d9c9a8;transition:all .25s}
+.ref-offers-dots i.active{width:17px;border-radius:8px;background:#a9823e}
+.ref-primary-nav{flex:0 0 auto;min-width:76px;justify-content:center}
+.ref-primary-nav a{padding:23px 13px 19px;border-radius:8px 8px 0 0}
+@media(max-width:767px){
+  .ref-offers-section{width:calc(100% - 20px);padding:28px 0 24px}
+  .ref-offers-heading{margin-bottom:16px}
+  .ref-offers-heading h1{font-size:23px}
+  .ref-offers-heading p{font-size:11px}
+  .ref-offers-count{padding:6px 9px;font-size:9px}
+  .ref-offers-track{--offer-step:calc(94% + 10px);gap:10px}
+  .ref-offer-card{flex-basis:94%;height:370px;border-radius:16px}
+  .ref-offer-copy{right:16px;left:14px;bottom:16px}
+  .ref-offer-copy b{font-size:16px}
+  .ref-primary-nav{display:flex!important;flex:0 0 auto;min-width:0;margin-inline:auto}
+  .ref-primary-nav a{padding:10px 13px 8px;font-size:12px}
+  .ref-mobile-menu{display:none!important}
+  .ref-mobile-links{display:none!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .ref-offers-track,.ref-offer-card img,.ref-offers-dots i{transition:none!important}
+}
+
+/* Requested storefront refinements: crisp logo and right-aligned home link */
+.ref-brand img{filter:contrast(1.22) saturate(1.12);image-rendering:auto}
+.ref-primary-nav{justify-content:flex-start}
+.ref-primary-nav a{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.ref-primary-nav a svg{flex:none;color:#8b682d}
+
+
+/* MAHGOLD LOGO FIT — consistent, uncropped brand artwork on desktop and mobile */
+.ref-brand-masthead{
+  height:clamp(150px,20vw,220px)!important;
+  background:#031b12!important;
+}
+.ref-brand-masthead img{
+  width:100%!important;
+  height:100%!important;
+  max-width:1440px!important;
+  margin-inline:auto!important;
+  padding:8px 14px!important;
+  box-sizing:border-box!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  image-rendering:auto!important;
+}
+.ref-footer-brand{
+  height:clamp(150px,20vw,220px)!important;
+  background:#062719!important;
+}
+.ref-footer-brand img{
+  width:100%!important;
+  height:100%!important;
+  max-width:1440px!important;
+  margin-inline:auto!important;
+  padding:8px 14px!important;
+  box-sizing:border-box!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  image-rendering:auto!important;
+}
+@media(max-width:767px){
+  .ref-brand-masthead,.ref-footer-brand{
+    height:clamp(118px,34vw,158px)!important;
+  }
+  .ref-brand-masthead img,.ref-footer-brand img{
+    padding:7px 10px!important;
+    object-fit:contain!important;
+    object-position:center!important;
+  }
+  /* Keep the Home item anchored to the right edge on mobile. */
+  .ref-primary-nav{
+    display:flex!important;
+    order:0!important;
+    flex:0 0 auto!important;
+    min-width:0!important;
+    margin-left:auto!important;
+    margin-right:0!important;
+    justify-content:flex-start!important;
+  }
+  .ref-primary-nav a{
+    padding:10px 12px 8px!important;
+    white-space:nowrap!important;
+  }
+  .ref-mobile-menu{order:1!important}
+  .ref-header-actions{order:2!important}
+}
+
+
+/* DESKTOP PRODUCT DETAIL LAYOUT — prevent image/specifications/price overlap */
+@media (min-width: 701px){
+  .ref-product-page{
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+  }
+  .ref-product-page-grid{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    align-items:start!important;
+    justify-items:stretch!important;
+    column-gap:clamp(28px,4vw,56px)!important;
+    row-gap:32px!important;
+    width:100%!important;
+    max-width:1180px!important;
+  }
+  .ref-product-page-grid>.ref-product-touch-image,
+  .ref-product-page-grid>.ref-product-page-image{
+    position:relative!important;
+    inset:auto!important;
+    float:none!important;
+    align-self:start!important;
+    justify-self:stretch!important;
+    width:100%!important;
+    min-width:0!important;
+    height:clamp(460px,42vw,620px)!important;
+    min-height:460px!important;
+    max-height:620px!important;
+    aspect-ratio:auto!important;
+    grid-column:1!important;
+    grid-row:1!important;
+    z-index:1!important;
+    transform:none!important;
+  }
+  .ref-product-page-grid>.ref-product-touch-image>img,
+  .ref-product-page-grid>.ref-product-page-image>img{
+    display:block!important;
+    position:relative!important;
+    inset:auto!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    object-fit:contain!important;
+  }
+  .ref-product-page-grid>.ref-product-page-copy{
+    position:relative!important;
+    inset:auto!important;
+    float:none!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    align-content:start!important;
+    align-self:start!important;
+    justify-self:stretch!important;
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    grid-column:2!important;
+    grid-row:1!important;
+    gap:18px!important;
+    padding:8px 0 28px!important;
+    margin:0!important;
+    overflow:visible!important;
+    z-index:2!important;
+    transform:none!important;
+  }
+  .ref-product-page-copy>.ref-product-detail-heading,
+  .ref-product-page-copy>h1,
+  .ref-product-page-copy>p,
+  .ref-product-page-copy>.ref-product-specs-wrap,
+  .ref-product-page-copy>.ref-product-page-price,
+  .ref-product-page-copy>.ref-full{
+    position:relative!important;
+    inset:auto!important;
+    float:none!important;
+    width:100%!important;
+    min-width:0!important;
+    grid-column:1!important;
+    margin-inline:0!important;
+    transform:none!important;
+  }
+  .ref-product-page-copy>.ref-product-specs-wrap{
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+    z-index:1!important;
+  }
+  .ref-product-page-copy>.ref-product-page-price{
+    display:block!important;
+    margin-top:0!important;
+    z-index:1!important;
+  }
+}
+
+
+/* MAHGOLD PRODUCT PAGE — large hero image above all product information */
+.ref-product-page-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  justify-items:center!important;
+  align-items:start!important;
+  width:100%!important;
+  max-width:1120px!important;
+  margin-inline:auto!important;
+  gap:30px!important;
+}
+.ref-product-page-grid>.ref-product-touch-image,
+.ref-product-page-grid>.ref-product-page-image{
+  grid-column:1!important;
+  grid-row:1!important;
+  justify-self:center!important;
+  width:min(100%,980px)!important;
+  height:clamp(540px,58vw,760px)!important;
+  min-height:540px!important;
+  max-height:760px!important;
+  margin-inline:auto!important;
+  border-radius:24px!important;
+}
+.ref-product-page-grid>.ref-product-touch-image>img,
+.ref-product-page-grid>.ref-product-page-image>img{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  padding:24px!important;
+  object-fit:contain!important;
+}
+.ref-product-page-grid>.ref-product-page-copy{
+  grid-column:1!important;
+  grid-row:2!important;
+  width:min(100%,980px)!important;
+  max-width:980px!important;
+  margin-inline:auto!important;
+  padding:0 0 36px!important;
+}
+@media(max-width:700px){
+  .ref-product-page-grid{
+    gap:20px!important;
+    max-width:100%!important;
+  }
+  .ref-product-page-grid>.ref-product-touch-image,
+  .ref-product-page-grid>.ref-product-page-image{
+    width:100%!important;
+    height:clamp(360px,108vw,520px)!important;
+    min-height:360px!important;
+    max-height:520px!important;
+    border-radius:19px!important;
+  }
+  .ref-product-page-grid>.ref-product-touch-image>img,
+  .ref-product-page-grid>.ref-product-page-image>img{
+    min-height:0!important;
+    max-height:none!important;
+    padding:14px!important;
+  }
+  .ref-product-page-grid>.ref-product-page-copy{
+    width:100%!important;
+    max-width:100%!important;
+    padding:0 1px 24px!important;
+  }
+}
+
+
+/* MAHGOLD PRODUCT IMAGE — stronger detail magnification */
+.ref-product-touch-lens{
+  background-size:420% 420%!important;
+}
+@media(max-width:700px){
+  .ref-product-touch-lens{
+    background-size:420% 420%!important;
+  }
+}
+
+
+/* MAHGOLD LOGO — fit the complete original artwork inside compact full-width bands */
+.ref-brand-masthead{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  position:relative!important;left:auto!important;width:100%!important;max-width:none!important;
+  height:clamp(150px,16vw,220px)!important;min-height:0!important;aspect-ratio:auto!important;
+  margin:0!important;padding:0!important;overflow:hidden!important;background:#08251a!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+}
+.ref-brand-masthead:before,.ref-brand-masthead:after{display:none!important;content:none!important}
+.ref-brand-masthead img{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  width:100%!important;height:100%!important;max-width:none!important;
+  margin:0!important;padding:0!important;object-fit:contain!important;
+  object-position:center!important;transform:none!important;filter:none!important;
+}
+.ref-footer-brand{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  position:relative!important;left:auto!important;width:100%!important;max-width:none!important;
+  height:clamp(130px,13vw,180px)!important;aspect-ratio:auto!important;
+  margin:0 auto 18px!important;padding:0!important;overflow:hidden!important;
+  border:0!important;border-radius:0!important;background:#08271c!important;box-shadow:none!important;
+}
+.ref-footer-brand img{
+  display:block!important;visibility:visible!important;opacity:1!important;
+  width:100%!important;height:100%!important;max-width:none!important;
+  margin:0!important;padding:0!important;object-fit:contain!important;object-position:center!important;
+  border:0!important;border-radius:0!important;
+}
+footer.bg-ink{padding-top:0!important}
+@media(max-width:767px){
+  .ref-brand-masthead{height:clamp(105px,32vw,145px)!important}
+  .ref-footer-brand{height:clamp(95px,27vw,125px)!important}
+}
+
+
+/* MAHGOLD — coordinated emerald & gold ornamental frames for header and footer */
+.ref-brand-masthead{
+  height:clamp(132px,15vw,188px)!important;
+  padding:9px!important;
+  background:
+    radial-gradient(ellipse at center,rgba(214,174,98,.10),transparent 62%),
+    linear-gradient(135deg,#041b12,#0b3425 48%,#041b12)!important;
+  border:1px solid rgba(211,174,105,.78)!important;
+  outline:1px solid rgba(211,174,105,.30)!important;
+  outline-offset:-5px!important;
+  box-shadow:inset 0 0 0 4px rgba(4,25,17,.72),inset 0 0 26px rgba(0,0,0,.28)!important;
+}
+.ref-brand-masthead:before{
+  content:""!important;display:block!important;position:absolute!important;
+  inset:8px!important;z-index:2!important;pointer-events:none!important;
+  background:
+    linear-gradient(#d9b66e,#d9b66e) left top/34px 1px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) left top/1px 24px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) right top/34px 1px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) right top/1px 24px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) left bottom/34px 1px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) left bottom/1px 24px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) right bottom/34px 1px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) right bottom/1px 24px no-repeat;
+  opacity:.9;
+}
+.ref-brand-masthead:after{
+  content:""!important;display:block!important;position:absolute!important;
+  inset:0!important;z-index:1!important;pointer-events:none!important;
+  background:linear-gradient(90deg,rgba(3,20,13,.12),transparent 18%,transparent 82%,rgba(3,20,13,.12))!important;
+}
+.ref-brand-masthead img{
+  position:relative!important;z-index:1!important;
+  width:100%!important;height:100%!important;max-width:none!important;
+  object-fit:contain!important;object-position:center!important;
+  transform:none!important;filter:drop-shadow(0 2px 9px rgba(0,0,0,.24))!important;
+}
+.ref-site-header{
+  background:#08271c!important;
+  border-top:1px solid rgba(211,174,105,.65)!important;
+  border-bottom:2px solid #bd9654!important;
+  box-shadow:0 7px 22px rgba(4,22,15,.16)!important;
+}
+.ref-main-header{
+  min-height:66px!important;
+  padding-inline:clamp(12px,3vw,38px)!important;
+  background:linear-gradient(180deg,#0b3022,#08271c)!important;
+  border-top:1px solid rgba(230,199,139,.14)!important;
+}
+.ref-primary-nav a{
+  color:#f0dfba!important;
+  border-bottom-color:transparent!important;
+}
+.ref-primary-nav a:hover,.ref-primary-nav a.active{
+  color:#f2d18a!important;border-bottom-color:#d4ad65!important;
+}
+.ref-header-search{
+  background:rgba(248,240,225,.09)!important;
+  border-color:rgba(218,184,117,.42)!important;
+  color:#f3e4c5!important;
+}
+.ref-header-search input{color:#fff0d1!important}
+.ref-header-search input::placeholder{color:#d6c39d!important}
+.ref-header-actions button,.ref-mobile-menu{color:#f0d9a8!important}
+.ref-header-cart b{background:#d5ad65!important;color:#172016!important}
+.ref-mobile-links{background:#08271c!important;border-color:rgba(211,174,105,.45)!important}
+.ref-mobile-links a{color:#f0dfba!important}
+footer.bg-ink{
+  position:relative!important;
+  margin-top:0!important;
+  padding:0 18px 34px!important;
+  overflow:hidden!important;
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(202,162,88,.12),transparent 55%),
+    linear-gradient(180deg,#0b3022,#061d14)!important;
+  border-top:2px solid #bd9654!important;
+}
+.ref-footer-brand{
+  position:relative!important;
+  width:100%!important;max-width:100%!important;
+  height:clamp(112px,13vw,158px)!important;
+  margin:0 auto 18px!important;padding:8px!important;
+  overflow:hidden!important;border:1px solid rgba(211,174,105,.78)!important;
+  border-radius:0!important;
+  outline:1px solid rgba(211,174,105,.28)!important;outline-offset:-5px!important;
+  background:linear-gradient(135deg,#041b12,#0b3425 48%,#041b12)!important;
+  box-shadow:inset 0 0 0 4px rgba(4,25,17,.68),inset 0 0 24px rgba(0,0,0,.25)!important;
+}
+.ref-footer-brand:before{
+  content:"";position:absolute;inset:8px;z-index:2;pointer-events:none;
+  background:
+    linear-gradient(#d9b66e,#d9b66e) left top/30px 1px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) left top/1px 20px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) right top/30px 1px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) right top/1px 20px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) left bottom/30px 1px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) left bottom/1px 20px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) right bottom/30px 1px no-repeat,
+    linear-gradient(#d9b66e,#d9b66e) right bottom/1px 20px no-repeat;
+}
+.ref-footer-brand img{
+  position:relative!important;z-index:1!important;
+  width:100%!important;height:100%!important;
+  object-fit:contain!important;object-position:center!important;
+  border:0!important;border-radius:0!important;
+}
+footer.bg-ink>div:not(.ref-footer-brand){color:#ead6aa!important}
+@media(max-width:767px){
+  .ref-brand-masthead{height:clamp(108px,30vw,140px)!important;padding:7px!important}
+  .ref-brand-masthead:before{inset:6px!important}
+  .ref-main-header{min-height:58px!important}
+  .ref-footer-brand{height:clamp(92px,25vw,118px)!important;padding:6px!important;margin-bottom:14px!important}
+  .ref-footer-brand:before{inset:6px}
+  footer.bg-ink{padding-inline:10px!important;padding-bottom:84px!important}
+}
