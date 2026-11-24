@@ -219,7 +219,7 @@ export default {
         url: absolute(route),
         inLanguage: "fa-IR"
       } : undefined);
-      output = seoHead(output, url, seo, { schema, noindex: url.hostname.endsWith("workers.dev") });
+      output = seoHead(output, url, seo, { schema, canonical: route === "/" ? absolute("/") : undefined, noindex: url.hostname.endsWith("workers.dev") });
     }
     const category = CATEGORY_COPY[route];
     if (category && response.headers.get("content-type")?.includes("text/html")) {
