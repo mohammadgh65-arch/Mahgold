@@ -16,7 +16,7 @@ export default {
       url.pathname = path + "/";
       return Response.redirect(url, 308);
     }
-    const productMatch = path.match(/^\\/product\\/([^/]+)\\/?$/);
+    const productMatch = path.match(/^\/product\/([^/]+)\/?$/);
     if (productMatch) {
       if (!path.endsWith("/")) {
         url.pathname = path + "/";
