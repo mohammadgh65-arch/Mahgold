@@ -18,7 +18,7 @@ function add(product,quantity=1){
  localStorage.setItem(KEY,JSON.stringify(cart));paint();
  toast(product.name,next<previous+amount?"حداکثر موجودی به سبد اضافه شد":"");
 }
-window.MahgoldCartUI={add,refresh:paint};
+window.MahgoldCartUI={add,refresh:paint,notify:(name,notice)=>toast(name,notice)};
 window.addEventListener("storage",event=>{if(event.key===KEY)paint()});
 window.addEventListener("pageshow",paint);
 document.addEventListener("DOMContentLoaded",paint);
