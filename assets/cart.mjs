@@ -15,5 +15,5 @@ function draw(){
   root.querySelectorAll("[data-dec]").forEach(b=>b.onclick=()=>{const p=cart[+b.dataset.dec];p.quantity=Math.max(1,(Number(p.quantity)||1)-1);save()});
   root.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{cart.splice(+b.dataset.del,1);save()});
 }
-function save(){localStorage.setItem("mahgold_cart",JSON.stringify(cart));draw()}
+function save(){localStorage.setItem("mahgold_cart",JSON.stringify(cart));window.MahgoldCartUI?.refresh();draw()}
 draw();
