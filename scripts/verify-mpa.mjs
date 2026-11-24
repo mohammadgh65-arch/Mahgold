@@ -30,7 +30,7 @@ const orderFn = await readFile("supabase/functions/mahgold-create-order/index.ts
 if (!orderFn.includes("MAHGOLD_ORDERS_ENABLED") || !orderFn.includes("mahgold_create_order_idempotent")) failures.push("Secure order function must retain its server-side feature gate and idempotent RPC.");
 const admin = await readFile("admin/index.html", "utf8").catch(() => "");
 if (!admin.includes("signInWithPassword") || !admin.includes("store_admins")) failures.push("Admin login must retain Supabase authentication and admin membership check.");
-const adminModule = admin.match(/<script type="module">([\\s\\S]*?)<\\/script>/i);
+const adminModule = admin.match(/<script type="module">([\s\S]*?)<\/script>/i);
 if (!adminModule) failures.push("Admin application module script is missing.");
 else {
   try { new Script(adminModule[1], { filename: "admin/index.html#module" }); }
