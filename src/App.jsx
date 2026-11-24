@@ -236,7 +236,7 @@ export default function App() {
   useEffect(()=>{setActiveOffer(0);setOfferTransition(true);},[offerItems.length]);
   useEffect(()=>{
     if(offerItems.length<2)return;
-    const timer=setInterval(()=>setActiveOffer(index=>index+1),3700);
+    const timer=setInterval(()=>setActiveOffer(index=>index+1),3000);
     return()=>clearInterval(timer);
   },[offerItems.length]);
   useEffect(()=>{
