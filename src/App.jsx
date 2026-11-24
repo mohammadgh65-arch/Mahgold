@@ -195,7 +195,8 @@ export default function App() {
   const [cartToast,setCartToast]=useState('');
   const [customer,setCustomer]=useState({name:'',phone:'',email:'',address:'',city:'',postalCode:'',note:''});
   const [menuOpen,setMenuOpen]=useState(false);
-  const [activeSlide,setActiveSlide]=useState(0);
+  const [activeOffer,setActiveOffer]=useState(0);
+  const [offerTransition,setOfferTransition]=useState(true);
   const [products,setProducts]=useState([]);
   const [dbCategories,setDbCategories]=useState([]);
   const [quote,setQuote]=useState(null);
@@ -205,9 +206,21 @@ export default function App() {
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
   const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||window.location.pathname==='/admin'||window.location.pathname==='/admin/'||window.location.hash==='#mahgold-control');
 
-  const displaySlides=useMemo(()=>{const rows=(siteContent?.slides||[]).filter(s=>s&&s.active!==false&&s.image&&s.title);return rows.length?rows:slides;},[siteContent]);
-  const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})),[siteContent]);
-  useEffect(()=>{setActiveSlide(index=>Math.min(index,displaySlides.length-1));},[displaySlides.length]);
+  const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})).filter(tile=>!['طلای آب‌شده','شمش'].includes(tile.name)),[siteContent]);
+  const offerItems=useMemo(()=>{
+    const excludedOfferItem=(category,title='')=>/شمش|آب\\s*شده|آبشده/.test(`${category||''} ${title||''}`.replace(/ي/g,'ی'));
+    const current=products.filter(product=>Number(product.price_toman)>0&&!excludedOfferItem(product.category,product.name)).slice(0,5).map(product=>({
+      id:product.id,title:product.name,category:product.category,
+      image:product.image_url||tiles.find(tile=>tile.name===product.category)?.image||tiles[0].image,
+      product
+    }));
+    const fallback=[
+      ...slides.filter(slide=>!excludedOfferItem(slide.category,slide.title)).map(slide=>({title:slide.title,category:slide.category,image:slide.image,product:null})),
+      ...tiles.filter(tile=>!excludedOfferItem(tile.name,tile.desc)).map(tile=>({title:tile.name,category:tile.name,image:tile.image,product:null}))
+    ];
+    return [...current,...fallback.slice(0,Math.max(0,5-current.length))].slice(0,5);
+  },[products]);
+  const offerTrackItems=useMemo(()=>[...offerItems,...offerItems.slice(0,3)],[offerItems]);
   useEffect(()=>{const timer=setInterval(()=>setClockNow(Date.now()),15000);return()=>clearInterval(timer);},[]);
   useEffect(()=>{
     if(!supabase)return;
@@ -220,7 +233,20 @@ export default function App() {
     const timer=setInterval(refreshGoldQuote,60000);
     return()=>{active=false;clearInterval(timer);};
   },[]);
-  useEffect(()=>{const timer=setInterval(()=>setActiveSlide(n=>(n+1)%displaySlides.length),6000);return()=>clearInterval(timer);},[displaySlides.length]);
+  useEffect(()=>{setActiveOffer(0);setOfferTransition(true);},[offerItems.length]);
+  useEffect(()=>{
+    if(offerItems.length<2)return;
+    const timer=setInterval(()=>setActiveOffer(index=>index+1),3700);
+    return()=>clearInterval(timer);
+  },[offerItems.length]);
+  useEffect(()=>{
+    if(activeOffer<offerItems.length)return;
+    const timer=setTimeout(()=>{
+      setOfferTransition(false);setActiveOffer(0);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>setOfferTransition(true)));
+    },750);
+    return()=>clearTimeout(timer);
+  },[activeOffer,offerItems.length]);
   useEffect(()=>{if(!supabase)return;let active=true;supabase.from('site_content').select('content').eq('id',1).maybeSingle().then(({data})=>{if(active&&data?.content)setSiteContent(data.content);});return()=>{active=false;};},[]);
   useEffect(()=>{
     const syncAdminRoute=()=>{
@@ -393,30 +419,33 @@ export default function App() {
     </header>
 
     <main className="min-h-[60vh]" id="home">
-      <section aria-label="اسلایدهای مه‌گلد" aria-roledescription="carousel" className="ref-hero relative h-[330px] overflow-hidden bg-ink text-ink-foreground md:h-[390px]">
-        {displaySlides.map((slide,index)=><div key={slide.image} aria-hidden={activeSlide!==index} className={'absolute inset-0 transition-opacity duration-1000 '+(activeSlide===index?'z-10 opacity-100':'pointer-events-none z-0 opacity-0')}>
-          <img alt={slide.title} className="h-full w-full object-cover transition-transform duration-[7000ms] ease-out" src={slide.image} loading={index===0?'eager':'lazy'} style={{transform:activeSlide===index?'scale(1.05)':'scale(1)'}}/>
-          <div className="slide-shade absolute inset-0"/>
-          <div className="ref-hero-copy absolute inset-0 mx-auto flex max-w-7xl flex-col justify-center px-6 py-8 md:px-10">
-            <div className="max-w-[560px] text-right">
-              <div className="eyebrow animate-rise text-gold-light">{slide.eyebrow||'MAHGOLD'}</div>
-              <h1 className="animate-rise mt-3 text-[2.1rem] font-medium leading-[1.45] [animation-delay:120ms] md:text-6xl md:leading-[1.4]">{slide.title}</h1>
-              <p className="animate-rise mt-4 max-w-md text-sm leading-8 text-ink-muted [animation-delay:240ms] md:text-[15px]">{slide.description||''}</p>
-              <button className="mt-7 inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-gold-gradient px-7 text-sm font-bold text-ink shadow-gold transition-all hover:-translate-y-0.5 hover:brightness-110" onClick={()=>{setCategory(slide.category);document.getElementById('shop')?.scrollIntoView({behavior:'smooth'});}}>
-                {slide.button||'مشاهده محصولات'}<ArrowLeft size={16}/>
-              </button>
-            </div>
+      <section aria-label="پیشنهادات مه‌گلد" aria-roledescription="carousel" className="ref-offers-section">
+        <div className="ref-offers-heading">
+          <div>
+            <span className="ref-offers-eyebrow">MAHGOLD SELECTION</span>
+            <h1>پیشنهادات مه‌گلد</h1>
+            <p>انتخاب‌هایی چشم‌نواز از مجموعه مه‌گلد</p>
           </div>
-        </div>)}
-        <div className="absolute inset-x-0 bottom-7 z-20 flex justify-center gap-2">
-          {displaySlides.map((slide,index)=><button key={slide.image} aria-label={'اسلاید '+(index+1)} aria-current={activeSlide===index} className={'relative h-1.5 overflow-hidden rounded-full bg-ink-foreground/30 transition-all duration-500 '+(activeSlide===index?'w-10':'w-4 hover:bg-ink-foreground/60')} onClick={()=>setActiveSlide(index)}>
-            {activeSlide===index&&<span className="absolute inset-y-0 right-0 bg-gold" style={{width:'100%'}}/>}
-          </button>)}
+          <span className="ref-offers-count">۰۵ انتخاب منتخب</span>
         </div>
-        <div className="absolute bottom-6 left-8 z-20 hidden gap-2 md:flex">
-          <button aria-label="اسلاید قبلی" className="flex size-11 items-center justify-center rounded-full border border-ink-foreground/30 bg-ink/30 backdrop-blur transition hover:border-gold hover:text-gold-light" onClick={()=>setActiveSlide(i=>(i+displaySlides.length-1)%displaySlides.length)}><ChevronRight size={18}/></button>
-          <button aria-label="اسلاید بعدی" className="flex size-11 items-center justify-center rounded-full border border-ink-foreground/30 bg-ink/30 backdrop-blur transition hover:border-gold hover:text-gold-light" onClick={()=>setActiveSlide(i=>(i+1)%displaySlides.length)}><ChevronLeft size={18}/></button>
+        <div className="ref-offers-viewport">
+          <div className="ref-offers-track" style={{transform:`translateX(-${activeOffer*(window.innerWidth<=767?83:32)}vw)`,transition:offerTransition?'transform 720ms cubic-bezier(.22,.75,.25,1)':'none'}}>
+            {offerTrackItems.map((item,index)=><button type="button" key={index} className="ref-offer-card" onClick={()=>{
+              if(item.product){openProduct(item.product);return;}
+              setCategory(item.category||'همه محصولات');
+              document.getElementById('shop')?.scrollIntoView({behavior:'smooth'});
+            }}>
+              <img src={item.image} alt={item.title} loading={index<3?'eager':'lazy'}/>
+              <span className="ref-offer-shade"/>
+              <span className="ref-offer-copy">
+                <small>{item.category||'منتخب مه‌گلد'}</small>
+                <b>{item.title}</b>
+                <em>{item.product?'مشاهده جزئیات محصول':'مشاهده مجموعه'} <ArrowLeft size={14}/></em>
+              </span>
+            </button>)}
+          </div>
         </div>
+        <div className="ref-offers-footer"><span>حرکت خودکار · هر ۳ ثانیه</span><span className="ref-offers-dots">{offerItems.map((item,index)=><i key={index} className={activeOffer%offerItems.length===index?'active':''}/>)}</span></div>
       </section>
 
                 <div className="ref-quote-strip">
@@ -493,14 +522,19 @@ export default function App() {
       </section>
     </main>
 
-    <footer className="bg-ink px-6 pb-28 pt-14 text-center text-xs leading-8 text-ink-muted md:pb-14">
-      <div className="ref-footer-brand"><img alt="نشان اصلی مه‌گلد؛ هلال و الماس طلایی" loading="lazy" src="/mahgold-brand-masthead.jpg"/></div>
-      <div>طلایی به زیباییِ لحظه‌های تو</div>
-      <div className="mt-3 flex flex-col items-center gap-1 md:flex-row md:justify-center md:gap-6">
-        <span className="inline-flex items-center gap-1.5"><Phone className="size-3.5 text-gold"/> شماره تماس: به‌زودی</span>
-        <span className="inline-flex items-center gap-1.5"><MapPin className="size-3.5 text-gold"/> نشانی: به‌زودی اعلام می‌شود</span>
+    <footer className="ref-lux-footer">
+      <div className="ref-footer-frame">
+        <div className="ref-footer-brand"><img alt="نشان اصلی مه‌گلد" loading="lazy" src="/mahgold-brand-masthead.jpg"/></div>
+        <div className="ref-footer-tagline">طلایی به زیباییِ لحظه‌های تو</div>
+        <div className="ref-footer-links">
+          <a href="#home">صفحه اصلی</a><a href="#categories">دسته‌بندی‌ها</a><a href="#shop">فروشگاه</a><a href="#story">درباره مه‌گلد</a>
+        </div>
+        <div className="ref-footer-contact">
+          <span><Phone size={15}/> شماره تماس: به‌زودی</span>
+          <span><MapPin size={15}/> نشانی: به‌زودی اعلام می‌شود</span>
+        </div>
+        <div className="ref-footer-copy">© ۱۴۰۵ فروشگاه آنلاین مه‌گلد · زیورآلات طلا</div>
       </div>
-      <div className="mt-3 text-[11px] opacity-60">© ۱۴۰۵ فروشگاه آنلاین مه‌گلد · زیورآلات طلا</div>
     </footer>
 
     <nav className="ref-mobile-nav fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background/95 px-2 pt-1 backdrop-blur-xl md:hidden">
