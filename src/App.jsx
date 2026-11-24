@@ -267,7 +267,7 @@ export default function App() {
   },[]);
   useEffect(()=>{try{localStorage.setItem('mahgold_cart',JSON.stringify(cart));}catch{}},[cart]);
   useEffect(()=>{if(!cartToast)return;const timer=setTimeout(()=>setCartToast(''),3200);return()=>clearTimeout(timer);},[cartToast]);
-  useEffect(()=>{const syncProductRoute=()=>{const match=window.location.pathname.match(/^\\/product\\/([^/]+)\\/?$/);if(!match){setSelectedProduct(null);return;}const product=products.find(p=>p.id===decodeURIComponent(match[1]));if(product)setSelectedProduct(product);};syncProductRoute();window.addEventListener('popstate',syncProductRoute);return()=>window.removeEventListener('popstate',syncProductRoute);},[products]);
+  useEffect(()=>{const syncProductRoute=()=>{const match=window.location.pathname.match(/^\/product\/([^/]+)\/?$/);if(!match){setSelectedProduct(null);return;}const product=products.find(p=>p.id===decodeURIComponent(match[1]));if(product)setSelectedProduct(product);};syncProductRoute();window.addEventListener('popstate',syncProductRoute);return()=>window.removeEventListener('popstate',syncProductRoute);},[products]);
   useEffect(()=>{setCheckoutRequestKey(null);},[cart,customer]);
 
   const categories=useMemo(()=>{
