@@ -236,16 +236,17 @@ export default function App() {
 
   const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})),[siteContent]);
   const offerItems=useMemo(()=>{
-    const current=products.filter(product=>Number(product.price_toman)>0).slice(0,5).map(product=>({
+    const excludedOfferCategory=category=>/شمش|آب\s*شده|آبشده/.test(String(category||'').replace(/ي/g,'ی'));
+    const current=products.filter(product=>Number(product.price_toman)>0&&!excludedOfferCategory(product.category)).slice(0,5).map(product=>({
       id:product.id,title:product.name,category:product.category,
       image:product.image_url||tiles.find(tile=>tile.name===product.category)?.image||tiles[0].image,
       product
     }));
     const fallback=[
-      ...slides.map(slide=>({title:slide.title,category:slide.category,image:slide.image,product:null})),
-      ...tiles.map(tile=>({title:tile.name,category:tile.name,image:tile.image,product:null}))
+      ...slides.filter(slide=>!excludedOfferCategory(slide.category)).map(slide=>({title:slide.title,category:slide.category,image:slide.image,product:null})),
+      ...tiles.filter(tile=>!excludedOfferCategory(tile.name)).map(tile=>({title:tile.name,category:tile.name,image:tile.image,product:null}))
     ];
-    return [...current,...fallback.slice(0,Math.max(0,5-current.length))];
+    return [...current,...fallback.slice(0,Math.max(0,5-current.length))].slice(0,5);
   },[products]);
   const offerTrackItems=useMemo(()=>[...offerItems,...offerItems.slice(0,3)],[offerItems]);
   useEffect(()=>{const timer=setInterval(()=>setClockNow(Date.now()),15000);return()=>clearInterval(timer);},[]);
@@ -426,11 +427,8 @@ export default function App() {
           <img src={siteContent?.logo_url||MAHGOLD_LOGO} alt="لوگوی مه‌گلد"/>
           <span>مه‌گلد</span>
         </a>
-        <nav className="ref-primary-nav">
+        <nav className="ref-primary-nav" aria-label="منوی اصلی">
           <a className="active" href="#home">خانه</a>
-          <button type="button" onClick={()=>setAccountOpen(true)}>پیگیری سفارش</button>
-          <a href="#categories" onClick={()=>setCategory('طلای زینتی')}>طلای زینتی</a>
-          <a href="#categories" onClick={()=>setCategory('سکه')}>سکه</a>
         </nav>
         <label className="ref-header-search"><Search size={16}/><input aria-label="جستجوی محصولات" value={query} onChange={e=>setQuery(e.target.value)} placeholder="جستجو در محصولات..."/></label>
         <div className="ref-header-actions">
@@ -438,9 +436,8 @@ export default function App() {
           <button aria-label="سبد خرید" className="ref-header-cart" onClick={()=>setCartOpen(true)}><ShoppingBag size={20}/>{cartCount>0&&<b>{money(cartCount)}</b>}</button>
         </div>
       </div>
-      {menuOpen&&<nav className="ref-mobile-links flex flex-col gap-4 border-t border-border bg-background px-5 py-4 text-sm text-muted-foreground md:hidden">
-        <a href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a><a href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a><a href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a><button className="text-right" onClick={()=>{setAccountOpen(true);setMenuOpen(false);}}>پیگیری سفارش</button>
-        <button className="text-right" onClick={()=>{setAccountOpen(true);setMenuOpen(false);}}>ورود / ثبت‌نام</button>
+      {menuOpen&&<nav aria-label="منوی موبایل" className="ref-mobile-links flex flex-col gap-4 border-t border-border bg-background px-5 py-4 text-sm text-muted-foreground md:hidden">
+        <a href="#home" onClick={()=>setMenuOpen(false)}>خانه</a>
       </nav>}
     </header>
 
