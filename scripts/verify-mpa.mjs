@@ -1,8 +1,8 @@
 import { access, readFile } from "node:fs/promises";
 import { constants } from "node:fs";
 
-const pages = ["products/index.html","category/jewelry/index.html","category/melted-gold/index.html","category/coins/index.html","category/bars/index.html","product/index.html","cart/index.html","checkout/index.html","about/index.html","contact/index.html","admin/index.html","404.html"];
-const modules = ["assets/products.mjs","assets/category.mjs","assets/product.mjs","assets/cart.mjs","assets/checkout.mjs","assets/mpa.css","worker.js","wrangler.jsonc","supabase/functions/mahgold-create-order/index.ts"];
+const pages = ["index.html","products/index.html","category/jewelry/index.html","category/melted-gold/index.html","category/coins/index.html","category/bars/index.html","product/index.html","cart/index.html","checkout/index.html","about/index.html","contact/index.html","admin/index.html","404.html"];
+const modules = ["assets/products.mjs","assets/category.mjs","assets/product.mjs","assets/cart.mjs","assets/checkout.mjs","assets/mpa.css","worker.js","wrangler.jsonc",".assetsignore","supabase/functions/mahgold-create-order/index.ts"];
 const failures = [];
 for (const path of [...pages, ...modules]) {
   try { await access(path, constants.R_OK); }
@@ -14,7 +14,7 @@ for (const path of pages) {
     if (!/^<!doctype html>/i.test(html)) failures.push("Missing doctype: " + path);
     if ((html.match(/<body\b/gi) || []).length !== 1) failures.push("Expected one body start: " + path);
     if ((html.match(/<\/body>/gi) || []).length !== 1) failures.push("Expected one body end: " + path);
-    if (path !== "admin/index.html" && !html.includes("/assets/mpa.css")) failures.push("Shared stylesheet not linked: " + path);
+    if (path !== "admin/index.html" && path !== "index.html" && !html.includes("/assets/mpa.css")) failures.push("Shared stylesheet not linked: " + path);
   } catch {}
 }
 const worker = await readFile("worker.js", "utf8").catch(() => "");
