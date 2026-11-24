@@ -640,3 +640,44 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 @media(max-width:360px){
   .ref-product-specs{grid-template-columns:1fr!important}
 }
+
+
+/* MAHGOLD velvet-curtain header: gathered emerald fabric and woven gold edging */
+.ref-site-header{
+  position:sticky!important;top:0!important;isolation:isolate!important;overflow:hidden!important;
+  background:
+    radial-gradient(ellipse at 50% -65%,rgba(221,190,122,.24),transparent 57%),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 3%,rgba(255,255,255,.035) 5%,rgba(0,0,0,.12) 9%,transparent 13%),
+    linear-gradient(180deg,#174532 0%,#0b3022 42%,#062719 100%)!important;
+  border-top:3px solid #d2ad68!important;border-bottom:3px solid #b98b43!important;
+  box-shadow:inset 0 5px 12px rgba(255,255,255,.07),inset 0 -8px 13px rgba(0,0,0,.3),0 8px 22px rgba(8,31,21,.2)!important;
+}
+.ref-site-header:before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.72;
+  background:
+    radial-gradient(ellipse 18% 150% at 8% 0%,rgba(255,255,255,.12),transparent 72%),
+    radial-gradient(ellipse 18% 150% at 28% 0%,rgba(0,0,0,.24),transparent 72%),
+    radial-gradient(ellipse 18% 150% at 50% 0%,rgba(255,255,255,.09),transparent 72%),
+    radial-gradient(ellipse 18% 150% at 72% 0%,rgba(0,0,0,.22),transparent 72%),
+    radial-gradient(ellipse 18% 150% at 94% 0%,rgba(255,255,255,.10),transparent 72%);
+}
+.ref-site-header:after{
+  content:"";position:absolute;top:0;left:0;right:0;height:5px;pointer-events:none;
+  background:repeating-linear-gradient(90deg,#8c642c 0 12px,#e8ce8e 12px 17px,#b78b45 17px 27px);
+  opacity:.9;
+}
+.ref-site-header .ref-main-header,.ref-site-header .ref-mobile-links{position:relative;z-index:1}
+.ref-site-header .ref-primary-nav a,.ref-site-header .ref-primary-nav button,
+.ref-site-header .ref-header-actions button,.ref-site-header .ref-mobile-menu{color:#f0dfb7!important}
+.ref-site-header .ref-primary-nav a:hover,.ref-site-header .ref-primary-nav a.active{color:#f4d18a!important;border-color:#e1bd73!important}
+.ref-site-header .ref-header-search{background:rgba(248,240,225,.12)!important;border-color:rgba(226,194,130,.45)!important}
+.ref-site-header .ref-header-search input{color:#fff5df!important}
+.ref-site-header .ref-header-search input::placeholder{color:#d6c49f!important}
+.ref-site-header .ref-mobile-links{background:linear-gradient(180deg,#123c2b,#08271c)!important;color:#f0dfb7!important;border-color:#b98b43!important}
+.ref-site-header .ref-mobile-links a,.ref-site-header .ref-mobile-links button{color:#f0dfb7!important}
+.ref-product-zoom-stage{touch-action:none!important;overscroll-behavior:contain!important}
+.ref-product-zoom-stage>img{user-select:none;-webkit-user-drag:none}
+@media(max-width:767px){
+  .ref-site-header{border-top-width:2px!important;border-bottom-width:2px!important}
+  .ref-site-header:after{height:3px}
+}
