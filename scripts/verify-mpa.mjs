@@ -20,7 +20,7 @@ for (const path of pages) {
 }
 const worker = await readFile("worker.js", "utf8").catch(() => "");
 if (!worker.includes("env.ASSETS.fetch") || !worker.includes("/product/index.html")) failures.push("Worker product route resolver is missing.");
-for (const token of ["PAGE_SEO", "CATEGORY_COPY", "PUBLIC_ORIGIN", "application/ld+json", "\\"@type\\": \\"Product\\"", "/robots.txt", "/sitemap.xml", "X-Robots-Tag"]) {
+for (const token of ["PAGE_SEO", "CATEGORY_COPY", "PUBLIC_ORIGIN", "application/ld+json", '"@type": "Product"', "/robots.txt", "/sitemap.xml", "X-Robots-Tag"]) {
   if (!worker.includes(token)) failures.push("SEO implementation is missing: " + token);
 }
 if (!worker.includes("Disallow: /admin/") || !worker.includes("Disallow: /cart/") || !worker.includes("Disallow: /checkout/")) failures.push("Robots exclusions for private/transactional pages are missing.");
