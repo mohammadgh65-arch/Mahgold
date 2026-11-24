@@ -977,7 +977,7 @@ footer.bg-ink{padding-top:0!important}
 }
 
 
-/* FINAL OVERRIDE — stretch the complete Mahgold artwork edge-to-edge in header and footer */
+/* FIX: keep the supplied logo image visible while making both brand bands full-bleed */
 html,body{overflow-x:hidden!important}
 .ref-brand-masthead,.ref-footer-brand{
   position:relative!important;
@@ -991,30 +991,32 @@ html,body{overflow-x:hidden!important}
   border:0!important;
   border-radius:0!important;
   box-shadow:none!important;
-  background:#062318!important;
+  background:#08251a!important;
+  height:auto!important;
+  min-height:0!important;
   aspect-ratio:auto!important;
 }
-.ref-brand-masthead{height:clamp(150px,22vw,260px)!important;min-height:0!important}
-.ref-footer-brand{height:clamp(150px,22vw,260px)!important;min-height:0!important;margin-bottom:0!important}
-.ref-brand-masthead:before,.ref-brand-masthead:after{display:none!important;content:none!important}
 .ref-brand-masthead img,.ref-footer-brand img{
+  position:relative!important;
+  z-index:2!important;
   display:block!important;
-  width:100%!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:100vw!important;
   max-width:none!important;
-  height:100%!important;
+  height:auto!important;
+  min-height:0!important;
   margin:0!important;
   padding:0!important;
-  box-sizing:border-box!important;
-  object-fit:fill!important;
+  object-fit:contain!important;
   object-position:center!important;
-  aspect-ratio:auto!important;
   transform:none!important;
   filter:none!important;
-  border:0!important;
-  border-radius:0!important;
 }
+.ref-brand-masthead:before,.ref-brand-masthead:after{pointer-events:none!important}
+.ref-footer-brand{margin-bottom:18px!important}
 footer.bg-ink{padding-top:0!important}
 @media(max-width:767px){
-  .ref-brand-masthead,.ref-footer-brand{height:clamp(112px,34vw,155px)!important;width:100vw!important;max-width:100vw!important}
-  .ref-brand-masthead img,.ref-footer-brand img{width:100%!important;height:100%!important;object-fit:fill!important}
+ .ref-brand-masthead,.ref-footer-brand{width:100vw!important;max-width:100vw!important}
+ .ref-brand-masthead img,.ref-footer-brand img{width:100vw!important;height:auto!important}
 }
