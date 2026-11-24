@@ -13,8 +13,8 @@ function add(product,quantity=1){
  const previous=existing?Math.max(0,Number(existing.quantity)||0):0;
  const next=Math.min(cap,previous+amount);
  if(next<=previous){toast(product.name,"حداکثر تعداد قابل سفارش "+new Intl.NumberFormat("fa-IR").format(cap)+" عدد است");return}
- if(existing){existing.quantity=next;existing.price_toman=product.price_toman??existing.price_toman;existing.image_url=product.image_url??existing.image_url;existing.name=product.name??existing.name}
- else cart.push({product_id:product.id||product.product_id,id:product.id||product.product_id,name:product.name,price_toman:product.price_toman,image_url:product.image_url,quantity:next});
+ if(existing){existing.quantity=next;existing.price_toman=product.price_toman??existing.price_toman;existing.image_url=product.image_url??existing.image_url;existing.stock=hasStock?cap:existing.stock;existing.name=product.name??existing.name}
+ else cart.push({product_id:product.id||product.product_id,id:product.id||product.product_id,name:product.name,price_toman:product.price_toman,image_url:product.image_url,stock:hasStock?cap:null,quantity:next});
  localStorage.setItem(KEY,JSON.stringify(cart));paint();
  toast(product.name,next<previous+amount?"حداکثر موجودی به سبد اضافه شد":"");
 }
