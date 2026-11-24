@@ -879,80 +879,37 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 }
 
 
-/* MAHGOLD LOGO — full-width artwork, natural 3:2 ratio, no crop */
+/* MAHGOLD LOGO — compact full-width banner */
 .ref-brand-masthead{
-  display:block!important;
-  position:relative!important;
-  left:auto!important;
-  isolation:isolate!important;
-  width:100%!important;
-  max-width:none!important;
-  height:auto!important;
-  min-height:0!important;
-  aspect-ratio:3 / 2!important;
-  margin:0!important;
-  padding:0!important;
-  overflow:hidden!important;
-  background:#08251a!important;
-  border:0!important;
-  border-radius:0!important;
-  box-shadow:none!important;
+  display:block!important;position:relative!important;left:auto!important;
+  width:100%!important;max-width:none!important;
+  height:clamp(150px,16vw,220px)!important;min-height:0!important;
+  aspect-ratio:auto!important;margin:0!important;padding:0!important;
+  overflow:hidden!important;background:#08251a!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
 }
-.ref-brand-masthead:before{display:none!important;content:none!important}
-.ref-brand-masthead:after{display:none!important;content:none!important}
+.ref-brand-masthead:before,.ref-brand-masthead:after{display:none!important;content:none!important}
 .ref-brand-masthead img{
-  position:relative!important;
-  z-index:1!important;
-  display:block!important;
-  visibility:visible!important;
-  opacity:1!important;
-  width:100%!important;
-  max-width:none!important;
-  height:100%!important;
-  min-height:0!important;
-  margin:0!important;
-  padding:0!important;
-  object-fit:contain!important;
-  object-position:center!important;
-  transform:none!important;
-  filter:none!important;
+  display:block!important;visibility:visible!important;opacity:1!important;
+  width:100%!important;max-width:none!important;height:100%!important;
+  margin:0!important;padding:0!important;object-fit:cover!important;
+  object-position:center 58%!important;transform:none!important;filter:none!important;
 }
 .ref-footer-brand{
-  display:block!important;
-  position:relative!important;
-  left:auto!important;
-  width:100%!important;
-  max-width:none!important;
-  height:auto!important;
-  aspect-ratio:3 / 2!important;
-  margin:0 auto 18px!important;
-  padding:0!important;
-  overflow:hidden!important;
-  border:0!important;
-  border-radius:0!important;
-  background:#08271c!important;
-  box-shadow:none!important;
+  display:block!important;position:relative!important;left:auto!important;
+  width:100%!important;max-width:none!important;
+  height:clamp(130px,13vw,180px)!important;aspect-ratio:auto!important;
+  margin:0 auto 18px!important;padding:0!important;overflow:hidden!important;
+  border:0!important;border-radius:0!important;background:#08271c!important;box-shadow:none!important;
 }
 .ref-footer-brand img{
-  display:block!important;
-  visibility:visible!important;
-  opacity:1!important;
-  width:100%!important;
-  max-width:none!important;
-  height:100%!important;
-  margin:0!important;
-  padding:0!important;
-  object-fit:contain!important;
-  object-position:center!important;
-  border:0!important;
-  border-radius:0!important;
+  display:block!important;visibility:visible!important;opacity:1!important;
+  width:100%!important;max-width:none!important;height:100%!important;
+  margin:0!important;padding:0!important;object-fit:cover!important;
+  object-position:center 58%!important;border:0!important;border-radius:0!important;
 }
 footer.bg-ink{padding-top:0!important}
 @media(max-width:767px){
-  .ref-brand-masthead,.ref-footer-brand{
-    width:100%!important;
-    max-width:100%!important;
-    aspect-ratio:3 / 2!important;
-  }
-  .ref-brand-masthead img,.ref-footer-brand img{width:100%!important;height:100%!important}
+  .ref-brand-masthead{height:clamp(105px,32vw,145px)!important}
+  .ref-footer-brand{height:clamp(95px,27vw,125px)!important}
 }
