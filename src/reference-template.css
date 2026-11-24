@@ -495,13 +495,13 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 
 /* MAHGOLD layout correction: consistent carousel spacing and product detail grid */
 .ref-offers-viewport{direction:ltr!important}
-.ref-offers-track{direction:ltr!important;gap:12px!important}
+.ref-offers-track{direction:ltr!important;gap:16px!important}
 .ref-offer-card{direction:rtl;box-sizing:border-box}
 @media(min-width:768px){
-  .ref-offer-card{width:min(32vw,390px)}
+  .ref-offer-card{width:min(31vw,390px)}
 }
 @media(max-width:767px){
-  .ref-offer-track{gap:11px!important}
+  .ref-offers-track{gap:11px!important}
   .ref-offer-card{width:82vw;height:clamp(220px,68vw,300px)}
 }
 .ref-product-page{box-sizing:border-box}
