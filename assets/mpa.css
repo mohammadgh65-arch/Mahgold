@@ -138,3 +138,34 @@ img{max-width:100%}
   .brand{flex:0 0 88px;width:88px;height:56px;min-width:88px;min-height:56px}
   .footer{padding:13px 0 15px}
 }
+
+
+/* Footer mirrors the approved compact emerald-and-gold header treatment. */
+.footer{
+  position:relative;
+  margin-top:20px;
+  padding:15px 0 17px;
+  border:0;
+  border-top:2px solid transparent;
+  border-bottom:2px solid transparent;
+  border-image:linear-gradient(90deg,transparent,#b88b3c 8%,#f4d98b 50%,#b88b3c 92%,transparent) 1;
+  background:
+    linear-gradient(180deg,#f4d98b 0,#b88b3c 2px,#e8c875 3px,transparent 4px calc(100% - 3px),#b88b3c calc(100% - 2px),#f4d98b 100%),
+    radial-gradient(ellipse at 18% 0%,#1b6249 0,transparent 48%),
+    repeating-linear-gradient(112deg,#0a3e30 0,#0a3e30 17px,#104b39 18px,#0b4434 36px);
+  color:#eadbb8;
+  box-shadow:0 -7px 22px #0004,inset 0 1px #fff2b455;
+}
+.footer strong{color:#f3d991}
+.footer:after{
+  content:"";
+  display:block;
+  height:1px;
+  width:min(100%,1180px);
+  margin:10px auto 0;
+  background:linear-gradient(90deg,transparent,#d9b45e88 18%,#f0d58c 50%,#d9b45e88 82%,transparent);
+}
+@media(max-width:620px){
+  .footer{padding:13px 0 15px}
+  .footer:after{margin-top:8px}
+}
