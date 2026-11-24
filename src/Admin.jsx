@@ -15,6 +15,7 @@ const productCategoryGroups=[
 ];
 const jewelryCategories=productCategoryGroups[0].values;
 const isAutoPricedCategory=category=>jewelryCategories.includes(category);
+const internalProductAttributeKeys=new Set(['has_stone','stone_labor_percent','market_quote_symbol','parent_product_id','variant_model_name','variant_size','variant_sku']);
 const blankProduct = {name:'',category:'طلای زینتی',description:'',image_url:'',weight_grams:'',karat:18,price_toman:0,pricing_mode:'auto',labor_mode:'percent',labor_value:0,seller_profit_percent:null,commission_percent:0,vat_percent:10,stock:1,is_active:true,tag:'',attributes:{}};
 export default function AdminPanel(){
  const [session,setSession]=useState(null),[checking,setChecking]=useState(true),[checkingAdmin,setCheckingAdmin]=useState(false),[adminOk,setAdminOk]=useState(false);
@@ -122,7 +123,7 @@ export default function AdminPanel(){
 <div className="admin-attributes-editor">
  <div className="admin-attributes-heading"><b>ویژگی‌های اختصاصی محصول</b><button type="button" className="secondary" onClick={()=>setProduct(p=>{const attrs={...(p.attributes||{})};let i=1;while(attrs['ویژگی جدید '+i])i++;attrs['ویژگی جدید '+i]='';return {...p,attributes:attrs};})}>＋ افزودن ویژگی</button></div>
  <small>عنوان و مقدار هر ویژگی را وارد کنید؛ فقط موارد کامل‌شده در صفحه محصول نمایش داده می‌شوند.</small>
- {Object.entries(product.attributes||{}).map(([key,value],index)=><div className="admin-attribute-row" key={key+'-'+index}>
+ {Object.entries(product.attributes||{}).filter(([key])=>!internalProductAttributeKeys.has(String(key).trim())).map(([key,value],index)=><div className="admin-attribute-row" key={key+'-'+index}>
   <input aria-label="عنوان ویژگی" placeholder="مثلاً رنگ طلا" value={key} onChange={e=>setProduct(p=>{const attrs={...(p.attributes||{})};delete attrs[key];attrs[e.target.value]=value;return {...p,attributes:attrs};})}/>
   <input aria-label="مقدار ویژگی" placeholder="مثلاً سفید" value={value??''} onChange={e=>setProduct(p=>({...p,attributes:{...(p.attributes||{}),[key]:e.target.value}}))}/>
   <button type="button" className="secondary" aria-label="حذف ویژگی" onClick={()=>setProduct(p=>{const attrs={...(p.attributes||{})};delete attrs[key];return {...p,attributes:attrs};})}>×</button>
