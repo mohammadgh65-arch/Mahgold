@@ -26,6 +26,9 @@ for (const token of ["PAGE_SEO", "CATEGORY_COPY", "PUBLIC_ORIGIN", "application/
 if (!worker.includes("Disallow: /admin/") || !worker.includes("Disallow: /cart/") || !worker.includes("Disallow: /checkout/")) failures.push("Robots exclusions for private/transactional pages are missing.");
 const wrangler = await readFile("wrangler.jsonc", "utf8").catch(() => "");
 if (!wrangler.includes('"/robots.txt"') || !wrangler.includes('"/sitemap.xml"')) failures.push("SEO Worker endpoints are not configured to run before static assets.");
+for (const route of ["/products/*", "/cart/*", "/checkout/*", "/about/*", "/contact/*", "/admin/*"]) {
+  if (!wrangler.includes('"' + route + '"')) failures.push("Trailing-slash route is not handled by SEO Worker: " + route);
+}
 if (!worker.includes("noindex, nofollow")) failures.push("Staging/private page noindex protection is missing.");
 const sharedCss = await readFile("assets/mpa.css", "utf8").catch(() => "");
 for (const token of [":focus-visible", "prefers-reduced-motion", "@media(max-width:620px)"]) {
