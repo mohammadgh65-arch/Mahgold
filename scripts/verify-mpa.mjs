@@ -19,6 +19,12 @@ for (const path of pages) {
 }
 const worker = await readFile("worker.js", "utf8").catch(() => "");
 if (!worker.includes("env.ASSETS.fetch") || !worker.includes("/product/index.html")) failures.push("Worker product route resolver is missing.");
+const sharedCss = await readFile("assets/mpa.css", "utf8").catch(() => "");
+for (const token of [":focus-visible", "prefers-reduced-motion", "@media(max-width:620px)"]) {
+  if (!sharedCss.includes(token)) failures.push("Shared CSS accessibility/mobile rule missing: " + token);
+}
+const checkout = await readFile("assets/checkout.mjs", "utf8").catch(() => "");
+if (!checkout.includes("const STAGING_SUBMISSION_ENABLED=false")) failures.push("Staging checkout must remain fail-closed.");
 const orderFn = await readFile("supabase/functions/mahgold-create-order/index.ts", "utf8").catch(() => "");
 if (!orderFn.includes("MAHGOLD_ORDERS_ENABLED") || !orderFn.includes("mahgold_create_order_idempotent")) failures.push("Secure order function must retain its server-side feature gate and idempotent RPC.");
 const admin = await readFile("admin/index.html", "utf8").catch(() => "");
