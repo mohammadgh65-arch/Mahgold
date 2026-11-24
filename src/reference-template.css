@@ -521,3 +521,24 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
   .ref-product-specs{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .ref-product-specs>div{padding:10px 11px;min-width:0}
 }
+
+
+/* MAHGOLD masthead: show the complete supplied logo artwork inside its frame */
+.ref-brand-masthead{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  padding:8px clamp(10px,3vw,34px)!important;box-sizing:border-box!important;
+  background:#062719!important;
+}
+.ref-brand-masthead img{
+  display:block!important;width:100%!important;height:100%!important;
+  max-width:1120px!important;max-height:100%!important;box-sizing:border-box!important;
+  object-fit:contain!important;object-position:center!important;
+  padding:0!important;transform:none!important;
+}
+/* Footer uses the same emerald-and-gold frame language without repeating the logo. */
+.ref-footer-brand{display:none!important}
+.ref-footer-frame{padding-top:14px!important}
+@media(max-width:767px){
+  .ref-brand-masthead{height:clamp(125px,34vw,170px)!important;padding:6px 9px!important}
+  .ref-brand-masthead img{max-width:100%!important}
+}
