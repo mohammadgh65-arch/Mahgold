@@ -19,3 +19,10 @@ The static-assets ignore file excludes Worker source, deployment configuration, 
 
 ## Deploy
 Use a separate Worker named `mahgold-mpa-staging` with `wrangler.jsonc`. Do not bind `mah-gold.ir` or change production DNS until the staging Worker has passed direct URL, refresh, mobile, admin-auth, cart and checkout tests.
+
+## Current staging verification notes (2026-11-24)
+
+- The existing admin panel checks both `profiles.role = 'admin'` and membership in `store_admins`. The connected Mahgold database currently reports zero rows in `store_admins`; therefore admin sign-in is expected to deny access until the intended operator's authenticated user UUID is explicitly allowlisted. Do not weaken or remove this second check to make the panel appear accessible.
+- Supabase Security Advisor currently reports leaked-password protection disabled. Enable it in Auth password/security settings before production cutover.
+- The checkout client and Edge Function remain fail-closed. Keep `STAGING_SUBMISSION_ENABLED=false` and the server-side `MAHGOLD_ORDERS_ENABLED` gate closed until licensing and a verified payment callback are ready.
+- Shared MPA CSS now includes visible keyboard focus, reduced-motion handling, and mobile navigation/layout refinements. CI verifies these requirements.
