@@ -123,3 +123,18 @@ img{max-width:100%}
   .brand{width:88px;height:56px;min-width:88px;min-height:56px}
   .footer:after{margin-top:9px}
 }
+
+
+/* Final compact brand lockup: keep the original full artwork visible at every breakpoint. */
+.header{border-bottom:1px solid #d6b45f88}
+.headrow{min-height:64px;gap:12px}
+.brand{
+  flex:0 0 104px;width:104px;height:62px;min-width:104px;min-height:62px;
+  background-position:center;background-size:contain;background-repeat:no-repeat;
+}
+.footer{padding:15px 0 17px}
+@media(max-width:620px){
+  .headrow{min-height:58px;padding:4px 0;gap:8px}
+  .brand{flex:0 0 88px;width:88px;height:56px;min-width:88px;min-height:56px}
+  .footer{padding:13px 0 15px}
+}
