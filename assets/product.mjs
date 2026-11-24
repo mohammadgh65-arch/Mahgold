@@ -28,6 +28,7 @@ else{
  const{data:p,error}=await c.from("products").select("id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,tag,attributes,created_at").eq("id",id).eq("is_active",true).maybeSingle();
  if(error||!p){root.innerHTML='<div class="status">محصول پیدا نشد یا در حال حاضر فعال نیست.</div>'}
  else{
+  try{
   document.querySelector("#product-name").textContent=p.name;document.querySelector("#product-description").textContent=p.description||"مشخصات کامل محصول مه‌گلد";document.title=p.name+" | مه‌گلد";
   const meta=document.querySelector('meta[name="description"]');if(meta)meta.content=(p.description||p.name).slice(0,155);
   const stock=Number(p.stock||0)>0?"موجود":"برای اطلاع از موجودی تماس بگیرید";
@@ -39,5 +40,6 @@ else{
   root.innerHTML='<div class="detail-layout"><div class="detail-visual"><div class="detail-photo-frame">'+(image?'<img class="detail-photo" id="detail-photo" src="'+esc(image)+'" alt="'+esc(p.name)+'" loading="eager"><span class="zoom-hint">⌕ لمس تصویر برای زوم حرفه‌ای</span>':'<div class="status">تصویری برای این محصول ثبت نشده است.</div>')+'</div></div><div class="detail-copy"><h2>'+esc(p.name)+'</h2><p class="detail-description">'+esc(p.description||"برای دریافت اطلاعات بیشتر درباره این محصول با مه‌گلد در ارتباط باشید.")+'</p><div class="detail-price">'+price+'</div><div class="spec-title">مشخصات محصول</div><table class="spec-table"><tbody>'+specs.map(x=>row(x[0],x[1])).join("")+'</tbody></table><div class="detail-actions"><button class="btn" id="add" '+(Number(p.price_toman)>0?'':'disabled')+'>'+(Number(p.price_toman)>0?'افزودن به سبد خرید':'قیمت: استعلام تلفنی')+'</button><a class="btn secondary" href="/products/">بازگشت به محصولات</a></div></div></div>';
   if(image){const photo=document.querySelector("#detail-photo");photo.addEventListener("error",()=>{photo.parentElement.innerHTML='<div class="status">تصویر محصول در دسترس نیست.</div>'});const openZoom=setupZoom(image,p.name);photo.addEventListener("click",openZoom)}
   if(Number(p.price_toman)>0){document.querySelector("#add").onclick=()=>{let a=[];try{a=JSON.parse(localStorage.getItem("mahgold_cart")||"[]")}catch{}const old=a.find(x=>String(x.product_id||x.id)===String(p.id));if(old)old.quantity=(old.quantity||1)+1;else a.push({product_id:p.id,id:p.id,name:p.name,price_toman:p.price_toman,image_url:p.image_url,quantity:1});localStorage.setItem("mahgold_cart",JSON.stringify(a));alert("به سبد خرید اضافه شد.")}}
+  }catch(e){console.error("Product detail render failed",e);root.innerHTML='<div class="status">نمایش مشخصات محصول با خطا مواجه شد. لطفاً صفحه را دوباره بارگذاری کنید.</div>'}
  }
 }
