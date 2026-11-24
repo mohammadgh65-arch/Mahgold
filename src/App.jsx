@@ -590,16 +590,19 @@ export default function App() {
       <div className="ref-product-page-top"><button className="ref-product-back" onClick={closeProduct}><ArrowLeft size={17}/> بازگشت به فروشگاه</button><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span></div>
       <div className="ref-product-page-grid">
         <ProductImage product={selectedProduct} className="ref-product-page-image" onClick={()=>{setZoomScale(1);setZoomOpen(true);}}/>
+        <section className="ref-product-specs-wrap" aria-label="جدول مشخصات محصول">
+          <div className="ref-product-specs-title">مشخصات محصول</div>
+          <div className="ref-product-specs" role="table">
+            <div role="row"><span role="cell">وزن</span><b role="cell">{gram(selectedProduct.weight_grams)}</b></div>
+            <div role="row"><span role="cell">عیار</span><b role="cell">{money(selectedProduct.karat||18)}</b></div>
+            <div role="row"><span role="cell">موجودی</span><b role="cell">{money(selectedProduct.stock||0)} عدد</b></div>
+            {Object.entries(selectedProduct.attributes||{}).filter(([key,value])=>!hiddenProductAttributeKeys.has(String(key).trim())&&String(key).trim()&&String(value??'').trim()).map(([key,value])=><div role="row" key={key}><span role="cell">{String(key).trim()}</span><b role="cell">{String(value)}</b></div>)}
+          </div>
+        </section>
         <div className="ref-product-page-copy">
           <span className="text-xs text-muted-foreground">{selectedProduct.category}</span>
           <h1>{selectedProduct.name}</h1>
           <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
-          <div className="ref-product-specs">
-            <div><span>وزن</span><b>{gram(selectedProduct.weight_grams)}</b></div>
-            <div><span>عیار</span><b>{money(selectedProduct.karat||18)}</b></div>
-            <div><span>موجودی</span><b>{money(selectedProduct.stock||0)} عدد</b></div>
-            {Object.entries(selectedProduct.attributes||{}).filter(([key,value])=>!hiddenProductAttributeKeys.has(String(key).trim())&&String(key).trim()&&String(value??'').trim()).map(([key,value])=><div key={key}><span>{String(key).trim()}</span><b>{String(value)}</b></div>)}
-          </div>
           <strong className="ref-product-page-price">{money(selectedProduct.price_toman)} <small>تومان</small></strong>
           <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1||(selectedProduct.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(selectedProduct)}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
           {checkoutError&&<p className="ref-message">{checkoutError}</p>}
