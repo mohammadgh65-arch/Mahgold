@@ -36,6 +36,12 @@ const PAGE_SEO = {
     description: "راه‌های ارتباط با فروشگاه مه‌گلد برای پرسش درباره محصولات، دریافت اطلاعات و پیگیری درخواست‌ها."
   }
 };
+const CATEGORY_COPY = {
+  "/category/jewelry/": { heading: "طلای زینتی", intro: "در این بخش می‌توانید مصنوعات طلای زینتی مه‌گلد از جمله انگشتر، گردنبند، دستبند، گوشواره و نیم‌ست را مشاهده کنید. مشخصات هر محصول، از جمله وزن و عیار، در صفحه اختصاصی آن ارائه می‌شود." },
+  "/category/melted-gold/": { heading: "طلای آب‌شده", intro: "محصولات دسته طلای آب‌شده را در این صفحه بررسی کنید. اطلاعات و مشخصات هر محصول بر اساس داده‌های ثبت‌شده در فروشگاه مه‌گلد نمایش داده می‌شود." },
+  "/category/coins/": { heading: "سکه طلا", intro: "در این دسته می‌توانید محصولات سکه طلا را مشاهده و مشخصات ثبت‌شده هر مورد را پیش از تصمیم‌گیری بررسی کنید." },
+  "/category/bars/": { heading: "شمش طلا", intro: "انواع شمش ثبت‌شده در فروشگاه مه‌گلد را در این صفحه ببینید و جزئیات محصول و اطلاعات وزن را در صفحه اختصاصی آن بررسی کنید." }
+};
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -80,7 +86,7 @@ function seoHead(response, url, seo, options = {}) {
     .transform(response);
 }
 function injectNavigation(response) {
-  const script = '<script>(() => { const links = [["/products/","همه محصولات"],["/category/jewelry/","طلای زینتی"],["/category/melted-gold/","طلای آب‌شده"],["/category/coins/","سکه"],["/category/bars/","شمش"],["/cart/","سبد خرید"],["/about/","درباره ما"],["/contact/","تماس"]]; const attach = (selector) => { const nav = document.querySelector(selector); if (!nav) return; for (const [href, label] of links) { if (nav.querySelector("[data-mpa-href=\\\"" + href + "\\\"]")) continue; const a = document.createElement("a"); a.href = href; a.dataset.mpaHref = href; a.textContent = label; nav.appendChild(a); } }; const update = () => { attach(".ref-primary-nav"); attach(".ref-mobile-links"); }; const observer = new MutationObserver(update); observer.observe(document.documentElement, { childList: true, subtree: true }); update(); })();</script>';
+  const script = '<script>(() => { const links = [["/products/","همه محصولات"],["/category/jewelry/","طلای زینتی"],["/category/melted-gold/","طلای آب‌شده"],["/category/coins/","سکه"],["/category/bars/","شمش"],["/cart/","سبد خرید"],["/about/","درباره ما"],["/contact/","تماس"]]; const attach = (selector) => { const nav = document.querySelector(selector); if (!nav) return; for (const [href, label] of links) { if (nav.querySelector("[data-mpa-href=\\\\\\\"" + href + "\\\\\\\"]")) continue; const a = document.createElement("a"); a.href = href; a.dataset.mpaHref = href; a.textContent = label; nav.appendChild(a); } }; const update = () => { attach(".ref-primary-nav"); attach(".ref-mobile-links"); }; const observer = new MutationObserver(update); observer.observe(document.documentElement, { childList: true, subtree: true }); update(); })();</script>';
   return new HTMLRewriter().on("body", {
     element(element) { element.append(script + '<script type="module" src="/assets/cart-ui.mjs"></script>', { html: true }); }
   }).transform(response);
@@ -95,7 +101,7 @@ async function productDocument(request, env, url, productId) {
   if (!product) return null;
 
   const title = String(product.name || "محصول مه‌گلد");
-  const description = String(product.description || ("مشاهده مشخصات، وزن، عیار و اطلاعات محصول " + title + " در فروشگاه مه‌گلد.")).replace(/\\s+/g, " ").slice(0, 155);
+  const description = String(product.description || ("مشاهده مشخصات، وزن، عیار و اطلاعات محصول " + title + " در فروشگاه مه‌گلد.")).replace(/\s+/g, " ").slice(0, 155);
   const canonicalPath = "/product/" + productId + "-" + productSlug(title) + "/";
   const canonical = absolute(canonicalPath);
   const schema = {
@@ -104,7 +110,7 @@ async function productDocument(request, env, url, productId) {
     name: title,
     description,
     category: product.category || undefined,
-    image: product.image_url && /^https?:\\/\\//i.test(product.image_url) ? [product.image_url] : undefined,
+    image: product.image_url && /^https?:\/\//i.test(product.image_url) ? [product.image_url] : undefined,
     brand: { "@type": "Brand", name: "مه‌گلد" },
     url: canonical,
     additionalProperty: [
@@ -134,6 +140,7 @@ async function productDocument(request, env, url, productId) {
   });
   const headers = new Headers(seoResponse.headers);
   headers.set("Cache-Control", "no-store");
+  if (url.hostname.endsWith("workers.dev")) headers.set("X-Robots-Tag", "noindex, nofollow");
   return new Response(seoResponse.body, { status: seoResponse.status, headers });
 }
 async function sitemapResponse() {
@@ -157,8 +164,8 @@ async function sitemapResponse() {
 function robotsResponse(url) {
   const staging = url.hostname.endsWith("workers.dev");
   const body = staging
-    ? "User-agent: *\\nDisallow: /\\n"
-    : "User-agent: *\\nAllow: /\\nDisallow: /admin/\\nDisallow: /cart/\\nDisallow: /checkout/\\nSitemap: " + absolute("/sitemap.xml") + "\\n";
+    ? "User-agent: *\nDisallow: /\n"
+    : "User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /cart/\nDisallow: /checkout/\nSitemap: " + absolute("/sitemap.xml") + "\n";
   return new Response(body, { headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=300" } });
 }
 export default {
@@ -176,7 +183,7 @@ export default {
       url.pathname = path + "/";
       return Response.redirect(url, 308);
     }
-    const productMatch = path.match(/^\\/product\\/([^/]+)\\/?$/);
+    const productMatch = path.match(/^\/product\/([^/]+)\/?$/);
     if (productMatch) {
       if (!path.endsWith("/")) {
         url.pathname = path + "/";
@@ -193,9 +200,7 @@ export default {
 
     const response = await env.ASSETS.fetch(request);
     let output = response;
-    if (path === "/" || path === "/index.html") {
-      output = injectNavigation(response);
-    }
+    if (path === "/" || path === "/index.html") output = injectNavigation(response);
     const route = path === "/index.html" ? "/" : path;
     const seo = PAGE_SEO[route];
     if (seo && response.headers.get("content-type")?.includes("text/html")) {
@@ -207,6 +212,13 @@ export default {
         description: PAGE_SEO["/"].description
       } : undefined;
       output = seoHead(output, url, seo, { schema, noindex: url.hostname.endsWith("workers.dev") });
+    }
+    const category = CATEGORY_COPY[route];
+    if (category && response.headers.get("content-type")?.includes("text/html")) {
+      output = new HTMLRewriter()
+        .on("#category-title", { element(element) { element.setInnerContent(category.heading); } })
+        .on(".hero > p", { element(element) { element.setInnerContent(category.intro); } })
+        .transform(output);
     }
     if (["/admin/", "/cart/", "/checkout/"].includes(route) && response.headers.get("content-type")?.includes("text/html")) {
       output = new HTMLRewriter().on("head", {
