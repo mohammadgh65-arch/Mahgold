@@ -87,13 +87,13 @@ function seoHead(response, url, seo, options = {}) {
     .transform(response);
 }
 function injectNavigation(response) {
-  const script = '<script>(() => { const links = [["/products/","همه محصولات"],["/category/jewelry/","طلای زینتی"],["/category/melted-gold/","طلای آب‌شده"],["/category/coins/","سکه"],["/category/bars/","شمش"],["/cart/","سبد خرید"],["/about/","درباره ما"],["/contact/","تماس"]]; const attach = (selector) => { const nav = document.querySelector(selector); if (!nav) return; for (const [href, label] of links) { if (nav.querySelector("[data-mpa-href=\\\\\\\"" + href + "\\\\\\\"]")) continue; const a = document.createElement("a"); a.href = href; a.dataset.mpaHref = href; a.textContent = label; nav.appendChild(a); } }; const update = () => { attach(".ref-primary-nav"); attach(".ref-mobile-links"); }; const observer = new MutationObserver(update); observer.observe(document.documentElement, { childList: true, subtree: true }); update(); })();</script>';
+  const script = '<script>(() => { const links = [["/products/","همه محصولات"],["/category/jewelry/","طلای زینتی"],["/category/melted-gold/","طلای آب‌شده"],["/category/coins/","سکه"],["/category/bars/","شمش"],["/cart/","سبد خرید"],["/about/","درباره ما"],["/contact/","تماس"]]; const attach = (selector) => { const nav = document.querySelector(selector); if (!nav) return; for (const [href, label] of links) { if ([...nav.querySelectorAll("[data-mpa-href]")].some((item) => item.dataset.mpaHref === href)) continue; const a = document.createElement("a"); a.href = href; a.dataset.mpaHref = href; a.textContent = label; nav.appendChild(a); } }; const update = () => { attach(".ref-primary-nav"); attach(".ref-mobile-links"); }; const observer = new MutationObserver(update); observer.observe(document.documentElement, { childList: true, subtree: true }); update(); })();</script>';
   return new HTMLRewriter().on("body", {
     element(element) { element.append(script + '<script type="module" src="/assets/cart-ui.mjs"></script>', { html: true }); }
   }).transform(response);
 }
 async function productDocument(request, env, url, productId) {
-  const fields = "id,name,description,category,price_toman,image_url,weight_grams,karat,stock,created_at";
+  const fields = "id,name,description,category,price_toman,image_url,weight_grams,karat,stock,attributes,created_at";
   const apiUrl = SUPABASE_URL + "/rest/v1/products?id=eq." + encodeURIComponent(productId) + "&is_active=eq.true&select=" + fields;
   const lookup = await fetch(apiUrl, { headers: { apikey: SUPABASE_PUBLIC_KEY, Accept: "application/json" } });
   if (!lookup.ok) return null;
@@ -116,7 +116,15 @@ async function productDocument(request, env, url, productId) {
     url: canonical,
     additionalProperty: [
       product.weight_grams != null ? { "@type": "PropertyValue", name: "وزن", value: product.weight_grams, unitText: "گرم" } : null,
-      product.karat != null ? { "@type": "PropertyValue", name: "عیار", value: product.karat } : null
+      product.karat != null ? { "@type": "PropertyValue", name: "عیار", value: product.karat } : null,
+      ...Object.entries(product.attributes && typeof product.attributes === "object" && !Array.isArray(product.attributes) ? product.attributes : {})
+        .filter(([key, value]) => !["variant_sku", "parent_product_id", "variant_model_name", "internal_sku", "admin_note"].includes(key) && value != null && value !== "")
+        .map(([key, value]) => ({
+          "@type": "PropertyValue",
+          name: key.replace(/[_-]+/g, " ").trim(),
+          value: Array.isArray(value) ? value.filter(item => item != null && String(item).trim()).join("، ") :
+            typeof value === "object" ? JSON.stringify(value) : String(value)
+        }))
     ].filter(Boolean)
   };
   if (Number(product.price_toman) > 0) {
