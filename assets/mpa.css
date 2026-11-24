@@ -57,3 +57,45 @@ img{max-width:100%}
   .nav{padding:7px 2px 5px}
   .footer{padding:16px 0 18px}
 }
+
+
+/* Approved Mahgold logo and matching velvet-and-gold ribbon trim. */
+.header{
+  background:
+    linear-gradient(180deg,#f4d98b 0,#b88b3c 2px,#e8c875 3px,transparent 4px calc(100% - 4px),#b88b3c calc(100% - 3px),#f4d98b 100%),
+    radial-gradient(ellipse at 18% 0%,#1b6249 0,transparent 48%),
+    repeating-linear-gradient(112deg,#0a3e30 0,#0a3e30 17px,#104b39 18px,#0b4434 36px);
+  border:0;
+  box-shadow:0 8px 24px #0006,inset 0 1px #fff2b455;
+}
+.headrow{min-height:64px;gap:14px}
+.brand{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  flex:0 0 96px;width:96px;height:62px;min-width:0;min-height:0;
+  padding:0;border:1px solid #e4c77b;border-radius:6px;overflow:hidden;
+  background:#073b2d;box-shadow:inset 0 0 0 2px #d0aa5144,0 3px 10px #001c1470;
+  line-height:0;font-size:0;
+}
+.brand:before,.brand:after{display:none}
+.brand img{display:block;width:100%;height:100%;object-fit:cover}
+.nav{color:#f1e5c6}
+.nav a:hover{color:#ffe4a0;text-shadow:0 0 10px #f2d48a66}
+.cartlink{border-color:#e2c477;color:#f4d990;background:#073b2d88;padding:8px 13px}
+.footer{
+  position:relative;margin-top:20px;padding:17px 0 19px;
+  border:0;
+  border-top:3px solid transparent;
+  border-bottom:2px solid transparent;
+  background:
+    linear-gradient(180deg,#f4d98b 0,#b88b3c 1px,#e8c875 3px,transparent 4px calc(100% - 3px),#b88b3c calc(100% - 2px),#f4d98b 100%),
+    radial-gradient(ellipse at 82% 0%,#1b6249 0,transparent 48%),
+    repeating-linear-gradient(112deg,#0a3e30 0,#0a3e30 17px,#104b39 18px,#0b4434 36px);
+  color:#e8dbb9;box-shadow:0 -8px 24px #0003;
+}
+.footer strong{color:#f3d991}
+@media(max-width:620px){
+  .headrow{min-height:58px;padding:5px 0;gap:8px}
+  .brand{flex-basis:82px;width:82px;height:54px}
+  .nav{padding:7px 2px 5px}
+  .footer{padding:14px 0 16px}
+}
