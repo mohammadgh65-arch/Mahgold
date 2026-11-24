@@ -236,15 +236,15 @@ export default function App() {
 
   const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})),[siteContent]);
   const offerItems=useMemo(()=>{
-    const excludedOfferCategory=category=>/شمش|آب\s*شده|آبشده/.test(String(category||'').replace(/ي/g,'ی'));
-    const current=products.filter(product=>Number(product.price_toman)>0&&!excludedOfferCategory(product.category)).slice(0,5).map(product=>({
+    const excludedOfferItem=(category,title='')=>/شمش|آب\s*شده|آبشده/.test(`${category||''} ${title||''}`.replace(/ي/g,'ی'));
+    const current=products.filter(product=>Number(product.price_toman)>0&&!excludedOfferItem(product.category,product.name)).slice(0,5).map(product=>({
       id:product.id,title:product.name,category:product.category,
       image:product.image_url||tiles.find(tile=>tile.name===product.category)?.image||tiles[0].image,
       product
     }));
     const fallback=[
-      ...slides.filter(slide=>!excludedOfferCategory(slide.category)).map(slide=>({title:slide.title,category:slide.category,image:slide.image,product:null})),
-      ...tiles.filter(tile=>!excludedOfferCategory(tile.name)).map(tile=>({title:tile.name,category:tile.name,image:tile.image,product:null}))
+      ...slides.filter(slide=>!excludedOfferItem(slide.category,slide.title)).map(slide=>({title:slide.title,category:slide.category,image:slide.image,product:null})),
+      ...tiles.filter(tile=>!excludedOfferItem(tile.name,tile.desc)).map(tile=>({title:tile.name,category:tile.name,image:tile.image,product:null}))
     ];
     return [...current,...fallback.slice(0,Math.max(0,5-current.length))].slice(0,5);
   },[products]);
