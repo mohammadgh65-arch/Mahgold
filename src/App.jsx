@@ -84,7 +84,7 @@ function ProductDetailImage({product,onClick}) {
   const startTouch=event=>{touchGesture.current=true;updateLens(event);};
   const endTouch=()=>{setLens(null);window.setTimeout(()=>{touchGesture.current=false;},450);};
   const handleClick=()=>{if(touchGesture.current)return;onClick?.();};
-  const lensLeft=lens?Math.max(8,Math.min(lens.width-158,lens.x-79)):0;
+  const lensLeft=lens?Math.max(8,Math.min(lens.width-148,lens.x-74)):0;
   const lensTop=lens?Math.max(8,lens.y-184):0;
   return <div ref={imageBox} className="ref-product-image ref-product-page-image ref-product-touch-image" onClick={handleClick} onTouchStart={startTouch} onTouchMove={updateLens} onTouchEnd={endTouch} onTouchCancel={endTouch} role="button" tabIndex={0} aria-label="برای مشاهده جزئیات تصویر، انگشت را روی آن حرکت دهید" onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick?.();}}}>
     <img src={src} alt={product.name||'محصول مه‌گلد'} onError={()=>setFailed(true)} draggable="false"/>
