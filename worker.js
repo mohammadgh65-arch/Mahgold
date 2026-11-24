@@ -3,7 +3,7 @@ const SUPABASE_PUBLIC_KEY = "sb_publishable_8UgFkQuDJNNeez2O1CNv3Q_Jf44PrL9";
 function injectNavigation(response) {
   const script = '<script>(() => { const links = [["/products/","همه محصولات"],["/category/jewelry/","طلای زینتی"],["/category/melted-gold/","طلای آب‌شده"],["/category/coins/","سکه"],["/category/bars/","شمش"],["/cart/","سبد خرید"],["/about/","درباره ما"],["/contact/","تماس"]]; const attach = (selector) => { const nav = document.querySelector(selector); if (!nav) return; for (const [href, label] of links) { if (nav.querySelector("[data-mpa-href=\\\"" + href + "\\\"]")) continue; const a = document.createElement("a"); a.href = href; a.dataset.mpaHref = href; a.textContent = label; nav.appendChild(a); } }; const update = () => { attach(".ref-primary-nav"); attach(".ref-mobile-links"); }; const observer = new MutationObserver(update); observer.observe(document.documentElement, { childList: true, subtree: true }); update(); })();</script>';
   return new HTMLRewriter().on("body", {
-    element(element) { element.append(script, { html: true }); }
+    element(element) { element.append(script + '<script type="module" src="/assets/cart-ui.mjs"></script>', { html: true }); }
   }).transform(response);
 }
 function escapeAttribute(value) {
