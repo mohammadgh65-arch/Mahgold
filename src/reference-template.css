@@ -525,3 +525,72 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
   .ref-product-specs>div{min-height:40px;padding:8px 3px;font-size:11px}
   .ref-product-page-price{padding:13px 15px;font-size:23px}
 }
+
+
+/* MAHGOLD LUXE SPECIFICATIONS — dark charcoal and luminous gold */
+.ref-product-specs-wrap{
+  position:relative;isolation:isolate;overflow:hidden;
+  padding:20px 21px 10px!important;
+  border:1px solid rgba(218,177,91,.78)!important;
+  border-radius:19px!important;
+  background:
+    radial-gradient(ellipse at 8% 0%,rgba(177,133,54,.17),transparent 48%),
+    linear-gradient(145deg,#17231e 0%,#0c1713 52%,#101d17 100%)!important;
+  box-shadow:
+    0 16px 38px rgba(4,17,12,.22),
+    inset 0 1px 0 rgba(255,226,164,.13),
+    inset 0 0 28px rgba(196,151,66,.055),
+    0 0 0 1px rgba(255,255,255,.025)!important;
+}
+.ref-product-specs-wrap:before{
+  content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;
+  background:linear-gradient(112deg,transparent 8%,rgba(255,224,158,.055) 34%,transparent 59%);
+}
+.ref-product-specs-title{
+  display:flex;align-items:center;gap:11px;
+  margin:0 0 11px!important;padding:0 0 14px!important;
+  border-bottom:1px solid rgba(218,177,91,.38)!important;
+  color:#f3d58e!important;font-size:16px!important;font-weight:850!important;
+  letter-spacing:.01em;text-shadow:0 0 14px rgba(238,193,99,.25);
+}
+.ref-product-specs-title:before{
+  content:"";width:4px;height:22px;flex:none;border-radius:5px;
+  background:linear-gradient(180deg,#fff0b8,#c08b35);
+  box-shadow:0 0 12px rgba(239,190,91,.48);
+}
+.ref-product-specs{
+  position:relative;display:flex!important;flex-direction:column!important;gap:0!important;
+}
+.ref-product-specs>div{
+  position:relative;display:flex!important;align-items:center;justify-content:space-between;
+  gap:16px;min-height:47px;padding:11px 12px!important;
+  border:0!important;border-bottom:1px solid rgba(210,171,91,.19)!important;
+  border-radius:8px!important;background:transparent!important;
+  font-size:12px!important;transition:background .22s ease,box-shadow .22s ease,transform .22s ease;
+}
+.ref-product-specs>div:nth-child(even){
+  background:linear-gradient(90deg,rgba(222,181,96,.075),rgba(222,181,96,.018))!important;
+}
+.ref-product-specs>div:last-child{border-bottom:0!important}
+.ref-product-specs>div:hover{
+  background:linear-gradient(90deg,rgba(229,188,101,.16),rgba(229,188,101,.045))!important;
+  box-shadow:inset 3px 0 0 #c99a4b,0 4px 16px rgba(0,0,0,.12);
+  transform:translateX(-2px);
+}
+.ref-product-specs span{
+  flex:0 0 38%;color:#c9b88f!important;font-weight:550!important;
+}
+.ref-product-specs b{
+  color:#f5d98f!important;font-weight:750!important;text-align:left;
+  overflow-wrap:anywhere;text-shadow:0 0 10px rgba(231,190,103,.13);
+}
+@media(max-width:700px){
+  .ref-product-specs-wrap{padding:16px 14px 8px!important;border-radius:16px!important}
+  .ref-product-specs-title{font-size:14px!important;padding-bottom:11px!important}
+  .ref-product-specs>div{min-height:43px;padding:10px 9px!important;font-size:11px!important}
+  .ref-product-specs span{flex-basis:36%}
+}
+@media(prefers-reduced-motion:reduce){
+  .ref-product-specs>div{transition:none}
+  .ref-product-specs>div:hover{transform:none}
+}
