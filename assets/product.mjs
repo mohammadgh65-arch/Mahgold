@@ -33,8 +33,8 @@ else{
   const stock=Number(p.stock||0)>0?"موجود":"برای اطلاع از موجودی تماس بگیرید";
   const specs=[["دسته‌بندی",p.category||"—"],["وزن",p.weight_grams!=null?fmt(p.weight_grams)+" گرم":"—"],["عیار",p.karat?fmt(p.karat):"—"],["وضعیت موجودی",stock]];
   if(p.tag)specs.push(["برچسب محصول",p.tag]);
-  for(const [k,v] of attrRows(p.attributes))specs.push([k,v]);
-  if(p.created_at){const d=new Date(p.created_at);if(!Number.isNaN(d.getTime()))specs.push(["تاریخ ثبت",new Intl.DateTimeFormat("fa-IR",{year:"numeric",month:"long",day:"numeric"}).format(d)])}
+  let extraSpecs=[];try{extraSpecs=attrRows(p.attributes&&typeof p.attributes==="object"?p.attributes:{})}catch(e){console.warn("Product attributes could not be rendered",e)}
+  for(const [k,v] of extraSpecs)specs.push([k,v]);
   const image=p.image_url||"",price=Number(p.price_toman)>0?money(p.price_toman):"استعلام قیمت";
   root.innerHTML='<div class="detail-layout"><div class="detail-visual"><div class="detail-photo-frame">'+(image?'<img class="detail-photo" id="detail-photo" src="'+esc(image)+'" alt="'+esc(p.name)+'" loading="eager"><span class="zoom-hint">⌕ لمس تصویر برای زوم حرفه‌ای</span>':'<div class="status">تصویری برای این محصول ثبت نشده است.</div>')+'</div></div><div class="detail-copy"><h2>'+esc(p.name)+'</h2><p class="detail-description">'+esc(p.description||"برای دریافت اطلاعات بیشتر درباره این محصول با مه‌گلد در ارتباط باشید.")+'</p><div class="detail-price">'+price+'</div><div class="spec-title">مشخصات محصول</div><table class="spec-table"><tbody>'+specs.map(x=>row(x[0],x[1])).join("")+'</tbody></table><div class="detail-actions"><button class="btn" id="add" '+(Number(p.price_toman)>0?'':'disabled')+'>'+(Number(p.price_toman)>0?'افزودن به سبد خرید':'قیمت: استعلام تلفنی')+'</button><a class="btn secondary" href="/products/">بازگشت به محصولات</a></div></div></div>';
   if(image){const photo=document.querySelector("#detail-photo");photo.addEventListener("error",()=>{photo.parentElement.innerHTML='<div class="status">تصویر محصول در دسترس نیست.</div>'});const openZoom=setupZoom(image,p.name);photo.addEventListener("click",openZoom)}
