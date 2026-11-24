@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - mahgold-independent-react
+      - feature/product-pages-dynamic-attributes-cart-toast
+  pull_request:
+    branches:
+      - mahgold-cloudflare-fix-20261123
   workflow_dispatch:
 
 permissions:

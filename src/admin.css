@@ -133,3 +133,14 @@
 .admin-optional-fields summary{cursor:pointer;font-size:12px;font-weight:700;color:#315440}
 .admin-hint{padding:11px 13px;border:1px solid #e6d6ad;border-radius:10px;background:#fbf5e8;color:#725a2b;font-size:11px;line-height:1.9}
 @media(max-width:520px){.admin-product-core,.admin-optional-fields{grid-template-columns:1fr}}
+
+
+/* Dynamic product attributes editor */
+.admin-attributes-editor{display:grid;gap:9px;padding:13px;border:1px solid #e5d8c2;border-radius:12px;background:#fcf8ef}
+.admin-attributes-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#244432;font-size:12px}
+.admin-attributes-heading button{padding:8px 11px;font-size:11px}
+.admin-attributes-editor>small{font-size:10px;line-height:1.8;color:#7a725f}
+.admin-attribute-row{display:grid;grid-template-columns:1fr 1fr 38px;gap:7px;align-items:center}
+.admin-attribute-row input{min-width:0;width:100%;padding:10px;border:1px solid #e5d8c2;border-radius:8px;background:#fffdf8;color:#29251e}
+.admin-attribute-row button{min-height:38px;padding:4px 10px;color:#9a4036}
+@media(max-width:520px){.admin-attribute-row{grid-template-columns:1fr 1fr 34px;gap:5px}.admin-attribute-row input{font-size:11px;padding:9px 7px}}

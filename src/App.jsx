@@ -1,7 +1,7 @@
 import { MAHGOLD_LOGO } from './mahgold-brand';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight,
+  Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn, ZoomOut,
   ShieldCheck, Gift, Headphones, Plus, Minus, UserRound, LogOut,
   House, LayoutGrid, Phone, MapPin, PackageCheck
 } from 'lucide-react';
@@ -48,6 +48,7 @@ const presetCategories = [
   'دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'
 ];
 const jewelryProductCategories = new Set(['طلای زینتی','انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات']);
+const hiddenProductAttributeKeys = new Set(['has_stone','stone_labor_percent','market_quote_symbol','parent_product_id','variant_model_name','variant_size','variant_sku']);
 const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85';
 const money = value => new Intl.NumberFormat('fa-IR').format(Number(value || 0));
 const gram = value => new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(Number(value || 0)) + ' گرم';
@@ -56,10 +57,10 @@ const toLatinDigits = value => value.replace(/[۰-۹٠-٩]/g, d => {
   return String(fa.indexOf(d)>=0 ? fa.indexOf(d) : ar.indexOf(d));
 });
 
-function ProductImage({product, className=''}) {
+function ProductImage({product, className='', onClick}) {
   const [failed,setFailed] = useState(false);
   const src = !failed && product.image_url ? product.image_url : tiles.find(t=>t.name===product.category)?.image || tiles[0].image;
-  return <div className={'ref-product-image ' + className}>
+  return <div className={'ref-product-image ' + className} onClick={onClick} role={onClick?'button':undefined} tabIndex={onClick?0:undefined} onKeyDown={onClick?(e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick();}}):undefined}>
     <img src={src} alt={product.name || 'محصول مه‌گلد'} loading="lazy" onError={()=>setFailed(true)}/>
   </div>;
 }
@@ -189,6 +190,9 @@ export default function App() {
   const [checkoutError,setCheckoutError]=useState('');
   const [orderResult,setOrderResult]=useState(null);
   const [selectedProduct,setSelectedProduct]=useState(null);
+  const [zoomOpen,setZoomOpen]=useState(false);
+  const [zoomScale,setZoomScale]=useState(1);
+  const [cartToast,setCartToast]=useState('');
   const [customer,setCustomer]=useState({name:'',phone:'',email:'',address:'',city:'',postalCode:'',note:''});
   const [menuOpen,setMenuOpen]=useState(false);
   const [activeSlide,setActiveSlide]=useState(0);
@@ -241,7 +245,7 @@ export default function App() {
     (async()=>{
       try{
         const [productResult,categoryResult,quoteResult]=await Promise.all([
-          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,created_at,tag,pricing_mode')
+          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,created_at,tag,pricing_mode,attributes')
             .eq('is_active',true).order('created_at',{ascending:false}),
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
             .eq('is_active',true).order('sort_order',{ascending:true}),
@@ -265,6 +269,8 @@ export default function App() {
     return()=>{active=false;};
   },[]);
   useEffect(()=>{try{localStorage.setItem('mahgold_cart',JSON.stringify(cart));}catch{}},[cart]);
+  useEffect(()=>{if(!cartToast)return;const timer=setTimeout(()=>setCartToast(''),3200);return()=>clearTimeout(timer);},[cartToast]);
+  useEffect(()=>{const syncProductRoute=()=>{const match=window.location.pathname.match(/^\/product\/([^/]+)\/?$/);if(!match){setSelectedProduct(null);return;}const product=products.find(p=>p.id===decodeURIComponent(match[1]));if(product)setSelectedProduct(product);};syncProductRoute();window.addEventListener('popstate',syncProductRoute);return()=>window.removeEventListener('popstate',syncProductRoute);},[products]);
   useEffect(()=>{setCheckoutRequestKey(null);},[cart,customer]);
 
   const categories=useMemo(()=>{
@@ -291,16 +297,17 @@ export default function App() {
   const quoteIsManual=quote?.source==='manual'&&quote?.is_live===false;
   const quoteFresh=(quote?.is_live===true||quoteIsManual)&&Number.isFinite(quoteObservedAt)&&quoteObservedAt<=clockNow+60000&&clockNow-quoteObservedAt<=300000;
 
+  const openProduct=product=>{setSelectedProduct(product);window.history.pushState({mahgoldProduct:true},'', '/product/'+encodeURIComponent(product.id));window.scrollTo({top:0,behavior:'auto'});};
+  const closeProduct=()=>{setSelectedProduct(null);if(window.location.pathname.startsWith('/product/'))window.history.pushState({},'', '/');};
   const addToCart=product=>{
     if(!supabase||dataStatus!=='connected'||!product.id){setCheckoutError('اتصال فروشگاه برقرار نیست.');return;}
     if(product.pricing_mode==='auto'&&!quoteFresh){setCheckoutError('نرخ معتبر طلای ۱۸ عیار در دسترس نیست؛ نرخ دستی یا خودکار باید در ۵ دقیقه اخیر ثبت شده باشد.');return;}
-    setCart(old=>{
-      const previous=old.find(item=>item.id===product.id);
-      const nextQty=(previous?.qty||0)+1;
-      if(nextQty>Number(product.stock||0)){setCheckoutError('تعداد انتخاب‌شده از موجودی محصول بیشتر است.');return old;}
-      return previous?old.map(item=>item.id===product.id?{...item,qty:nextQty}:item):[...old,{...product,qty:1}];
-    });
+    const previous=cart.find(item=>item.id===product.id);
+    const nextQty=Number(previous?.qty||0)+1;
+    if(nextQty>Number(product.stock||0)){setCheckoutError('تعداد انتخاب‌شده از موجودی محصول بیشتر است.');return;}
+    setCart(old=>previous?old.map(item=>item.id===product.id?{...item,qty:nextQty}:item):[...old,{...product,qty:1}]);
     setCheckoutError('');
+    setCartToast('«'+product.name+'» به سبد خرید اضافه شد.');
   };
   const changeQuantity=(id,delta)=>{
     const current=cart.find(item=>item.id===id);
@@ -454,12 +461,12 @@ export default function App() {
           </div>
           <div className="ref-product-grid">
             {filtered.map(product=><article className="ref-product-card group" key={product.id}>
-              <button className="block w-full overflow-hidden text-right" onClick={()=>setSelectedProduct(product)} aria-label={'مشاهده '+product.name}>
+              <button className="block w-full overflow-hidden text-right" onClick={()=>openProduct(product)} aria-label={'مشاهده '+product.name}>
                 <ProductImage product={product}/>
               </button>
               <div className="ref-product-body">
                 <span className="text-[10px] text-muted-foreground md:text-[11px]">{product.category}</span>
-                <button className="ref-product-name line-clamp-1 text-right" onClick={()=>setSelectedProduct(product)}>{product.name}</button>
+                <button className="ref-product-name line-clamp-1 text-right" onClick={()=>openProduct(product)}>{product.name}</button>
                 <div className="mt-0.5 text-[11px] text-muted-foreground">{[product.weight_grams?gram(product.weight_grams):null,product.karat?money(product.karat)+' عیار':null].filter(Boolean).join(' · ')}</div>
                 <div className="ref-product-bottom">
                   <strong>{money(product.price_toman)} <small>تومان</small></strong>
@@ -545,22 +552,30 @@ export default function App() {
       </form>
     </div>}
 
-    {selectedProduct&&<div className="ref-overlay" onClick={()=>setSelectedProduct(null)}>
-      <section className="ref-dialog ref-dialog-wide" onClick={e=>e.stopPropagation()}>
-        <div className="ref-dialog-head"><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span><button className="ref-close" aria-label="بستن" onClick={()=>setSelectedProduct(null)}><X/></button></div>
-        <div className="grid gap-6 md:grid-cols-2">
-          <ProductImage product={selectedProduct} className="ref-product-modal-image"/>
-          <div className="ref-product-modal-copy">
-            <span className="text-xs text-muted-foreground">{selectedProduct.category}</span>
-            <h2>{selectedProduct.name}</h2>
-            <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
-            <div className="grid gap-2 text-xs text-muted-foreground"><span>وزن: {gram(selectedProduct.weight_grams)}</span><span>عیار: {money(selectedProduct.karat||18)}</span><span>موجودی: {money(selectedProduct.stock||0)}</span></div>
-            <strong className="ref-detail-price">{money(selectedProduct.price_toman)} تومان</strong>
-            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1||(selectedProduct.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>{addToCart(selectedProduct);setSelectedProduct(null);setCartOpen(true);}}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
+    {selectedProduct&&<div className="ref-product-page">
+      <div className="ref-product-page-top"><button className="ref-product-back" onClick={closeProduct}><ArrowLeft size={17}/> بازگشت به فروشگاه</button><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span></div>
+      <div className="ref-product-page-grid">
+        <ProductImage product={selectedProduct} className="ref-product-page-image" onClick={()=>{setZoomScale(1);setZoomOpen(true);}}/>
+        <div className="ref-product-page-copy">
+          <span className="text-xs text-muted-foreground">{selectedProduct.category}</span>
+          <h1>{selectedProduct.name}</h1>
+          <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
+          <div className="ref-product-specs">
+            <div><span>وزن</span><b>{gram(selectedProduct.weight_grams)}</b></div>
+            <div><span>عیار</span><b>{money(selectedProduct.karat||18)}</b></div>
+            <div><span>موجودی</span><b>{money(selectedProduct.stock||0)} عدد</b></div>
+            {Object.entries(selectedProduct.attributes||{}).filter(([key,value])=>!hiddenProductAttributeKeys.has(String(key).trim())&&String(key).trim()&&String(value??'').trim()).map(([key,value])=><div key={key}><span>{String(key).trim()}</span><b>{String(value)}</b></div>)}
           </div>
+          <strong className="ref-product-page-price">{money(selectedProduct.price_toman)} <small>تومان</small></strong>
+          <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1||(selectedProduct.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(selectedProduct)}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
+          {checkoutError&&<p className="ref-message">{checkoutError}</p>}
         </div>
-      </section>
+      </div>
     </div>}
+
+    {zoomOpen&&selectedProduct&&<div className="ref-product-zoom" role="dialog" aria-modal="true" aria-label="نمایش بزرگ تصویر محصول" onClick={()=>setZoomOpen(false)}><button className="ref-product-zoom-close" aria-label="بستن بزرگ‌نمایی" onClick={()=>setZoomOpen(false)}><X/></button><div className="ref-product-zoom-tools" onClick={e=>e.stopPropagation()}><button aria-label="کوچک‌نمایی" onClick={()=>setZoomScale(v=>Math.max(1,v-.25))}><ZoomOut/></button><span>{Math.round(zoomScale*100)}٪</span><button aria-label="بزرگ‌نمایی" onClick={()=>setZoomScale(v=>Math.min(3,v+.25))}><ZoomIn/></button></div><div className="ref-product-zoom-stage" onClick={e=>e.stopPropagation()}><ProductImage product={selectedProduct} className="ref-product-zoom-image"/><img src={selectedProduct.image_url||tiles.find(t=>t.name===selectedProduct.category)?.image||tiles[0].image} alt={selectedProduct.name} style={{transform:`scale(${zoomScale})`}}/></div></div>}
+
+    {cartToast&&<div className="ref-cart-toast" role="status"><span className="ref-cart-toast-check">✓</span><span>{cartToast}</span><button onClick={()=>setCartOpen(true)}>مشاهده سبد</button><button aria-label="بستن پیام" onClick={()=>setCartToast('')}>×</button></div>}
 
     {orderResult&&<div className="ref-overlay">
       <section className="ref-dialog text-center">
