@@ -440,3 +440,88 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 .ref-product-zoom-stage>.ref-product-zoom-image{display:none}
 .ref-product-zoom-stage>img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;transition:transform .18s ease;transform-origin:center}
 @media(max-width:700px){.ref-product-page{background:#f6efe2;padding:14px}.ref-product-page-image,.ref-product-page-image img{min-height:290px;max-height:390px}.ref-product-page-image img{padding:10px}.ref-product-page-image:after{font-size:9px}.ref-product-zoom{padding:12px}.ref-product-zoom-stage{width:96vw;height:78vh}.ref-product-zoom-tools{top:auto;bottom:18px;left:50%;transform:translateX(-50%)}.ref-product-zoom-close{top:12px;right:12px}}
+
+
+/* Mahgold product detail: touch magnifier + elegant specification table */
+.ref-product-page{
+  background:linear-gradient(155deg,#fbf7ee 0%,#f5eddf 58%,#eee2cd 100%);
+  color:#193629;
+}
+.ref-product-page-grid{gap:clamp(26px,4.5vw,58px);align-items:start}
+.ref-product-touch-image{
+  position:relative;isolation:isolate;overflow:hidden;touch-action:none;
+  border:1px solid #c6a15b;border-radius:20px;
+  background:radial-gradient(ellipse at 50% 42%,#315b43 0%,#173b2b 62%,#0d291e 100%);
+  box-shadow:0 18px 48px rgba(22,48,34,.17),inset 0 0 0 5px rgba(255,255,255,.035);
+  cursor:zoom-in;
+}
+.ref-product-touch-image>img{
+  display:block;width:100%;height:100%;min-height:460px;max-height:620px;
+  object-fit:contain;padding:18px;user-select:none;-webkit-user-drag:none;
+}
+.ref-product-touch-hint{
+  position:absolute;right:14px;bottom:14px;z-index:2;
+  padding:8px 13px;border:1px solid rgba(225,195,133,.55);border-radius:30px;
+  background:rgba(10,35,24,.86);color:#f3dfb5;font-size:11px;
+  box-shadow:0 5px 18px rgba(0,0,0,.16);pointer-events:none;
+}
+.ref-product-touch-lens{
+  position:absolute;z-index:5;width:158px;height:158px;border-radius:50%;
+  border:3px solid #e8c77f;
+  background-repeat:no-repeat;background-size:260% 260%;
+  box-shadow:0 8px 30px rgba(0,0,0,.42),0 0 0 5px rgba(255,247,222,.2);
+  pointer-events:none;
+}
+.ref-product-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ref-product-detail-kicker{font-size:10px;letter-spacing:.13em;color:#9b773c;font-weight:700}
+.ref-product-detail-category{
+  display:inline-flex;align-items:center;padding:6px 13px;border-radius:30px;
+  border:1px solid #d6bd8b;background:#fffaf0;color:#775a2b;font-size:11px;
+}
+.ref-product-page-copy h1{
+  margin:0;color:#173729;font-size:clamp(27px,3vw,39px);
+  font-weight:700;line-height:1.65;letter-spacing:-.02em;
+}
+.ref-product-page-copy>p{margin:0;color:#77705f;font-size:13px;line-height:2.25}
+.ref-product-specs-wrap{
+  padding:17px 18px 9px;border:1px solid #d9c69e;border-radius:17px;
+  background:linear-gradient(145deg,rgba(255,252,244,.96),rgba(248,240,224,.92));
+  box-shadow:0 9px 28px rgba(89,66,30,.055);
+}
+.ref-product-specs-title{
+  margin:0 0 9px;padding-bottom:10px;border-bottom:1px solid #dfcca3;
+  color:#80602c;font-size:14px;font-weight:800;
+}
+.ref-product-specs{display:flex;flex-direction:column;gap:0}
+.ref-product-specs>div{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  min-height:43px;padding:9px 5px;border:0;border-bottom:1px solid rgba(197,165,103,.25);
+  border-radius:0;background:transparent;font-size:12px;
+}
+.ref-product-specs>div:last-child{border-bottom:0}
+.ref-product-specs span{color:#81745f;flex:0 0 38%}
+.ref-product-specs b{
+  color:#1b3e2e;font-weight:700;text-align:left;overflow-wrap:anywhere;
+}
+.ref-product-page-price{
+  display:block;margin:0;padding:15px 18px;border:1px solid #d5bd8d;border-radius:14px;
+  background:linear-gradient(110deg,#fffaf0,#f1e4c9);
+  color:#896323;font-size:clamp(23px,2.5vw,30px);line-height:1.5;
+  box-shadow:inset 0 1px rgba(255,255,255,.9);
+}
+.ref-product-page-price small{color:#8c806b}
+@media(max-width:700px){
+  .ref-product-page{padding:13px 13px calc(28px + env(safe-area-inset-bottom))}
+  .ref-product-page-top{gap:12px;margin-bottom:15px}
+  .ref-product-page-grid{gap:15px}
+  .ref-product-touch-image,.ref-product-page-image{min-height:300px;max-height:390px}
+  .ref-product-touch-image>img{min-height:300px;max-height:390px;padding:12px}
+  .ref-product-touch-hint{right:9px;bottom:9px;padding:7px 10px;font-size:9px}
+  .ref-product-touch-lens{width:148px;height:148px}
+  .ref-product-detail-heading{margin-top:3px}
+  .ref-product-page-copy{gap:12px;padding:4px 1px}
+  .ref-product-page-copy h1{font-size:25px}
+  .ref-product-specs-wrap{padding:13px 13px 7px;border-radius:14px}
+  .ref-product-specs>div{min-height:40px;padding:8px 3px;font-size:11px}
+  .ref-product-page-price{padding:13px 15px;font-size:23px}
+}
