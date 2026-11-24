@@ -879,39 +879,61 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 }
 
 
-/* MAHGOLD BRAND LOCKUP — full artwork, edge-to-edge, uncropped, native image ratio */
+/* MAHGOLD LOGO RESTORE — preserve the supplied artwork and show it edge-to-edge */
 .ref-brand-masthead{
+  display:block!important;
+  position:relative!important;
+  left:auto!important;
+  isolation:isolate!important;
   width:100%!important;
+  max-width:none!important;
   height:auto!important;
   min-height:0!important;
-  aspect-ratio:782 / 180;
-  padding:0!important;
+  aspect-ratio:782 / 180!important;
   margin:0!important;
+  padding:0!important;
   overflow:hidden!important;
-  background:#062318!important;
+  background:#08251a!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
 }
-.ref-brand-masthead:before,
+.ref-brand-masthead:before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:0!important;
+  background-image:url('/mahgold-brand-masthead.jpg')!important;
+  background-size:cover!important;
+  background-position:center!important;
+  filter:blur(10px) brightness(.52)!important;
+}
 .ref-brand-masthead:after{display:none!important;content:none!important}
 .ref-brand-masthead img{
+  position:relative!important;
+  z-index:1!important;
   display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
   width:100%!important;
-  height:auto!important;
   max-width:none!important;
-  aspect-ratio:782 / 180;
+  height:auto!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
   object-fit:contain!important;
   object-position:center!important;
   transform:none!important;
   filter:none!important;
-  mask-image:none!important;
-  -webkit-mask-image:none!important;
-  image-rendering:auto;
 }
 .ref-footer-brand{
   display:block!important;
+  position:relative!important;
+  left:auto!important;
   width:100%!important;
   max-width:none!important;
   height:auto!important;
-  aspect-ratio:782 / 180;
+  aspect-ratio:782 / 180!important;
   margin:0 auto 18px!important;
   padding:0!important;
   overflow:hidden!important;
@@ -922,101 +944,24 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 }
 .ref-footer-brand img{
   display:block!important;
-  width:100%!important;
-  height:auto!important;
-  aspect-ratio:782 / 180;
-  object-fit:contain!important;
-  object-position:center!important;
-  border:0!important;
-  border-radius:0!important;
-  image-rendering:auto;
-}
-footer.bg-ink{padding-top:0!important}
-@media(max-width:767px){
-  .ref-brand-masthead,
-  .ref-footer-brand{height:auto!important;min-height:0!important;aspect-ratio:782 / 180}
-  .ref-brand-masthead img,
-  .ref-footer-brand img{height:auto!important;object-fit:contain!important}
-}
-
-
-/* TRUE FULL-VIEWPORT BRAND ARTWORK — header and footer */
-.ref-brand-masthead,
-.ref-footer-brand{
-  position:relative!important;
-  left:50%!important;
-  width:100vw!important;
-  max-width:100vw!important;
-  margin-left:-50vw!important;
-  margin-right:-50vw!important;
-  padding:0!important;
-  overflow:hidden!important;
-  border:0!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-}
-.ref-brand-masthead{height:auto!important;min-height:0!important;aspect-ratio:auto!important}
-.ref-brand-masthead img,
-.ref-footer-brand img{
-  display:block!important;
-  width:100vw!important;
-  max-width:none!important;
-  height:auto!important;
-  aspect-ratio:auto!important;
-  object-fit:contain!important;
-  object-position:center!important;
-  transform:none!important;
-  filter:none!important;
-  mask-image:none!important;
-  -webkit-mask-image:none!important;
-}
-.ref-footer-brand{height:auto!important;aspect-ratio:auto!important;margin-bottom:18px!important}
-@media(max-width:767px){
-  .ref-brand-masthead,.ref-footer-brand{width:100vw!important;max-width:100vw!important}
-  .ref-brand-masthead img,.ref-footer-brand img{width:100vw!important;height:auto!important}
-}
-
-
-/* FIX: keep the supplied logo image visible while making both brand bands full-bleed */
-html,body{overflow-x:hidden!important}
-.ref-brand-masthead,.ref-footer-brand{
-  position:relative!important;
-  left:50%!important;
-  width:100vw!important;
-  max-width:100vw!important;
-  margin-left:-50vw!important;
-  margin-right:-50vw!important;
-  padding:0!important;
-  overflow:hidden!important;
-  border:0!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-  background:#08251a!important;
-  height:auto!important;
-  min-height:0!important;
-  aspect-ratio:auto!important;
-}
-.ref-brand-masthead img,.ref-footer-brand img{
-  position:relative!important;
-  z-index:2!important;
-  display:block!important;
   visibility:visible!important;
   opacity:1!important;
-  width:100vw!important;
+  width:100%!important;
   max-width:none!important;
   height:auto!important;
-  min-height:0!important;
   margin:0!important;
   padding:0!important;
   object-fit:contain!important;
   object-position:center!important;
-  transform:none!important;
-  filter:none!important;
+  border:0!important;
+  border-radius:0!important;
 }
-.ref-brand-masthead:before,.ref-brand-masthead:after{pointer-events:none!important}
-.ref-footer-brand{margin-bottom:18px!important}
 footer.bg-ink{padding-top:0!important}
 @media(max-width:767px){
- .ref-brand-masthead,.ref-footer-brand{width:100vw!important;max-width:100vw!important}
- .ref-brand-masthead img,.ref-footer-brand img{width:100vw!important;height:auto!important}
+  .ref-brand-masthead,.ref-footer-brand{
+    width:100%!important;
+    max-width:100%!important;
+    aspect-ratio:782 / 180!important;
+  }
+  .ref-brand-masthead img,.ref-footer-brand img{width:100%!important;height:auto!important}
 }
