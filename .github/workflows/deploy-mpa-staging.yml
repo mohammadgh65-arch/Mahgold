@@ -1,0 +1,42 @@
+name: Deploy Mahgold MPA Staging
+
+on:
+  push:
+    branches: [mpa-staging-2026-11-24]
+    paths:
+      - "**"
+      - ".github/workflows/deploy-mpa-staging.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Cloudflare deployment credentials
+        id: credentials
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [[ -z "$CLOUDFLARE_API_TOKEN" ]]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Staging deployment skipped. Add the CLOUDFLARE_API_TOKEN repository secret to enable it."
+          else
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.credentials.outputs.available == 'true'
+        with:
+          node-version: 22
+
+      - name: Deploy isolated staging Worker and static assets
+        if: steps.credentials.outputs.available == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx --yes wrangler@4 deploy --config wrangler.jsonc

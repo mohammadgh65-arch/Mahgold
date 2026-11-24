@@ -1,0 +1,171 @@
+:root{color-scheme:dark;--bg:#17130d;--panel:#211a10;--panel2:#2b2113;--gold:#c9a45e;--gold2:#e5c77f;--text:#f5ecd9;--muted:#b9a98a;--line:#5b4524;--ok:#68c99a;--danger:#e58b80}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#3a2b16 0,#17130d 52%);color:var(--text);font-family:Shabnam,Tahoma,Arial,sans-serif;direction:rtl}a{color:inherit;text-decoration:none}.wrap{width:min(1180px,92%);margin:auto}.topline{border-bottom:1px solid #8e6c3544;color:var(--muted);font-size:12px;padding:9px 0}.header{position:sticky;top:0;z-index:5;background:#17130df2;backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}.headrow{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{font-size:25px;font-weight:800;color:var(--gold2);letter-spacing:-1px}.brand small{display:block;font-size:10px;color:var(--muted);letter-spacing:2px;font-weight:400}.nav{display:flex;gap:22px;flex-wrap:wrap;color:#dfd0b0;font-size:13px}.nav a:hover{color:var(--gold2)}.cartlink{border:1px solid var(--gold);border-radius:999px;padding:10px 16px;color:var(--gold2);font-size:13px}.hero{padding:46px 0 26px}.eyebrow{color:var(--gold);font-size:12px;letter-spacing:1px}.hero h1{font-size:clamp(25px,4vw,42px);margin:10px 0;color:var(--gold2)}.hero p{color:var(--muted);line-height:2;max-width:650px;font-size:14px}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:20px 0}.toolbar input{width:min(340px,100%);background:#211a10;border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--text);font:inherit;outline:none}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;padding-bottom:56px}.product{background:linear-gradient(145deg,#2b2113,#1d170e);border:1px solid #72572d88;border-radius:17px;overflow:hidden;min-width:0;transition:.2s}.product:hover{transform:translateY(-3px);border-color:var(--gold)}.product img{width:100%;height:210px;object-fit:cover;background:#302515}.productbody{padding:14px}.product h2{font-size:15px;margin:0 0 8px;color:#f4e6c8}.meta{color:var(--muted);font-size:11px;line-height:1.9;min-height:40px}.price{color:var(--gold2);font-size:16px;font-weight:800;margin:12px 0}.actions{display:flex;gap:8px}.btn{border:1px solid var(--gold);background:linear-gradient(135deg,#d4b16d,#a47b36);color:#211707;border-radius:10px;padding:10px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;flex:1}.btn.secondary{background:transparent;color:var(--gold2)}.status{padding:24px;border:1px dashed var(--line);border-radius:14px;color:var(--muted);text-align:center;grid-column:1/-1;line-height:2}.footer{border-top:1px solid var(--line);padding:24px 0 34px;color:var(--muted);font-size:12px;line-height:2}.footer strong{color:var(--gold2)}@media(max-width:900px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.nav{gap:12px}}@media(max-width:620px){.headrow{min-height:65px;flex-wrap:wrap;padding:12px 0}.nav{order:3;width:100%;overflow:auto;flex-wrap:nowrap;padding-bottom:5px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.product img{height:155px}.productbody{padding:11px}.product h2{font-size:13px}.price{font-size:14px}.hero{padding-top:30px}.toolbar{align-items:stretch;flex-direction:column}}
+/* Accessibility and responsive polish for the isolated MPA routes. */
+:focus-visible{outline:3px solid var(--gold2);outline-offset:3px;border-radius:6px}
+button,input,textarea,select{font:inherit}
+button:disabled{opacity:.58;cursor:not-allowed}
+img{max-width:100%}
+.product img{display:block}
+.status a.btn,.product a.btn{display:inline-flex;align-items:center;justify-content:center;text-align:center}
+.toolbar input:focus,.toolbar input:focus-visible{border-color:var(--gold2);box-shadow:0 0 0 3px #e5c77f22}
+::selection{background:#c9a45e55;color:var(--text)}
+@media(max-width:620px){.wrap{width:min(100% - 28px,1180px)}.headrow{gap:10px}.brand{font-size:22px}.cartlink{padding:8px 12px}.nav{scrollbar-width:thin}.nav a{white-space:nowrap}.grid{padding-bottom:34px}.product img{height:150px}.actions{flex-wrap:wrap}.btn{min-height:42px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.product:hover{transform:none}}
+
+/* Shared cart count and non-blocking add-to-cart confirmation. */
+.cartlink{display:inline-flex;align-items:center;gap:8px}.cart-count{display:inline-flex;align-items:center;justify-content:center;min-width:23px;height:23px;padding:0 6px;border-radius:999px;background:linear-gradient(135deg,#f5dfa0,#c99a43);color:#211707;font-size:11px;font-weight:900;box-shadow:0 0 12px #e5c77f55;transition:transform .2s ease,opacity .2s ease}.cart-count.is-empty{display:none}.cart-toast{position:fixed;z-index:1200;right:50%;bottom:24px;transform:translate(50%,18px);width:min(520px,calc(100% - 28px));display:flex;align-items:center;gap:12px;padding:13px 15px;border:1px solid #d7b45f99;border-radius:16px;background:linear-gradient(120deg,#302313f5,#17130df7);color:#f7e8c3;box-shadow:0 16px 44px #0009,0 0 24px #d8b45f22;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s ease,transform .25s ease,visibility .25s}.cart-toast.show{opacity:1;visibility:visible;transform:translate(50%,0);pointer-events:auto}.cart-toast-icon{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:50%;background:#d6b35d22;border:1px solid #e6c979;color:#f6d98e;font-size:18px}.cart-toast-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}.cart-toast-copy strong{font-size:12px;color:#f5d990}.cart-toast-copy small{font-size:11px;color:#cbb995;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cart-toast>a{flex:0 0 auto;color:#f5d990;font-size:11px;font-weight:800;padding:8px 10px;border:1px solid #b58b4377;border-radius:9px}.cart-toast>a:hover{background:#d5ad4c18}@media(max-width:420px){.cart-toast{gap:8px;padding:11px}.cart-toast>a{padding:7px;font-size:10px}.cart-toast-copy strong{font-size:11px}}@media(prefers-reduced-motion:reduce){.cart-toast,.cart-count{transition:none}}
+
+
+/* Mahgold signature header/footer — compact emerald fabric with gold ribbon trim. */
+.header{
+  background:
+    linear-gradient(180deg,#d7b45e 0 2px,transparent 2px calc(100% - 2px),#d7b45e calc(100% - 2px)),
+    repeating-linear-gradient(112deg,#0d4938 0,#0d4938 18px,#104f3d 19px,#0b4434 38px);
+  border:0;
+  box-shadow:0 8px 24px #0005,inset 0 1px #f4dfa055;
+}
+.headrow{min-height:64px;gap:14px}
+.brand{
+  position:relative;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:112px;min-height:43px;padding:3px 15px 4px;
+  border:1px solid #e2c477;border-radius:5px;
+  background:linear-gradient(115deg,#073b2d,#145842 48%,#073b2d);
+  color:#f2d88f;text-shadow:0 1px 2px #001c14;
+  box-shadow:inset 0 0 0 2px #d0aa5144,0 2px 8px #001c1470;
+  font-size:21px;line-height:1.15;letter-spacing:0;
+}
+.brand:before,.brand:after{
+  content:"";position:absolute;right:7px;left:7px;height:1px;
+  background:linear-gradient(90deg,transparent,#e7cb80 18%,#f1d995 50%,#e7cb80 82%,transparent);
+}
+.brand:before{top:4px}.brand:after{bottom:4px}
+.brand small{font-size:8px;line-height:1.2;color:#e6cf94;letter-spacing:2px}
+.nav{color:#f1e5c6}
+.nav a:hover{color:#ffe4a0;text-shadow:0 0 10px #f2d48a66}
+.cartlink{border-color:#e2c477;color:#f4d990;background:#073b2d88;padding:8px 13px}
+.footer{
+  position:relative;margin-top:20px;padding:20px 0 22px;
+  border:0;border-top:2px solid #d1aa53;
+  background:
+    linear-gradient(180deg,#d1aa53 0 2px,transparent 2px),
+    repeating-linear-gradient(112deg,#0d4938 0,#0d4938 18px,#104f3d 19px,#0b4434 38px);
+  color:#e3d4b0;box-shadow:0 -8px 24px #0003;
+}
+.footer strong{color:#f3d991}
+@media(max-width:620px){
+  .headrow{min-height:58px;padding:8px 0;gap:8px}
+  .brand{min-width:100px;min-height:40px;font-size:19px;padding:3px 12px}
+  .nav{padding:7px 2px 5px}
+  .footer{padding:16px 0 18px}
+}
+
+
+/* Approved Mahgold logo and matching velvet-and-gold ribbon trim. */
+.header{
+  background:
+    linear-gradient(180deg,#f4d98b 0,#b88b3c 2px,#e8c875 3px,transparent 4px calc(100% - 4px),#b88b3c calc(100% - 3px),#f4d98b 100%),
+    radial-gradient(ellipse at 18% 0%,#1b6249 0,transparent 48%),
+    repeating-linear-gradient(112deg,#0a3e30 0,#0a3e30 17px,#104b39 18px,#0b4434 36px);
+  border:0;
+  box-shadow:0 8px 24px #0006,inset 0 1px #fff2b455;
+}
+.headrow{min-height:64px;gap:14px}
+.brand{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  flex:0 0 96px;width:96px;height:62px;min-width:0;min-height:0;
+  padding:0;border:1px solid #e4c77b;border-radius:6px;overflow:hidden;
+  background:#073b2d;box-shadow:inset 0 0 0 2px #d0aa5144,0 3px 10px #001c1470;
+  line-height:0;font-size:0;
+}
+.brand:before,.brand:after{display:none}
+.brand img{display:block;width:100%;height:100%;object-fit:cover}
+.nav{color:#f1e5c6}
+.nav a:hover{color:#ffe4a0;text-shadow:0 0 10px #f2d48a66}
+.cartlink{border-color:#e2c477;color:#f4d990;background:#073b2d88;padding:8px 13px}
+.footer{
+  position:relative;margin-top:20px;padding:17px 0 19px;
+  border:0;
+  border-top:3px solid transparent;
+  border-bottom:2px solid transparent;
+  background:
+    linear-gradient(180deg,#f4d98b 0,#b88b3c 1px,#e8c875 3px,transparent 4px calc(100% - 3px),#b88b3c calc(100% - 2px),#f4d98b 100%),
+    radial-gradient(ellipse at 82% 0%,#1b6249 0,transparent 48%),
+    repeating-linear-gradient(112deg,#0a3e30 0,#0a3e30 17px,#104b39 18px,#0b4434 36px);
+  color:#e8dbb9;box-shadow:0 -8px 24px #0003;
+}
+.footer strong{color:#f3d991}
+@media(max-width:620px){
+  .headrow{min-height:58px;padding:5px 0;gap:8px}
+  .brand{flex-basis:82px;width:82px;height:54px}
+  .nav{padding:7px 2px 5px}
+  .footer{padding:14px 0 16px}
+}
+
+/* Use the original integrated Mahgold artwork as the actual brand mark. */
+.brand{
+  width:104px;height:62px;min-width:104px;min-height:62px;
+  padding:0;border:0;border-radius:0;
+  background:transparent url("/assets/mahgold-logo-header.webp") center/contain no-repeat;
+  box-shadow:none;text-shadow:none;
+  color:transparent;font-size:0;line-height:0;
+}
+.brand:before,.brand:after{display:none;content:none}
+.brand small{display:none}
+.footer{
+  border-top:2px solid transparent;
+  border-image:linear-gradient(90deg,transparent,#b88d42 12%,#f0d58c 50%,#b88d42 88%,transparent) 1;
+  box-shadow:inset 0 1px #f5df9a55,0 -7px 22px #0003;
+}
+.footer:after{
+  content:"";display:block;height:1px;margin:12px auto 0;width:min(100%,1180px);
+  background:linear-gradient(90deg,transparent,#d9b45e88 18%,#f0d58c 50%,#d9b45e88 82%,transparent);
+}
+@media(max-width:620px){
+  .brand{width:88px;height:56px;min-width:88px;min-height:56px}
+  .footer:after{margin-top:9px}
+}
+
+
+/* Final compact brand lockup: keep the original full artwork visible at every breakpoint. */
+.header{border-bottom:1px solid #d6b45f88}
+.headrow{min-height:64px;gap:12px}
+.brand{
+  flex:0 0 104px;width:104px;height:62px;min-width:104px;min-height:62px;
+  background-position:center;background-size:contain;background-repeat:no-repeat;
+}
+.footer{padding:15px 0 17px}
+@media(max-width:620px){
+  .headrow{min-height:58px;padding:4px 0;gap:8px}
+  .brand{flex:0 0 88px;width:88px;height:56px;min-width:88px;min-height:56px}
+  .footer{padding:13px 0 15px}
+}
+
+
+/* Footer mirrors the approved compact emerald-and-gold header treatment. */
+.footer{
+  position:relative;
+  margin-top:20px;
+  padding:15px 0 17px;
+  border:0;
+  border-top:2px solid transparent;
+  border-bottom:2px solid transparent;
+  border-image:linear-gradient(90deg,transparent,#b88b3c 8%,#f4d98b 50%,#b88b3c 92%,transparent) 1;
+  background:
+    linear-gradient(180deg,#f4d98b 0,#b88b3c 2px,#e8c875 3px,transparent 4px calc(100% - 3px),#b88b3c calc(100% - 2px),#f4d98b 100%),
+    radial-gradient(ellipse at 18% 0%,#1b6249 0,transparent 48%),
+    repeating-linear-gradient(112deg,#0a3e30 0,#0a3e30 17px,#104b39 18px,#0b4434 36px);
+  color:#eadbb8;
+  box-shadow:0 -7px 22px #0004,inset 0 1px #fff2b455;
+}
+.footer strong{color:#f3d991}
+.footer:after{
+  content:"";
+  display:block;
+  height:1px;
+  width:min(100%,1180px);
+  margin:10px auto 0;
+  background:linear-gradient(90deg,transparent,#d9b45e88 18%,#f0d58c 50%,#d9b45e88 82%,transparent);
+}
+@media(max-width:620px){
+  .footer{padding:13px 0 15px}
+  .footer:after{margin-top:8px}
+}

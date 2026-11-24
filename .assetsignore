@@ -1,0 +1,13 @@
+.git/
+.github/
+supabase/
+scripts/
+worker.js
+wrangler.jsonc
+*.md
+CNAME
+email-templates/
+src/
+MAHGOLD_LUXURY_MOTION_v101_SHABNAM.html
+Mahgold_Footer_Premium_Quality.html
+.assetsignore

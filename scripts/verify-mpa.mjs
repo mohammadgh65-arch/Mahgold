@@ -1,0 +1,73 @@
+import { access, readFile } from "node:fs/promises";
+import { constants } from "node:fs";
+import { Script } from "node:vm";
+
+const pages = ["index.html","products/index.html","category/jewelry/index.html","category/melted-gold/index.html","category/coins/index.html","category/bars/index.html","product/index.html","cart/index.html","checkout/index.html","about/index.html","contact/index.html","admin/index.html","404.html"];
+const modules = ["assets/products.mjs","assets/category.mjs","assets/product.mjs","assets/cart.mjs","assets/checkout.mjs","assets/cart-ui.mjs","assets/mpa.css","worker.js","wrangler.jsonc",".assetsignore","supabase/functions/mahgold-create-order/index.ts"];
+const failures = [];
+for (const path of [...pages, ...modules]) {
+  try { await access(path, constants.R_OK); }
+  catch { failures.push("Missing file: " + path); }
+}
+for (const path of pages) {
+  try {
+    const html = await readFile(path, "utf8");
+    if (!/^<!doctype html>/i.test(html)) failures.push("Missing doctype: " + path);
+    if ((html.match(/<body\b/gi) || []).length !== 1) failures.push("Expected one body start: " + path);
+    if ((html.match(/<\/body>/gi) || []).length !== 1) failures.push("Expected one body end: " + path);
+    if (path !== "admin/index.html" && path !== "index.html" && !html.includes("/assets/mpa.css")) failures.push("Shared stylesheet not linked: " + path);
+  } catch {}
+}
+const worker = await readFile("worker.js", "utf8").catch(() => "");
+if (!worker.includes("env.ASSETS.fetch") || !worker.includes("/product/index.html")) failures.push("Worker product route resolver is missing.");
+for (const token of ["PAGE_SEO", "CATEGORY_COPY", "PUBLIC_ORIGIN", "application/ld+json", '"@type": "Product"', "/robots.txt", "/sitemap.xml", "X-Robots-Tag"]) {
+  if (!worker.includes(token)) failures.push("SEO implementation is missing: " + token);
+}
+if (!worker.includes("Disallow: /admin/") || !worker.includes("Disallow: /cart/") || !worker.includes("Disallow: /checkout/")) failures.push("Robots exclusions for private/transactional pages are missing.");
+const wrangler = await readFile("wrangler.jsonc", "utf8").catch(() => "");
+if (!wrangler.includes('"/robots.txt"') || !wrangler.includes('"/sitemap.xml"')) failures.push("SEO Worker endpoints are not configured to run before static assets.");
+for (const route of ["/products/*", "/cart/*", "/checkout/*", "/about/*", "/contact/*", "/admin/*"]) {
+  if (!wrangler.includes('"' + route + '"')) failures.push("Trailing-slash route is not handled by SEO Worker: " + route);
+}
+if (!worker.includes("noindex, nofollow")) failures.push("Staging/private page noindex protection is missing.");
+const sharedCss = await readFile("assets/mpa.css", "utf8").catch(() => "");
+for (const token of [":focus-visible", "prefers-reduced-motion", "@media(max-width:620px)"]) {
+  if (!sharedCss.includes(token)) failures.push("Shared CSS accessibility/mobile rule missing: " + token);
+}
+const checkout = await readFile("assets/checkout.mjs", "utf8").catch(() => "");
+if (!checkout.includes("const STAGING_SUBMISSION_ENABLED=false")) failures.push("Staging checkout must remain fail-closed.");
+const orderFn = await readFile("supabase/functions/mahgold-create-order/index.ts", "utf8").catch(() => "");
+if (!orderFn.includes("MAHGOLD_ORDERS_ENABLED") || !orderFn.includes("mahgold_create_order_idempotent")) failures.push("Secure order function must retain its server-side feature gate and idempotent RPC.");
+const admin = await readFile("admin/index.html", "utf8").catch(() => "");
+if (!admin.includes("signInWithPassword") || !admin.includes("store_admins")) failures.push("Admin login must retain Supabase authentication and admin membership check.");
+const adminModule = admin.match(/<script type="module">([\s\S]*?)<\/script>/i);
+if (!adminModule) failures.push("Admin application module script is missing.");
+else {
+  try { new Script(adminModule[1], { filename: "admin/index.html#module" }); }
+  catch (error) { failures.push("Admin application JavaScript syntax error: " + error.message); }
+}
+if (!admin.includes("getAuthenticatorAssuranceLevel") || (admin.split("await Vn()").length - 1) !== 3) failures.push("Admin financial MFA must guard product pricing, market quote and store pricing settings.");
+const productModule = await readFile("assets/product.mjs", "utf8").catch(() => "");
+for (const token of ['attributes', 'function attrRows', 'specs.map', 'MahgoldCartUI?.add', 'product-quantity', 'Math.min(Number(p.stock)', 'function cleanAttrValue', 'prettyLabel(k)', '"بدون سنگ"', 'chain_length:"طول زنجیر"']) {
+  if (!productModule.includes(token)) failures.push("Product detail dynamic attributes/cart integration missing: " + token);
+}
+const adminAttributes = ['مشخصات اختصاصی این محصول', '＋ افزودن مشخصه', 'admin-product-attribute-row', 'حذف'];
+for (const token of adminAttributes) {
+  if (!admin.includes(token)) failures.push("Admin dynamic product attribute editor missing: " + token);
+}
+const cartUi = await readFile("assets/cart-ui.mjs", "utf8").catch(() => "");
+for (const token of ['localStorage.setItem(KEY', 'cart-count', 'cart-toast', 'aria-live', 'window.MahgoldCartUI', 'function add(product,quantity=1)']) {
+  if (!cartUi.includes(token)) failures.push("Cart counter/toast/persistence behavior missing: " + token);
+}
+const cartPage = await readFile("assets/cart.mjs", "utf8").catch(() => "");
+for (const token of ['data-inc', 'data-dec', 'data-del', 'localStorage.setItem("mahgold_cart"']) {
+  if (!cartPage.includes(token)) failures.push("Cart quantity/removal/persistence behavior missing: " + token);
+}
+const listing = await readFile("assets/products.mjs", "utf8").catch(() => "");
+if (!listing.includes('window.MahgoldCartUI.add(p)') || !listing.includes('data-add') || !listing.includes('Number(p.stock||0)>0')) failures.push("Product listing add-to-cart integration is missing.");
+if (failures.length) {
+  console.error(failures.join("\n"));
+  process.exitCode = 1;
+} else {
+  console.log("MPA checks passed: " + pages.length + " HTML pages and " + modules.length + " runtime/config files.");
+}
