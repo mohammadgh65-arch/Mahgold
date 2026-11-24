@@ -637,3 +637,9 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 @media(prefers-reduced-motion:reduce){
   .ref-offers-track,.ref-offer-card img,.ref-offers-dots i{transition:none!important}
 }
+
+/* Requested storefront refinements: crisp logo and right-aligned home link */
+.ref-brand img{filter:contrast(1.22) saturate(1.12);image-rendering:auto}
+.ref-primary-nav{justify-content:flex-start}
+.ref-primary-nav a{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.ref-primary-nav a svg{flex:none;color:#8b682d}
