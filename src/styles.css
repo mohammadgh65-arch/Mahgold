@@ -23,23 +23,3 @@
 
 /* Customer account dialog */
 .account-drawer{padding-bottom:34px}.account-form,.account-panel{display:flex;flex-direction:column;gap:14px;padding-top:12px}.account-form label{display:flex;flex-direction:column;gap:7px;color:#d8c9a8;font-size:12px}.account-form input{width:100%;min-height:44px;background:#17140f;border:1px solid #5b492d;color:#f6ead0;padding:10px 12px;outline:none;border-radius:3px}.account-form input:focus{border-color:#d3b36d;box-shadow:0 0 0 2px #d3b36d22}.account-form .primary-btn,.account-panel .primary-btn{justify-content:center;border:0;cursor:pointer;font:inherit}.account-form .primary-btn:disabled{opacity:.55;cursor:wait}.account-tabs{display:flex;border-bottom:1px solid #51432d;margin-bottom:5px}.account-tabs button{flex:1;background:transparent;border:0;color:#b9aa8d;padding:12px}.account-tabs button.active{color:#e6c982;border-bottom:2px solid #c7a45f}.account-form>small,.account-panel>small{color:#a99b7d;font-size:10px;line-height:2}.account-message{color:#e2c47c;background:#2b2316;padding:9px 11px;font-size:12px}.account-panel{align-items:center;text-align:center}.account-panel p{margin:0}.account-avatar{width:62px;height:62px;border:1px solid #b99554;border-radius:50%;display:grid;place-items:center;color:#dfc17c}.account-logout{display:flex;align-items:center;gap:8px;border:1px solid #5b492d;background:transparent;color:#e4d3b1;padding:10px 16px}
-
-
-/* Product detail route and cart confirmation */
-.ref-product-page{position:fixed;inset:0;z-index:70;overflow-y:auto;background:#f8f4eb;color:#27231b;padding:clamp(18px,4vw,52px)}
-.ref-product-page-top{max-width:1180px;margin:0 auto 28px;display:flex;align-items:center;justify-content:space-between;gap:15px}
-.ref-product-back{display:inline-flex;align-items:center;gap:8px;border:1px solid #dfd2b8;background:#fffaf1;color:#5d4a2d;border-radius:999px;padding:10px 16px;font-size:12px}
-.ref-product-page-grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,5vw,64px);align-items:start}
-.ref-product-page-image{min-height:460px;max-height:620px;border:1px solid #e9dfce;border-radius:22px;background:#f0e9dc;overflow:hidden}
-.ref-product-page-image img{width:100%;height:100%;min-height:460px;max-height:620px;object-fit:contain}
-.ref-product-page-copy{padding:16px 0;display:grid;gap:18px}
-.ref-product-page-copy h1{font-size:clamp(25px,3vw,38px);font-weight:600;line-height:1.6;color:#25251e}
-.ref-product-page-copy>p{font-size:14px;line-height:2.2;color:#77705f}
-.ref-product-specs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.ref-product-specs>div{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:13px 15px;border:1px solid #e6dcc9;border-radius:12px;background:#fffaf2;font-size:12px}
-.ref-product-specs span{color:#8b806d}.ref-product-specs b{color:#4a402e;font-weight:600}
-.ref-product-page-price{font-size:27px;color:#9b742f}.ref-product-page-price small{font-size:12px;font-weight:400}
-.ref-cart-toast{position:fixed;z-index:90;top:18px;left:18px;display:flex;align-items:center;gap:12px;max-width:min(560px,calc(100vw - 36px));padding:13px 16px;border:1px solid #d6c18f;border-radius:14px;background:#fffaf0;color:#263b2e;box-shadow:0 12px 40px #17130d24;font-size:12px}
-.ref-cart-toast-check{display:grid;place-items:center;width:25px;height:25px;flex:none;border-radius:50%;background:#e2f1e4;color:#287243;font-weight:800}
-.ref-cart-toast button{border:0;background:transparent;color:#8b6729;font-weight:700;white-space:nowrap}.ref-cart-toast button:last-child{font-size:18px;color:#857c6c}
-@media(max-width:700px){.ref-product-page{padding:16px}.ref-product-page-top{align-items:flex-start;flex-direction:column;margin-bottom:18px}.ref-product-page-grid{grid-template-columns:1fr;gap:16px}.ref-product-page-image,.ref-product-page-image img{min-height:280px;max-height:390px}.ref-product-page-copy{padding:4px 0}.ref-product-page-copy h1{font-size:25px}.ref-product-specs{gap:7px}.ref-product-specs>div{padding:11px;font-size:11px}.ref-cart-toast{top:10px;left:10px;gap:8px;padding:10px 11px;font-size:11px}}
