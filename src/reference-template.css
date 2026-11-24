@@ -879,34 +879,33 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 }
 
 
-/* MAHGOLD LOGO — compact full-width banner */
+/* MAHGOLD LOGO — fit the complete original artwork inside compact full-width bands */
 .ref-brand-masthead{
-  display:block!important;position:relative!important;left:auto!important;
-  width:100%!important;max-width:none!important;
-  height:clamp(150px,16vw,220px)!important;min-height:0!important;
-  aspect-ratio:auto!important;margin:0!important;padding:0!important;
-  overflow:hidden!important;background:#08251a!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  position:relative!important;left:auto!important;width:100%!important;max-width:none!important;
+  height:clamp(150px,16vw,220px)!important;min-height:0!important;aspect-ratio:auto!important;
+  margin:0!important;padding:0!important;overflow:hidden!important;background:#08251a!important;
   border:0!important;border-radius:0!important;box-shadow:none!important;
 }
 .ref-brand-masthead:before,.ref-brand-masthead:after{display:none!important;content:none!important}
 .ref-brand-masthead img{
   display:block!important;visibility:visible!important;opacity:1!important;
-  width:100%!important;max-width:none!important;height:100%!important;
-  margin:0!important;padding:0!important;object-fit:cover!important;
-  object-position:center 58%!important;transform:none!important;filter:none!important;
+  width:100%!important;height:100%!important;max-width:none!important;
+  margin:0!important;padding:0!important;object-fit:contain!important;
+  object-position:center!important;transform:none!important;filter:none!important;
 }
 .ref-footer-brand{
-  display:block!important;position:relative!important;left:auto!important;
-  width:100%!important;max-width:none!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  position:relative!important;left:auto!important;width:100%!important;max-width:none!important;
   height:clamp(130px,13vw,180px)!important;aspect-ratio:auto!important;
   margin:0 auto 18px!important;padding:0!important;overflow:hidden!important;
   border:0!important;border-radius:0!important;background:#08271c!important;box-shadow:none!important;
 }
 .ref-footer-brand img{
   display:block!important;visibility:visible!important;opacity:1!important;
-  width:100%!important;max-width:none!important;height:100%!important;
-  margin:0!important;padding:0!important;object-fit:cover!important;
-  object-position:center 58%!important;border:0!important;border-radius:0!important;
+  width:100%!important;height:100%!important;max-width:none!important;
+  margin:0!important;padding:0!important;object-fit:contain!important;object-position:center!important;
+  border:0!important;border-radius:0!important;
 }
 footer.bg-ink{padding-top:0!important}
 @media(max-width:767px){
