@@ -1,5 +1,6 @@
 import { access, readFile } from "node:fs/promises";
 import { constants } from "node:fs";
+import { Script } from "node:vm";
 
 const pages = ["index.html","products/index.html","category/jewelry/index.html","category/melted-gold/index.html","category/coins/index.html","category/bars/index.html","product/index.html","cart/index.html","checkout/index.html","about/index.html","contact/index.html","admin/index.html","404.html"];
 const modules = ["assets/products.mjs","assets/category.mjs","assets/product.mjs","assets/cart.mjs","assets/checkout.mjs","assets/mpa.css","worker.js","wrangler.jsonc",".assetsignore","supabase/functions/mahgold-create-order/index.ts"];
@@ -29,6 +30,13 @@ const orderFn = await readFile("supabase/functions/mahgold-create-order/index.ts
 if (!orderFn.includes("MAHGOLD_ORDERS_ENABLED") || !orderFn.includes("mahgold_create_order_idempotent")) failures.push("Secure order function must retain its server-side feature gate and idempotent RPC.");
 const admin = await readFile("admin/index.html", "utf8").catch(() => "");
 if (!admin.includes("signInWithPassword") || !admin.includes("store_admins")) failures.push("Admin login must retain Supabase authentication and admin membership check.");
+const adminModule = admin.match(/<script type="module">([\\s\\S]*?)<\\/script>/i);
+if (!adminModule) failures.push("Admin application module script is missing.");
+else {
+  try { new Script(adminModule[1], { filename: "admin/index.html#module" }); }
+  catch (error) { failures.push("Admin application JavaScript syntax error: " + error.message); }
+}
+if (!admin.includes("getAuthenticatorAssuranceLevel") || (admin.match(/await Vn\\(\\)/g) || []).length !== 3) failures.push("Admin financial MFA must guard product pricing, market quote and store pricing settings.");
 if (failures.length) {
   console.error(failures.join("\n"));
   process.exitCode = 1;
