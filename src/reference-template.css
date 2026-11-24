@@ -596,36 +596,43 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 }
 
 
-/* MAHGOLD OFFERS — right-moving, looping product carousel */
-.ref-offers-section{width:min(1280px,calc(100% - 40px));margin:0 auto;padding:34px 0 27px;overflow:hidden}
-.ref-offers-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:19px}
+/* MAHGOLD OFFERS — large-format, right-moving product carousel */
+.ref-offers-section{width:min(1480px,calc(100% - 28px));margin:0 auto;padding:38px 0 30px;overflow:hidden}
+.ref-offers-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:22px}
 .ref-offers-eyebrow{display:block;color:#98743a;font-size:9px;font-weight:700;letter-spacing:.19em;margin-bottom:7px}
-.ref-offers-heading h1{margin:0;color:#292319;font-size:clamp(21px,2.5vw,29px);font-weight:700;line-height:1.5}
-.ref-offers-heading p{margin:5px 0 0;color:#827765;font-size:11px;line-height:1.8}
+.ref-offers-heading h1{margin:0;color:#292319;font-size:clamp(22px,2.7vw,31px);font-weight:700;line-height:1.5}
+.ref-offers-heading p{margin:5px 0 0;color:#827765;font-size:12px;line-height:1.8}
 .ref-offers-count{flex:none;border:1px solid #dfcfaa;border-radius:999px;padding:7px 12px;color:#8d6b32;background:#f2e8d4;font-size:10px}
 .ref-offers-viewport{width:100%;overflow:hidden;direction:rtl}
-.ref-offers-track{--offer-step:calc((100% + 14px)/3);display:flex;flex-wrap:nowrap;gap:14px;width:100%;direction:rtl;transform:translateX(calc(var(--offer-index)*var(--offer-step)));will-change:transform}
-.ref-offer-card{position:relative;display:block;flex:0 0 calc((100% - 28px)/3);height:320px;min-width:0;overflow:hidden;padding:0;border:1px solid #d8c59d;border-radius:17px;background:#211d16;text-align:right;box-shadow:0 9px 28px #261d0d16;cursor:pointer}
+.ref-offers-track{--offer-step:calc(44% + 14px);display:flex;flex-wrap:nowrap;gap:14px;width:100%;direction:rtl;transform:translateX(calc(var(--offer-index)*var(--offer-step)));will-change:transform}
+.ref-offer-card{position:relative;display:block;flex:0 0 44%;height:430px;min-width:0;overflow:hidden;padding:0;border:1px solid #d8c59d;border-radius:19px;background:#211d16;text-align:right;box-shadow:0 12px 34px #261d0d1c;cursor:pointer}
 .ref-offer-card img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .75s ease}
 .ref-offer-card:hover img{transform:scale(1.045)}
 .ref-offer-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,12,8,.02) 22%,rgba(14,12,8,.14) 48%,rgba(14,12,8,.82) 100%)}
-.ref-offer-copy{position:absolute;right:19px;left:16px;bottom:17px;display:grid;gap:6px;color:#fff}
-.ref-offer-copy small{color:#ead39d;font-size:10px}
-.ref-offer-copy b{font-size:16px;font-weight:700;line-height:1.8;text-shadow:0 2px 8px #0007}
-.ref-offer-copy em{display:flex;align-items:center;gap:6px;color:#f1dcae;font-size:10px;font-style:normal}
-.ref-offers-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;color:#988b75;font-size:9px}
+.ref-offer-copy{position:absolute;right:22px;left:18px;bottom:20px;display:grid;gap:7px;color:#fff}
+.ref-offer-copy small{color:#ead39d;font-size:11px}
+.ref-offer-copy b{font-size:18px;font-weight:700;line-height:1.8;text-shadow:0 2px 8px #0007}
+.ref-offer-copy em{display:flex;align-items:center;gap:6px;color:#f1dcae;font-size:11px;font-style:normal}
+.ref-offers-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:15px;color:#988b75;font-size:10px}
 .ref-offers-dots{display:flex;align-items:center;gap:5px}
 .ref-offers-dots i{display:block;width:5px;height:5px;border-radius:50%;background:#d9c9a8;transition:all .25s}
 .ref-offers-dots i.active{width:17px;border-radius:8px;background:#a9823e}
+.ref-primary-nav{flex:0 0 auto;min-width:76px;justify-content:center}
+.ref-primary-nav a{padding:23px 13px 19px;border-radius:8px 8px 0 0}
 @media(max-width:767px){
-  .ref-offers-section{width:calc(100% - 28px);padding:25px 0 22px}
-  .ref-offers-heading{margin-bottom:14px}
-  .ref-offers-heading h1{font-size:22px}
+  .ref-offers-section{width:calc(100% - 20px);padding:28px 0 24px}
+  .ref-offers-heading{margin-bottom:16px}
+  .ref-offers-heading h1{font-size:23px}
+  .ref-offers-heading p{font-size:11px}
   .ref-offers-count{padding:6px 9px;font-size:9px}
-  .ref-offers-track{--offer-step:calc(78% + 10px);gap:10px}
-  .ref-offer-card{flex-basis:86%;height:270px;border-radius:14px}
-  .ref-offer-copy{right:14px;left:12px;bottom:13px}
-  .ref-offer-copy b{font-size:14px}
+  .ref-offers-track{--offer-step:calc(94% + 10px);gap:10px}
+  .ref-offer-card{flex-basis:94%;height:370px;border-radius:16px}
+  .ref-offer-copy{right:16px;left:14px;bottom:16px}
+  .ref-offer-copy b{font-size:16px}
+  .ref-primary-nav{display:flex!important;flex:0 0 auto;min-width:0;margin-inline:auto}
+  .ref-primary-nav a{padding:10px 13px 8px;font-size:12px}
+  .ref-mobile-menu{display:none!important}
+  .ref-mobile-links{display:none!important}
 }
 @media(prefers-reduced-motion:reduce){
   .ref-offers-track,.ref-offer-card img,.ref-offers-dots i{transition:none!important}
