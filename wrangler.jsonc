@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "mahgold-mpa-staging",
+  "account_id": "8bf2b95b3799fcf1679ff23dd19d2a8d",
   "main": "worker.js",
   "compatibility_date": "2026-11-24",
   "assets": {
