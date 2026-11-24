@@ -228,7 +228,7 @@ export default {
         .on(".hero > p", { element(element) { element.setInnerContent(category.intro); } })
         .transform(output);
     }
-    if (["/admin/", "/cart/", "/checkout/"].includes(route) && response.headers.get("content-type")?.includes("text/html")) {
+    if (["/cart/", "/checkout/"].includes(route) && response.headers.get("content-type")?.includes("text/html")) {
       output = new HTMLRewriter().on("head", {
         element(element) { element.append('<meta name="robots" content="noindex, nofollow">', { html: true }); }
       }).transform(output);
