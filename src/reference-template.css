@@ -491,3 +491,33 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
  .ref-footer-links a{font-size:10px}
  .ref-footer-contact{gap:7px 14px}.ref-footer-contact span{font-size:10px}
 }
+
+
+/* MAHGOLD layout correction: consistent carousel spacing and product detail grid */
+.ref-offers-viewport{direction:ltr!important}
+.ref-offers-track{direction:ltr!important;gap:12px!important}
+.ref-offer-card{direction:rtl;box-sizing:border-box}
+@media(min-width:768px){
+  .ref-offer-card{width:min(32vw,390px)}
+}
+@media(max-width:767px){
+  .ref-offer-track{gap:11px!important}
+  .ref-offer-card{width:82vw;height:clamp(220px,68vw,300px)}
+}
+.ref-product-page{box-sizing:border-box}
+.ref-product-page-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:clamp(18px,3vw,42px)}
+.ref-product-page-image{width:100%;aspect-ratio:1/1;min-height:0!important;max-height:560px;display:grid;place-items:center}
+.ref-product-page-image img{width:100%;height:100%;min-height:0!important;max-height:560px;object-fit:contain;padding:clamp(8px,1.5vw,18px)}
+.ref-product-page-copy{min-width:0;align-content:start;gap:14px}
+.ref-product-page-copy h1{overflow-wrap:anywhere}
+.ref-product-specs{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:700px){
+  .ref-product-page{padding:14px}
+  .ref-product-page-top{flex-direction:row;align-items:center;gap:8px;margin-bottom:14px}
+  .ref-product-page-grid{grid-template-columns:minmax(0,1fr);gap:14px}
+  .ref-product-page-image{aspect-ratio:1/1;max-height:min(88vw,380px)}
+  .ref-product-page-image img{max-height:min(88vw,380px)}
+  .ref-product-page-copy{gap:11px;padding:0 2px}
+  .ref-product-specs{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .ref-product-specs>div{padding:10px 11px;min-width:0}
+}
