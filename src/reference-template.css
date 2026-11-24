@@ -879,7 +879,7 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 }
 
 
-/* MAHGOLD LOGO RESTORE — preserve the supplied artwork and show it edge-to-edge */
+/* MAHGOLD LOGO — full-width artwork, natural 3:2 ratio, no crop */
 .ref-brand-masthead{
   display:block!important;
   position:relative!important;
@@ -889,7 +889,7 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
   max-width:none!important;
   height:auto!important;
   min-height:0!important;
-  aspect-ratio:782 / 180!important;
+  aspect-ratio:3 / 2!important;
   margin:0!important;
   padding:0!important;
   overflow:hidden!important;
@@ -898,16 +898,7 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
   border-radius:0!important;
   box-shadow:none!important;
 }
-.ref-brand-masthead:before{
-  content:""!important;
-  position:absolute!important;
-  inset:0!important;
-  z-index:0!important;
-  background-image:url('/mahgold-brand-masthead.jpg')!important;
-  background-size:cover!important;
-  background-position:center!important;
-  filter:blur(10px) brightness(.52)!important;
-}
+.ref-brand-masthead:before{display:none!important;content:none!important}
 .ref-brand-masthead:after{display:none!important;content:none!important}
 .ref-brand-masthead img{
   position:relative!important;
@@ -917,7 +908,7 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
   opacity:1!important;
   width:100%!important;
   max-width:none!important;
-  height:auto!important;
+  height:100%!important;
   min-height:0!important;
   margin:0!important;
   padding:0!important;
@@ -933,7 +924,7 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
   width:100%!important;
   max-width:none!important;
   height:auto!important;
-  aspect-ratio:782 / 180!important;
+  aspect-ratio:3 / 2!important;
   margin:0 auto 18px!important;
   padding:0!important;
   overflow:hidden!important;
@@ -948,7 +939,7 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
   opacity:1!important;
   width:100%!important;
   max-width:none!important;
-  height:auto!important;
+  height:100%!important;
   margin:0!important;
   padding:0!important;
   object-fit:contain!important;
@@ -961,7 +952,7 @@ footer.bg-ink{padding-top:0!important}
   .ref-brand-masthead,.ref-footer-brand{
     width:100%!important;
     max-width:100%!important;
-    aspect-ratio:782 / 180!important;
+    aspect-ratio:3 / 2!important;
   }
-  .ref-brand-masthead img,.ref-footer-brand img{width:100%!important;height:auto!important}
+  .ref-brand-masthead img,.ref-footer-brand img{width:100%!important;height:100%!important}
 }
