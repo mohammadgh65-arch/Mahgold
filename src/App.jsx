@@ -429,7 +429,7 @@ export default function App() {
           <span className="ref-offers-count">۰۵ انتخاب منتخب</span>
         </div>
         <div className="ref-offers-viewport">
-          <div className="ref-offers-track" style={{'--offer-index':activeOffer,transition:offerTransition?'transform 720ms cubic-bezier(.22,.75,.25,1)':'none'}}>
+          <div className="ref-offers-track" style={{transform:`translateX(-${activeOffer*(window.innerWidth<=767?83:32)}vw)`,transition:offerTransition?'transform 720ms cubic-bezier(.22,.75,.25,1)':'none'}}>
             {offerTrackItems.map((item,index)=><button type="button" key={index} className="ref-offer-card" onClick={()=>{
               if(item.product){openProduct(item.product);return;}
               setCategory(item.category||'همه محصولات');
