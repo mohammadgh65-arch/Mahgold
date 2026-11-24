@@ -48,7 +48,7 @@ else {
 }
 if (!admin.includes("getAuthenticatorAssuranceLevel") || (admin.split("await Vn()").length - 1) !== 3) failures.push("Admin financial MFA must guard product pricing, market quote and store pricing settings.");
 const productModule = await readFile("assets/product.mjs", "utf8").catch(() => "");
-for (const token of ['attributes', 'function attrRows', 'specs.map', 'MahgoldCartUI?.add', 'product-quantity', 'Math.min(Number(p.stock)']) {
+for (const token of ['attributes', 'function attrRows', 'specs.map', 'MahgoldCartUI?.add', 'product-quantity', 'Math.min(Number(p.stock)', 'function cleanAttrValue', 'prettyLabel(k)', '"بدون سنگ"', 'chain_length:"طول زنجیر"']) {
   if (!productModule.includes(token)) failures.push("Product detail dynamic attributes/cart integration missing: " + token);
 }
 const adminAttributes = ['مشخصات اختصاصی این محصول', '＋ افزودن مشخصه', 'admin-product-attribute-row', 'حذف'];
