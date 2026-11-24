@@ -51,7 +51,7 @@ export default function AdminPanel(){
    seller_profit_percent:Number(product.seller_profit_percent??settings.default_markup_percent??0),
    commission_percent:Number(product.commission_percent||0),vat_percent:10,
    pricing_mode:autoPricing?'auto':'manual',
-   attributes:Object.fromEntries(Object.entries(product.attributes||{}).map(([key,value])=>[String(key).trim(),String(value??'').trim()]).filter(([key,value])=>key&&value))
+   attributes:{...Object.fromEntries(Object.entries(product.attributes||{}).filter(([key])=>internalProductAttributeKeys.has(String(key).trim()))),...Object.fromEntries(Object.entries(product.attributes||{}).filter(([key])=>!internalProductAttributeKeys.has(String(key).trim())).map(([key,value])=>[String(key).trim(),String(value??'').trim()]).filter(([key,value])=>key&&value))}
   };
   if(!Number.isFinite(payload.weight_grams)||payload.weight_grams<=0||!Number.isFinite(payload.karat)||payload.karat<=0||payload.karat>24||payload.stock<0||payload.labor_value<0||payload.seller_profit_percent<0||payload.commission_percent<0){setNotice('وزن، عیار، موجودی یا اجرت واردشده معتبر نیست.');return;}
   if(autoPricing&&!quoteIsFresh(data.quotes.find(q=>q.symbol==='gold_18k'))){setNotice('برای قیمت‌گذاری خودکار، ابتدا نرخ معتبر و تازه طلای ۱۸ عیار را ثبت کنید.');return;}
