@@ -1,5 +1,5 @@
 import { MAHGOLD_LOGO } from './mahgold-brand';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn, ZoomOut,
   ShieldCheck, Gift, Headphones, Plus, Minus, UserRound, LogOut,
@@ -192,6 +192,7 @@ export default function App() {
   const [selectedProduct,setSelectedProduct]=useState(null);
   const [zoomOpen,setZoomOpen]=useState(false);
   const [zoomScale,setZoomScale]=useState(1);
+  const pinchZoomRef=useRef({distance:0,scale:1});
   const [cartToast,setCartToast]=useState('');
   const [customer,setCustomer]=useState({name:'',phone:'',email:'',address:'',city:'',postalCode:'',note:''});
   const [menuOpen,setMenuOpen]=useState(false);
@@ -610,7 +611,7 @@ export default function App() {
       </div>
     </div>}
 
-    {zoomOpen&&selectedProduct&&<div className="ref-product-zoom" role="dialog" aria-modal="true" aria-label="نمایش بزرگ تصویر محصول" onClick={()=>setZoomOpen(false)}><button className="ref-product-zoom-close" aria-label="بستن بزرگ‌نمایی" onClick={()=>setZoomOpen(false)}><X/></button><div className="ref-product-zoom-tools" onClick={e=>e.stopPropagation()}><button aria-label="کوچک‌نمایی" onClick={()=>setZoomScale(v=>Math.max(1,v-.25))}><ZoomOut/></button><span>{Math.round(zoomScale*100)}٪</span><button aria-label="بزرگ‌نمایی" onClick={()=>setZoomScale(v=>Math.min(3,v+.25))}><ZoomIn/></button></div><div className="ref-product-zoom-stage" onClick={e=>e.stopPropagation()}><ProductImage product={selectedProduct} className="ref-product-zoom-image"/><img src={selectedProduct.image_url||tiles.find(t=>t.name===selectedProduct.category)?.image||tiles[0].image} alt={selectedProduct.name} style={{transform:`scale(${zoomScale})`}} onWheel={e=>{e.preventDefault();setZoomScale(v=>Math.min(3,Math.max(1,v+(e.deltaY<0?.2:-.2))));}} onDoubleClick={()=>setZoomScale(v=>v>1?1:2)}/></div></div>}
+    {zoomOpen&&selectedProduct&&<div className="ref-product-zoom" role="dialog" aria-modal="true" aria-label="نمایش بزرگ تصویر محصول" onClick={()=>setZoomOpen(false)}><button className="ref-product-zoom-close" aria-label="بستن بزرگ‌نمایی" onClick={()=>setZoomOpen(false)}><X/></button><div className="ref-product-zoom-tools" onClick={e=>e.stopPropagation()}><button aria-label="کوچک‌نمایی" onClick={()=>setZoomScale(v=>Math.max(1,v-.25))}><ZoomOut/></button><span>{Math.round(zoomScale*100)}٪</span><button aria-label="بزرگ‌نمایی" onClick={()=>setZoomScale(v=>Math.min(3,v+.25))}><ZoomIn/></button></div><div className="ref-product-zoom-stage" onClick={e=>e.stopPropagation()} onTouchStart={e=>{if(e.touches.length===2){const dx=e.touches[0].clientX-e.touches[1].clientX;const dy=e.touches[0].clientY-e.touches[1].clientY;pinchZoomRef.current={distance:Math.hypot(dx,dy),scale:zoomScale};}}} onTouchMove={e=>{if(e.touches.length===2&&pinchZoomRef.current.distance>0){e.preventDefault();const dx=e.touches[0].clientX-e.touches[1].clientX;const dy=e.touches[0].clientY-e.touches[1].clientY;const distance=Math.hypot(dx,dy);setZoomScale(Math.min(3,Math.max(1,pinchZoomRef.current.scale*distance/pinchZoomRef.current.distance)));}}} onTouchEnd={e=>{if(e.touches.length<2)pinchZoomRef.current={distance:0,scale:zoomScale};}}><ProductImage product={selectedProduct} className="ref-product-zoom-image"/><img src={selectedProduct.image_url||tiles.find(t=>t.name===selectedProduct.category)?.image||tiles[0].image} alt={selectedProduct.name} style={{transform:`scale(${zoomScale})`}} onWheel={e=>{e.preventDefault();setZoomScale(v=>Math.min(3,Math.max(1,v+(e.deltaY<0?.2:-.2))));}} onDoubleClick={()=>setZoomScale(v=>v>1?1:2)}/></div></div>}
 
     {cartToast&&<div className="ref-cart-toast" role="status"><span className="ref-cart-toast-check">✓</span><span>{cartToast}</span><button onClick={()=>setCartOpen(true)}>مشاهده سبد</button><button aria-label="بستن پیام" onClick={()=>setCartToast('')}>×</button></div>}
 
