@@ -14,11 +14,17 @@
       "/sitemap.xml",
       "/product/*",
       "/products",
+      "/products/*",
       "/cart",
+      "/cart/*",
       "/checkout",
+      "/checkout/*",
       "/about",
+      "/about/*",
       "/contact",
+      "/contact/*",
       "/admin",
+      "/admin/*",
       "/category/*"
     ],
     "not_found_handling": "404-page"
