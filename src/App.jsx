@@ -430,9 +430,7 @@ export default function App() {
           <a className="active" href="#home">خانه</a>
           <button type="button" onClick={()=>setAccountOpen(true)}>پیگیری سفارش</button>
           <a href="#categories" onClick={()=>setCategory('طلای زینتی')}>طلای زینتی</a>
-          <a href="#categories" onClick={()=>setCategory('طلای آب‌شده')}>طلای آب‌شده</a>
           <a href="#categories" onClick={()=>setCategory('سکه')}>سکه</a>
-          <a href="#categories" onClick={()=>setCategory('شمش')}>شمش</a>
         </nav>
         <label className="ref-header-search"><Search size={16}/><input aria-label="جستجوی محصولات" value={query} onChange={e=>setQuery(e.target.value)} placeholder="جستجو در محصولات..."/></label>
         <div className="ref-header-actions">
