@@ -28,15 +28,15 @@ const modules = [
 const failures = [];
 for (const path of [...pages, ...modules]) {
   try { await access(path, constants.R_OK); }
-  catch { failures.push(`Missing file: ${path}`); }
+  catch { failures.push(\`Missing file: \${path}\`); }
 }
 for (const path of pages) {
   try {
     const html = await readFile(path, "utf8");
-    if (!/^<!doctype html>/i.test(html)) failures.push(`Missing doctype: ${path}`);
-    if ((html.match(/<body\\b/gi) || []).length !== 1) failures.push(`Expected one body start: ${path}`);
-    if ((html.match(/<\\/body>/gi) || []).length !== 1) failures.push(`Expected one body end: ${path}`);
-    if (!html.includes("/assets/mpa.css")) failures.push(`Shared stylesheet not linked: ${path}`);
+    if (!/^<!doctype html>/i.test(html)) failures.push(\`Missing doctype: \${path}\`);
+    if ((html.match(/<body\b/gi) || []).length !== 1) failures.push(\`Expected one body start: \${path}\`);
+    if ((html.match(/<\/body>/gi) || []).length !== 1) failures.push(\`Expected one body end: \${path}\`);
+    if (!html.includes("/assets/mpa.css")) failures.push(\`Shared stylesheet not linked: \${path}\`);
   } catch {}
 }
 const worker = await readFile("worker.js", "utf8").catch(() => "");
@@ -52,8 +52,8 @@ if (!admin.includes("signInWithPassword") || !admin.includes("store_admins")) {
   failures.push("Admin login must retain Supabase authentication and admin membership check.");
 }
 if (failures.length) {
-  console.error(failures.join("\\n"));
+  console.error(failures.join("\n"));
   process.exitCode = 1;
 } else {
-  console.log(`MPA checks passed: ${pages.length} HTML pages and ${modules.length} runtime/config files.`);
+  console.log(\`MPA checks passed: \${pages.length} HTML pages and \${modules.length} runtime/config files.\`);
 }
