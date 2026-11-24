@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema自.cloudflare.com/wrangler/config-schema.json",
+  "$schema": "https://schema.cloudflare.com/wrangler/config-schema.json",
   "name": "mahgold-mpa-staging",
   "main": "worker.js",
   "compatibility_date": "2026-11-24",
