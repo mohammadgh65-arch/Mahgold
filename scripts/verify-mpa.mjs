@@ -36,7 +36,7 @@ else {
   try { new Script(adminModule[1], { filename: "admin/index.html#module" }); }
   catch (error) { failures.push("Admin application JavaScript syntax error: " + error.message); }
 }
-if (!admin.includes("getAuthenticatorAssuranceLevel") || (admin.match(/await Vn\\(\\)/g) || []).length !== 3) failures.push("Admin financial MFA must guard product pricing, market quote and store pricing settings.");
+if (!admin.includes("getAuthenticatorAssuranceLevel") || (admin.split("await Vn()").length - 1) !== 3) failures.push("Admin financial MFA must guard product pricing, market quote and store pricing settings.");
 if (failures.length) {
   console.error(failures.join("\n"));
   process.exitCode = 1;
