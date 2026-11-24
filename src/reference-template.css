@@ -393,3 +393,54 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
   .ref-footer-brand{height:clamp(130px,38vw,175px)!important}
   footer.bg-ink{padding-bottom:calc(24px + env(safe-area-inset-bottom))!important}
 }
+
+
+/* MAHGOLD — compact emerald fabric header/footer with gold woven edging */
+.ref-site-header{
+  position:sticky!important;top:0!important;min-height:0!important;
+  background:
+    linear-gradient(180deg,rgba(2,18,12,.22),transparent 22%,transparent 78%,rgba(2,18,12,.28)),
+    repeating-linear-gradient(90deg,rgba(211,174,100,.045) 0 1px,transparent 1px 7px),
+    linear-gradient(110deg,#073321 0%,#0b3b2a 48%,#062719 100%)!important;
+  border-top:5px solid transparent!important;
+  border-bottom:5px solid transparent!important;
+  border-image:linear-gradient(90deg,#8b642d,#e5c77e,#a77a37,#f0d994,#8b642d) 1!important;
+  box-shadow:0 5px 18px rgba(0,0,0,.2),inset 0 1px rgba(255,232,175,.16)!important;
+}
+.ref-site-header:before,.ref-site-header:after{
+  content:"";position:absolute;left:0;right:0;height:2px;pointer-events:none;z-index:2;
+  background:repeating-linear-gradient(90deg,#8d6935 0 5px,#e4c47a 5px 8px,#b38b49 8px 13px,#f1d995 13px 15px);
+  opacity:.92;
+}
+.ref-site-header:before{top:0}
+.ref-site-header:after{bottom:0}
+.ref-main-header{min-height:64px!important;position:relative;z-index:3}
+.ref-primary-nav a{padding-top:17px!important;padding-bottom:15px!important}
+.ref-header-search{height:36px!important}
+.ref-footer-brand{
+  height:76px!important;max-height:76px!important;overflow:hidden!important;
+  background:
+    repeating-linear-gradient(90deg,rgba(211,174,100,.045) 0 1px,transparent 1px 7px),
+    linear-gradient(110deg,#073321,#0b3b2a 48%,#062719)!important;
+  border-top:4px solid transparent!important;border-bottom:4px solid transparent!important;
+  border-image:linear-gradient(90deg,#8b642d,#e5c77e,#a77a37,#f0d994,#8b642d) 1!important;
+}
+.ref-footer-brand img{display:none!important}
+footer.bg-ink{
+  position:relative!important;padding:0 0 18px!important;
+  background:
+    repeating-linear-gradient(90deg,rgba(211,174,100,.035) 0 1px,transparent 1px 7px),
+    linear-gradient(110deg,#073321,#0b3b2a 48%,#062719)!important;
+  border-top:0!important;
+}
+footer.bg-ink:before{
+  content:"";display:block;height:2px;width:100%;
+  background:repeating-linear-gradient(90deg,#8d6935 0 5px,#e4c47a 5px 8px,#b38b49 8px 13px,#f1d995 13px 15px);
+}
+footer.bg-ink>div:not(.ref-footer-brand){margin-top:8px!important}
+@media(max-width:767px){
+  .ref-main-header{min-height:54px!important}
+  .ref-site-header{border-top-width:4px!important;border-bottom-width:4px!important}
+  .ref-footer-brand{height:62px!important;max-height:62px!important}
+  footer.bg-ink{padding-bottom:calc(16px + env(safe-area-inset-bottom))!important}
+}
