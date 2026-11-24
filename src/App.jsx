@@ -48,6 +48,7 @@ const presetCategories = [
   'دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'
 ];
 const jewelryProductCategories = new Set(['طلای زینتی','انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات']);
+const hiddenProductAttributeKeys = new Set(['has_stone','stone_labor_percent','market_quote_symbol','parent_product_id','variant_model_name','variant_size','variant_sku']);
 const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85';
 const money = value => new Intl.NumberFormat('fa-IR').format(Number(value || 0));
 const gram = value => new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(Number(value || 0)) + ' گرم';
@@ -561,7 +562,7 @@ export default function App() {
             <div><span>وزن</span><b>{gram(selectedProduct.weight_grams)}</b></div>
             <div><span>عیار</span><b>{money(selectedProduct.karat||18)}</b></div>
             <div><span>موجودی</span><b>{money(selectedProduct.stock||0)} عدد</b></div>
-            {Object.entries(selectedProduct.attributes||{}).filter(([key,value])=>String(key).trim()&&String(value??'').trim()).map(([key,value])=><div key={key}><span>{key}</span><b>{String(value)}</b></div>)}
+            {Object.entries(selectedProduct.attributes||{}).filter(([key,value])=>!hiddenProductAttributeKeys.has(String(key).trim())&&String(key).trim()&&String(value??'').trim()).map(([key,value])=><div key={key}><span>{String(key).trim()}</span><b>{String(value)}</b></div>)}
           </div>
           <strong className="ref-product-page-price">{money(selectedProduct.price_toman)} <small>تومان</small></strong>
           <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1||(selectedProduct.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(selectedProduct)}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
