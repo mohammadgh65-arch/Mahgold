@@ -1,7 +1,7 @@
 import { MAHGOLD_LOGO } from './mahgold-brand';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight,
+  Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn, ZoomOut,
   ShieldCheck, Gift, Headphones, Plus, Minus, UserRound, LogOut,
   House, LayoutGrid, Phone, MapPin, PackageCheck
 } from 'lucide-react';
@@ -57,10 +57,10 @@ const toLatinDigits = value => value.replace(/[۰-۹٠-٩]/g, d => {
   return String(fa.indexOf(d)>=0 ? fa.indexOf(d) : ar.indexOf(d));
 });
 
-function ProductImage({product, className=''}) {
+function ProductImage({product, className='', onClick}) {
   const [failed,setFailed] = useState(false);
   const src = !failed && product.image_url ? product.image_url : tiles.find(t=>t.name===product.category)?.image || tiles[0].image;
-  return <div className={'ref-product-image ' + className}>
+  return <div className={'ref-product-image ' + className} onClick={onClick} role={onClick?'button':undefined} tabIndex={onClick?0:undefined} onKeyDown={onClick?(e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick();}}):undefined}>
     <img src={src} alt={product.name || 'محصول مه‌گلد'} loading="lazy" onError={()=>setFailed(true)}/>
   </div>;
 }
@@ -190,6 +190,8 @@ export default function App() {
   const [checkoutError,setCheckoutError]=useState('');
   const [orderResult,setOrderResult]=useState(null);
   const [selectedProduct,setSelectedProduct]=useState(null);
+  const [zoomOpen,setZoomOpen]=useState(false);
+  const [zoomScale,setZoomScale]=useState(1);
   const [cartToast,setCartToast]=useState('');
   const [customer,setCustomer]=useState({name:'',phone:'',email:'',address:'',city:'',postalCode:'',note:''});
   const [menuOpen,setMenuOpen]=useState(false);
@@ -553,7 +555,7 @@ export default function App() {
     {selectedProduct&&<div className="ref-product-page">
       <div className="ref-product-page-top"><button className="ref-product-back" onClick={closeProduct}><ArrowLeft size={17}/> بازگشت به فروشگاه</button><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span></div>
       <div className="ref-product-page-grid">
-        <ProductImage product={selectedProduct} className="ref-product-page-image"/>
+        <ProductImage product={selectedProduct} className="ref-product-page-image" onClick={()=>{setZoomScale(1);setZoomOpen(true);}}/>
         <div className="ref-product-page-copy">
           <span className="text-xs text-muted-foreground">{selectedProduct.category}</span>
           <h1>{selectedProduct.name}</h1>
@@ -570,6 +572,8 @@ export default function App() {
         </div>
       </div>
     </div>}
+
+    {zoomOpen&&selectedProduct&&<div className="ref-product-zoom" role="dialog" aria-modal="true" aria-label="نمایش بزرگ تصویر محصول" onClick={()=>setZoomOpen(false)}><button className="ref-product-zoom-close" aria-label="بستن بزرگ‌نمایی" onClick={()=>setZoomOpen(false)}><X/></button><div className="ref-product-zoom-tools" onClick={e=>e.stopPropagation()}><button aria-label="کوچک‌نمایی" onClick={()=>setZoomScale(v=>Math.max(1,v-.25))}><ZoomOut/></button><span>{Math.round(zoomScale*100)}٪</span><button aria-label="بزرگ‌نمایی" onClick={()=>setZoomScale(v=>Math.min(3,v+.25))}><ZoomIn/></button></div><div className="ref-product-zoom-stage" onClick={e=>e.stopPropagation()}><ProductImage product={selectedProduct} className="ref-product-zoom-image"/><img src={selectedProduct.image_url||tiles.find(t=>t.name===selectedProduct.category)?.image||tiles[0].image} alt={selectedProduct.name} style={{transform:`scale(${zoomScale})`}}/></div></div>}
 
     {cartToast&&<div className="ref-cart-toast" role="status"><span className="ref-cart-toast-check">✓</span><span>{cartToast}</span><button onClick={()=>setCartOpen(true)}>مشاهده سبد</button><button aria-label="بستن پیام" onClick={()=>setCartToast('')}>×</button></div>}
 
