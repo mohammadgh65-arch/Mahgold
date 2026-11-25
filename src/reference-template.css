@@ -723,3 +723,135 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
   .ref-brand-masthead{height:clamp(92px,25vw,132px)!important;padding:8px 12px!important}
   .ref-brand-masthead img{width:min(360px,82vw)!important}
 }
+
+
+/* MAHGOLD FINAL HEADER: integrated emerald masthead + custom gold wordmark */
+.ref-site-header{
+  background:#062719!important;
+  border-top:1px solid rgba(218,181,106,.7)!important;
+  border-bottom:1px solid #c7a15d!important;
+  box-shadow:0 8px 26px rgba(2,20,13,.18)!important;
+}
+.ref-main-header{
+  min-height:84px!important;
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr) minmax(150px,220px) auto!important;
+  grid-template-areas:"brand nav search actions"!important;
+  align-items:center!important;
+  gap:clamp(12px,2vw,28px)!important;
+  padding-inline:clamp(14px,3vw,34px)!important;
+  background:radial-gradient(ellipse at 82% 0%,rgba(196,158,87,.10),transparent 40%),linear-gradient(180deg,#0d3324,#062719)!important;
+}
+.ref-brand-redesigned{
+  grid-area:brand!important;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:9px!important;
+  padding:0!important;
+  min-width:max-content!important;
+  border:0!important;
+  background:transparent!important;
+}
+.ref-brand-redesigned .ref-brand-symbol{
+  display:grid!important;
+  place-items:center!important;
+  color:#e4c274!important;
+  filter:drop-shadow(0 1px 5px rgba(221,177,89,.18))!important;
+}
+.ref-brand-redesigned .ref-brand-wordmark{
+  display:block!important;
+  color:#edce87!important;
+  font-family:"Shabnam",Tahoma,sans-serif!important;
+  font-size:clamp(22px,2.4vw,31px)!important;
+  font-weight:800!important;
+  letter-spacing:0!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  background:none!important;
+  -webkit-text-fill-color:currentColor!important;
+  text-shadow:0 2px 12px rgba(0,0,0,.22)!important;
+}
+.ref-primary-nav{
+  grid-area:nav!important;
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  gap:clamp(12px,2vw,27px)!important;
+  min-width:0!important;
+}
+.ref-primary-nav a,.ref-primary-nav button{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  color:#e9dfc5!important;
+  font-size:clamp(11px,1vw,13px)!important;
+  font-weight:600!important;
+  white-space:nowrap!important;
+  border:0!important;
+  border-bottom:2px solid transparent!important;
+  background:transparent!important;
+  padding:27px 0 23px!important;
+}
+.ref-primary-nav a:hover,.ref-primary-nav a.active{
+  color:#f2d58e!important;
+  border-bottom-color:#c7a15d!important;
+}
+.ref-header-search{
+  grid-area:search!important;
+  width:100%!important;
+  min-width:0!important;
+  background:rgba(255,255,255,.055)!important;
+  border:1px solid rgba(199,161,93,.48)!important;
+  border-radius:28px!important;
+  color:#e7c77e!important;
+}
+.ref-header-search input{color:#fff2d6!important}
+.ref-header-search input::placeholder{color:#cdbb94!important}
+.ref-header-actions{
+  grid-area:actions!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+}
+.ref-header-actions button,.ref-mobile-menu{
+  color:#e7c77e!important;
+  background:transparent!important;
+}
+.ref-header-actions button:hover{color:#fff0c5!important}
+.ref-header-cart b{background:#d6b064!important;color:#08271b!important}
+.ref-mobile-links{
+  background:linear-gradient(180deg,#103a29,#062719)!important;
+  border-color:#c7a15d!important;
+}
+.ref-mobile-links a,.ref-mobile-links button{color:#f0dfb7!important}
+@media(max-width:900px){
+  .ref-main-header{
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+    grid-template-areas:"brand nav actions"!important;
+    gap:12px!important;
+  }
+  .ref-header-search{display:none!important}
+  .ref-primary-nav{gap:12px!important}
+}
+@media(max-width:767px){
+  .ref-main-header{
+    min-height:70px!important;
+    grid-template-columns:40px minmax(0,1fr) auto!important;
+    grid-template-areas:"menu brand actions"!important;
+    gap:7px!important;
+    padding-inline:11px!important;
+  }
+  .ref-mobile-menu{grid-area:menu!important;width:38px!important;height:40px!important}
+  .ref-brand-redesigned{grid-area:brand!important;justify-self:center!important;gap:7px!important}
+  .ref-brand-redesigned .ref-brand-symbol svg{width:29px!important;height:29px!important}
+  .ref-brand-redesigned .ref-brand-wordmark{font-size:23px!important}
+  .ref-primary-nav{display:none!important}
+  .ref-header-actions{gap:3px!important}
+  .ref-header-actions button{width:34px!important}
+}
+@media(max-width:360px){
+  .ref-brand-redesigned .ref-brand-wordmark{font-size:20px!important}
+  .ref-brand-redesigned .ref-brand-symbol svg{width:25px!important;height:25px!important}
+}
