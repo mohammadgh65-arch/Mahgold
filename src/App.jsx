@@ -328,7 +328,7 @@ export default function App() {
     // Products without a positive sale price are kept in Admin but never exposed for sale.
     const rows=products.filter(p=>
       Number(p.price_toman)>0&&
-      (category==='همه محصولات'||(category==='طلای زینتی'?jewelryProductCategories.has(p.category):category==='سرمایه‌گذاری'?investmentCategories.has(p.category):p.category===category)||p.name?.includes(category))&&
+      (category==='همه محصولات'||(category==='طلای زینتی'?jewelryProductCategories.has(p.category):category==='سرمایه‌گذاری'?investmentCategories.has(p.category):p.category===category))&&
       (!query.trim()||p.name?.toLocaleLowerCase('fa').includes(query.trim().toLocaleLowerCase('fa')))
     );
     return rows.sort((a,b)=>{
@@ -469,11 +469,11 @@ export default function App() {
 
       {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">MAHGOLD CATALOG</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div><img className="ref-catalog-category-image" src={products.find(p=>p.category===category&&p.image_url)?.image_url||displayTiles.find(t=>t.name===category)?.image||displayTiles.find(t=>t.name==='طلای زینتی')?.image||tiles[0].image} alt={'تصویر دسته '+category} loading="eager" decoding="async"/></div></section>}
 
-                <div className="ref-quote-strip">
+                {!catalogPage&&<div className="ref-quote-strip">
           <div className="ref-quote-title"><span className="ref-quote-bars">▥</span><div><b>قیمت لحظه‌ای طلای ۱۸ عیار</b><small>{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'به‌روزرسانی لحظه‌ای'):quoteIsManual?'نرخ دستی منقضی‌شده':quote?.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'در انتظار نرخ معتبر'}</small></div></div>
           <strong>{quote?money(quote.price_toman)+' تومان':'— تومان'}</strong>
           <span className="ref-quote-live"><i/> {quoteFresh?'نرخ معتبر':'بدون نرخ تازه'}</span>
-        </div>
+        </div>}
 
       {!catalogPage&&(
       <section className="mx-auto max-w-7xl scroll-mt-20 px-4 py-5 md:px-7 md:py-6" id="categories">
@@ -520,7 +520,7 @@ export default function App() {
             </label>
           </div>
           <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            {catalogPage&&<div className="ref-collection-image-grid" aria-label="مجموعه‌های فروشگاه">
+            {catalogPage&&category==='همه محصولات'&&<div className="ref-collection-image-grid" aria-label="مجموعه‌های فروشگاه">
               {(categoryGroup==='همه محصولات'?[
                 {name:'طلای زینتی',desc:'زیورآلات و مجموعه‌های ظریف',image:displayTiles.find(t=>t.name==='طلای زینتی')?.image},
                 {name:'سکه',desc:'مجموعه سکه‌های طلا',image:displayTiles.find(t=>t.name==='سکه')?.image}
