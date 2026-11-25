@@ -1163,3 +1163,32 @@ body{background:var(--mah-paper);color:var(--mah-ink);font-family:'Shabnam',Taho
  #categories .ref-category-grid.ref-category-grid-collections{gap:17px 7px!important}
  #categories .ref-category-card,#categories .ref-category-card:nth-child(1),#categories .ref-category-card:nth-child(2){max-width:105px!important}
 }
+
+
+/* Mahgold subtle premium motion: lightweight CSS-only logo shimmer + rotating gold category halo */
+@keyframes mah-logo-glint{
+  0%,68%,100%{filter:drop-shadow(0 2px 9px rgba(0,0,0,.32)) brightness(1)}
+  78%{filter:drop-shadow(0 0 7px rgba(255,224,145,.72)) brightness(1.13)}
+  88%{filter:drop-shadow(0 0 13px rgba(255,238,190,.9)) brightness(1.2)}
+}
+@keyframes mah-gold-orbit{to{transform:rotate(360deg)}}
+.ref-brand-masthead img{
+  animation:mah-logo-glint 6.8s ease-in-out infinite;
+  will-change:filter;
+}
+#categories .ref-category-card{
+  isolation:isolate;
+  box-shadow:0 10px 28px rgba(30,45,29,.13),0 0 0 5px #f7f0e3!important;
+}
+#categories .ref-category-card:before{
+  content:"";position:absolute;inset:-3px;border-radius:inherit;padding:3px;
+  background:conic-gradient(from 0deg,#8b6527 0deg,#f3d995 42deg,#fff1bf 70deg,#b78b42 112deg,#73501c 160deg,#f0d18a 210deg,#fff0bd 250deg,#9b7131 300deg,#8b6527 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;z-index:3;animation:mah-gold-orbit 8s linear infinite;
+  filter:drop-shadow(0 0 2px rgba(211,171,91,.38));
+}
+@media(prefers-reduced-motion:reduce){
+ .ref-brand-masthead img{animation:none!important}
+ #categories .ref-category-card:before{animation:none!important}
+}
