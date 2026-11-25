@@ -477,7 +477,7 @@ export default function App() {
         </div>
         <div className="ref-category-grid ref-category-grid-collections">
           {[
-            ...displayTiles,
+            ...displayTiles.filter(tile=>tile.name!=='طلای زینتی'),
             {name:'انگشتر',desc:'انگشترهای ظریف و خاص',image:'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=900&q=85'},
             {name:'گردنبند',desc:'گردنبندهای درخشان',image:'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=85'},
             {name:'دستبند',desc:'دستبندهای طلایی',image:'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=900&q=85'},
