@@ -1045,3 +1045,19 @@ footer.bg-ink>div:not(.ref-footer-brand){color:#ead6aa!important}
     padding-bottom:24px;
   }
 }
+
+
+/* Final brand alignment: footer stays clean; header mark and band follow the original logo palette */
+.ref-footer-brand{display:none!important}
+footer.bg-ink{padding-top:34px!important}
+.ref-site-header{background:#062719!important;border-top:1px solid #c7a15d!important;border-bottom:2px solid #c7a15d!important}
+.ref-main-header{background:linear-gradient(180deg,#0b3022 0%,#062719 100%)!important}
+.ref-brand{display:flex!important;align-items:center!important;gap:10px!important;padding:5px 12px!important;border:1px solid rgba(205,166,93,.48)!important;border-radius:8px!important;background:linear-gradient(135deg,rgba(211,174,105,.12),rgba(5,31,21,.2))!important}
+.ref-brand img{width:clamp(72px,9vw,112px)!important;height:42px!important;object-fit:contain!important;object-position:center!important;filter:none!important}
+.ref-brand span{color:#e8c77f!important;font-family:"Shabnam",Tahoma,sans-serif!important;font-weight:700!important;letter-spacing:0!important}
+@media(max-width:767px){
+ .ref-brand{gap:6px!important;padding:4px 7px!important}
+ .ref-brand img{width:72px!important;height:34px!important}
+ .ref-brand span{font-size:12px!important}
+ footer.bg-ink{padding-top:26px!important}
+}
