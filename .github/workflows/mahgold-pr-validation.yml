@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - mahgold-canonical-20261125
-      - mahgold-development
   push:
     branches:
       - mahgold-canonical-20261125
@@ -25,9 +24,18 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
-      - name: Install from lockfile
-        run: npm ci
+      - name: Reconcile lockfile in isolated CI workspace
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Clean install from reconciled lock
+        run: npm ci --no-audit --no-fund
       - name: Production build
         run: npm run build
+      - name: Export reconciled lockfile for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mahgold-reconciled-package-lock
+          path: package-lock.json
+          retention-days: 7
