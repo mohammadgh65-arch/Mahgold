@@ -498,10 +498,15 @@ export default function App() {
             </label>
           </div>
           <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            {catalogPage&&<div className="ref-category-filter-groups" aria-label="دسته‌بندی محصولات">
-              <div className="ref-category-group-tabs">{catalogCategoryGroups.map(group=><button key={group.name} className={categoryGroup===group.name?'active':''} onClick={()=>{setCategoryGroup(group.name);openCatalog(group.value);}}>{group.name}</button>)}</div>
-              {categoryGroup!=='همه محصولات'&&<div className="ref-category-subgroups">{catalogCategoryGroups.find(group=>group.name===categoryGroup)?.items.map(item=><button key={item} className={category===item?'active':''} onClick={()=>openCatalog(item)}>{item}</button>)}</div>}
-              {categories.filter(item=>!presetCategories.includes(item)).length>0&&<div className="ref-category-subgroups ref-category-extra">{categories.filter(item=>!presetCategories.includes(item)).map(item=><button key={item} className={category===item?'active':''} onClick={()=>openCatalog(item)}>{item}</button>)}</div>}
+            {catalogPage&&<div className="ref-collection-image-grid" aria-label="مجموعه‌های فروشگاه">
+              {(categoryGroup==='همه محصولات'?[
+                {name:'طلای زینتی',desc:'زیورآلات و مجموعه‌های ظریف',image:displayTiles.find(t=>t.name==='طلای زینتی')?.image},
+                {name:'طلای آب‌شده',desc:'مجموعه طلای آب‌شده',image:displayTiles.find(t=>t.name==='طلای آب‌شده')?.image},
+                {name:'سکه',desc:'مجموعه سکه‌های طلا',image:displayTiles.find(t=>t.name==='سکه')?.image},
+                {name:'شمش',desc:'مجموعه شمش طلا',image:displayTiles.find(t=>t.name==='شمش')?.image}
+              ]:catalogCategoryGroups.find(group=>group.name===categoryGroup)?.items.map(name=>({name,desc:'مشاهده محصولات '+name,image:products.find(p=>p.category===name&&p.image_url)?.image_url||displayTiles.find(t=>t.name==='طلای زینتی')?.image}))||[]).map(tile=><button type="button" key={tile.name} className="ref-collection-image-card" onClick={()=>openCatalog(tile.name)}>
+                <img src={tile.image||displayTiles[0].image} alt={tile.name} loading="lazy"/><span className="ref-collection-image-shade"/><span className="ref-collection-image-label"><b>{tile.name}</b><small>دیدن مجموعه <ArrowLeft size={12}/></small></span>
+              </button>)}
             </div>}
             <label className="ref-sort shrink-0"><span>مرتب‌سازی</span><select aria-label="مرتب‌سازی" value={sortMode} onChange={e=>setSortMode(e.target.value)}>
               <option value="newest">جدیدترین</option><option value="cheap">ارزان‌ترین</option><option value="expensive">گران‌ترین</option>
