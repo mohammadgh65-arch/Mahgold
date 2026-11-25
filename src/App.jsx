@@ -262,8 +262,8 @@ export default function App() {
       if(forceAdminPreview){setIsAdminPage(true);return;}
       const path=window.location.pathname;
       setIsAdminPage(path==='/admin'||path==='/admin/'||window.location.hash==='#mahgold-control');
-      const categoryMatch=path.match(/^\\/category\\/([^/]+)\\/?$/);
-      const productMatch=path.match(/^\\/product\\/([^/]+)\\/?$/);
+      const categoryMatch=path.match(/^\/category\/([^/]+)\/?$/);
+      const productMatch=path.match(/^\/product\/([^/]+)\/?$/);
       if(categoryMatch){
         const next=decodeURIComponent(categoryMatch[1]);
         setCategory(next);setCategoryGroup(investmentCategories.has(next)?'سرمایه‌گذاری':jewelryProductCategories.has(next)?'طلای زینتی':'همه محصولات');
