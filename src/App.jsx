@@ -1,7 +1,7 @@
 import { MAHGOLD_LOGO } from './mahgold-brand';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn, ZoomOut,
+  Search, ShoppingBag, Menu, X, Gem, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn, ZoomOut,
   ShieldCheck, Gift, Headphones, Plus, Minus, UserRound, LogOut,
   House, LayoutGrid, Phone, MapPin, PackageCheck
 } from 'lucide-react';
@@ -390,14 +390,12 @@ export default function App() {
 
   return <div dir="rtl" className="min-h-screen bg-background text-foreground">
     {siteContent?.announcement?.active!==false&&<div className="ref-announcement">{siteContent?.announcement?.text||"ارسال امن و بسته‌بندی ویژه ✦ پشتیبانی مه‌گلد ✦ همراه انتخاب شما"}</div>}
-    <div className="ref-brand-masthead" aria-label="مه‌گلد"><img src={MAHGOLD_LOGO} alt="لوگوی مه‌گلد" fetchPriority="high"/></div>
-
     <header className="ref-site-header sticky top-0 z-40">
       <div className="ref-main-header mx-auto max-w-[1440px] px-4 md:px-6">
         <button aria-label="منو" className="ref-mobile-menu md:hidden" onClick={()=>setMenuOpen(v=>!v)}><Menu size={20}/></button>
-        <a aria-label="مه‌گلد - صفحه اصلی" className="ref-brand" href="#home">
-          <img src={siteContent?.logo_url||MAHGOLD_LOGO} alt="لوگوی مه‌گلد"/>
-          <span>مه‌گلد</span>
+        <a aria-label="مه‌گلد - صفحه اصلی" className="ref-brand ref-brand-redesigned" href="#home">
+          <span className="ref-brand-symbol" aria-hidden="true"><Gem size={34} strokeWidth={1.65}/></span>
+          <span className="ref-brand-wordmark">مه‌گلد</span>
         </a>
         <nav className="ref-primary-nav">
           <a className="active" href="#home">خانه</a>
