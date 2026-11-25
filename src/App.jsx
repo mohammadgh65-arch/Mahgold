@@ -39,7 +39,23 @@ const tiles = [
   {name:'طلای زینتی',desc:'زیورآلات برای هر روز و هر occasion',image:'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=640&q=70'},
   {name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=640&q=70'}
 ];
-const displayTileDefaults = tiles;
+const editorialCategoryImages = {
+  'طلای زینتی':'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=82',
+  'سکه':'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=900&q=82',
+  'انگشتر':'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=900&q=82',
+  'گردنبند':'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=900&q=82',
+  'دستبند':'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=82',
+  'النگو':'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=900&q=82',
+  'گوشواره':'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=900&q=82',
+  'آویز و پلاک':'https://images.unsplash.com/photo-1602170427-0c1a6f2c0f1b?auto=format&fit=crop&w=900&q=82',
+  'زنجیر':'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=900&q=82',
+  'پابند':'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=82',
+  'سرویس طلا':'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=900&q=82',
+  'سایر زیورآلات':'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=900&q=82'
+};
+const editorialImageFor = name => editorialCategoryImages[name] || editorialCategoryImages['طلای زینتی'];
+
+const displayTileDefaults = tiles.map(tile=>({...tile,image:editorialImageFor(tile.name)}));
 const presetCategories = [
   'همه محصولات','طلای زینتی','سکه','انگشتر','گردنبند',
   'دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'
@@ -467,7 +483,7 @@ export default function App() {
         <div className="ref-offers-footer"><span>حرکت خودکار · هر ۳ ثانیه</span><span className="ref-offers-dots">{offerItems.map((item,index)=><i key={index} className={activeOffer%offerItems.length===index?'active':''}/>)}</span></div>
       </section>}
 
-      {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">MAHGOLD CATALOG</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div><img className="ref-catalog-category-image" src={products.find(p=>p.category===category&&p.image_url)?.image_url||displayTiles.find(t=>t.name===category)?.image||displayTiles.find(t=>t.name==='طلای زینتی')?.image||tiles[0].image} alt={'تصویر دسته '+category} loading="eager" decoding="async"/></div></section>}
+      {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">MAHGOLD CATALOG</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div><img className="ref-catalog-category-image" src={editorialImageFor(category)||displayTiles.find(t=>t.name===category)?.image||tiles[0].image} alt={'تصویر دسته '+category} loading="eager" decoding="async"/></div></section>}
 
                 {!catalogPage&&<div className="ref-quote-strip">
           <div className="ref-quote-title"><span className="ref-quote-bars">▥</span><div><b>قیمت لحظه‌ای طلای ۱۸ عیار</b><small>{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'به‌روزرسانی لحظه‌ای'):quoteIsManual?'نرخ دستی منقضی‌شده':quote?.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'در انتظار نرخ معتبر'}</small></div></div>
@@ -524,7 +540,7 @@ export default function App() {
               {(categoryGroup==='همه محصولات'?[
                 {name:'طلای زینتی',desc:'زیورآلات و مجموعه‌های ظریف',image:displayTiles.find(t=>t.name==='طلای زینتی')?.image},
                 {name:'سکه',desc:'مجموعه سکه‌های طلا',image:displayTiles.find(t=>t.name==='سکه')?.image}
-              ]:catalogCategoryGroups.find(group=>group.name===categoryGroup)?.items.map(name=>({name,desc:'مشاهده محصولات '+name,image:products.find(p=>p.category===name&&p.image_url)?.image_url||displayTiles.find(t=>t.name==='طلای زینتی')?.image}))||[]).map(tile=><button type="button" key={tile.name} className="ref-collection-image-card" onClick={()=>openCatalog(tile.name)}>
+              ]:catalogCategoryGroups.find(group=>group.name===categoryGroup)?.items.map(name=>({name,desc:'مشاهده محصولات '+name,image:editorialImageFor(name)}))||[]).map(tile=><button type="button" key={tile.name} className="ref-collection-image-card" onClick={()=>openCatalog(tile.name)}>
                 <img src={tile.image||displayTiles[0].image} alt={tile.name} loading="lazy"/><span className="ref-collection-image-shade"/><span className="ref-collection-image-label"><b>{tile.name}</b><small>دیدن مجموعه <ArrowLeft size={12}/></small></span>
               </button>)}
             </div>}
