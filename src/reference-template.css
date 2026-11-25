@@ -903,3 +903,18 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
  .ref-zoom-hint{bottom:12px!important;font-size:10px!important}
 }
 @media(prefers-reduced-motion:reduce){.ref-product-zoom-stage>.ref-product-zoom-image{transition:none!important}}
+
+
+/* MAHGOLD CATALOG: uncluttered landing, complete category and product listings */
+.ref-catalog-heading{padding-top:30px!important;padding-bottom:24px!important}
+.ref-catalog-heading .ref-catalog-back{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;padding:9px 14px;border:1px solid #c8a15d;border-radius:24px;color:#234331;background:#fffaf0;font-size:12px}
+.ref-catalog-heading h1{margin:8px 0;color:#153b2a;font-family:"Shabnam",Tahoma,sans-serif;font-size:clamp(24px,4vw,36px);font-weight:800}
+.ref-catalog-heading p{margin:8px 0 0;color:#81745d;font-size:13px}
+.ref-shop-section.ref-catalog-full{background:linear-gradient(180deg,#f8f2e7,#f1e7d5);padding-top:24px!important;padding-bottom:42px!important}
+.ref-all-products-link{display:inline-flex;align-items:center;gap:8px;margin:12px 0 18px;padding:10px 17px;border:1px solid #c7a15d;border-radius:24px;background:#103b2a;color:#f0d28b;font-size:12px;font-weight:700}
+.ref-shop-section:not(.ref-catalog-full) .ref-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+@media(min-width:640px){.ref-shop-section:not(.ref-catalog-full) .ref-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(min-width:1024px){.ref-shop-section:not(.ref-catalog-full) .ref-product-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+.ref-catalog-full .ref-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+@media(min-width:640px){.ref-catalog-full .ref-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(min-width:1024px){.ref-catalog-full .ref-product-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
