@@ -972,3 +972,12 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
  .ref-category-grid-collections .ref-category-text small{display:none!important}
  .ref-category-grid-collections .ref-category-text em{font-size:8px!important}
 }
+
+/* Mahgold accessibility contrast and faster visual rendering */
+:root{--foreground:#13271e;--muted-foreground:#52645a;--border:#c9d2c8;--gold-deep:#79551a}
+.ref-product-card,.ref-category-card,.ref-collection-image-card{border:1px solid rgba(105,79,31,.32)}
+.ref-product-name{color:#15281f;font-weight:650}
+.ref-product-body .text-muted-foreground{color:#52645a}
+.ref-shop-note,.ref-catalog-heading p{color:#4d6055}
+.ref-product-image img,.ref-category-card img,.ref-collection-image-card img,.ref-offer-card img{content-visibility:auto}
+.ref-product-image img{background:#e8e4d8}
