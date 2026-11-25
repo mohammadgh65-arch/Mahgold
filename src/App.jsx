@@ -65,7 +65,7 @@ function ProductImage({product, className='', onClick}) {
   const [failed,setFailed] = useState(false);
   const src = !failed && product.image_url ? product.image_url : tiles.find(t=>t.name===product.category)?.image || tiles[0].image;
   return <div className={'ref-product-image ' + className} onClick={onClick} role={onClick?'button':undefined} tabIndex={onClick?0:undefined} onKeyDown={onClick?(e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick();}}):undefined}>
-    <img src={src} alt={product.name || 'محصول مه‌گلد'} loading="lazy" onError={()=>setFailed(true)}/>
+    <img src={src} alt={product.name || 'محصول مه‌گلد'} loading="lazy" decoding="async" fetchPriority="low" onError={()=>setFailed(true)}/>
   </div>;
 }
 
@@ -337,7 +337,7 @@ export default function App() {
   const quoteFresh=(quote?.is_live===true||quoteIsManual)&&Number.isFinite(quoteObservedAt)&&quoteObservedAt<=clockNow+60000&&clockNow-quoteObservedAt<=300000;
 
   const openProduct=product=>{setCatalogPage(false);setSelectedProduct(product);window.history.pushState({mahgoldProduct:true},'', '/product/'+encodeURIComponent(product.id));window.scrollTo({top:0,behavior:'auto'});};
-  const closeProduct=()=>{setSelectedProduct(null);if(window.location.pathname.startsWith('/product/'))window.history.pushState({},'',catalogPage?(category==='همه محصولات'?'/products':'/category/'+encodeURIComponent(category)):'/');};
+  const closeProduct=()=>{setSelectedProduct(null);if(window.location.pathname.startsWith('/product/'))window.history.pushState({},'', '/category/'+encodeURIComponent(category==='همه محصولات'?'طلای زینتی':category));setCatalogPage(true);window.scrollTo({top:0,behavior:'auto'});};
   const addToCart=product=>{
     if(!supabase||dataStatus!=='connected'||!product.id){setCheckoutError('اتصال فروشگاه برقرار نیست.');return;}
     if(product.pricing_mode==='auto'&&!quoteFresh){setCheckoutError('نرخ معتبر طلای ۱۸ عیار در دسترس نیست؛ نرخ دستی یا خودکار باید در ۵ دقیقه اخیر ثبت شده باشد.');return;}
@@ -414,9 +414,7 @@ export default function App() {
           <button type="button" onClick={()=>openCatalog('همه محصولات')}>همه محصولات</button>
           <button type="button" onClick={()=>setAccountOpen(true)}>پیگیری سفارش</button>
           <a href="/category/طلای%20زینتی" onClick={e=>{e.preventDefault();openCatalog('طلای زینتی');}}>طلای زینتی</a>
-          <a href="/category/طلای%20آب‌شده" onClick={e=>{e.preventDefault();openCatalog('طلای آب‌شده');}}>طلای آب‌شده</a>
           <a href="/category/سکه" onClick={e=>{e.preventDefault();openCatalog('سکه');}}>سکه</a>
-          <a href="/category/شمش" onClick={e=>{e.preventDefault();openCatalog('شمش');}}>شمش</a>
         </nav>
         <label className="ref-header-search"><Search size={16}/><input aria-label="جستجوی محصولات" value={query} onChange={e=>{setQuery(e.target.value);if(e.target.value.trim()&&!catalogPage)openCatalog("همه محصولات");}} placeholder="جستجو در محصولات..."/></label>
         <div className="ref-header-actions">
@@ -444,8 +442,7 @@ export default function App() {
           <div className="ref-offers-track" style={{transform:`translateX(-${activeOffer*(window.innerWidth<=767?window.innerWidth*.82+11:Math.min(window.innerWidth*.31,390)+16)}px)`,transition:offerTransition?'transform 720ms cubic-bezier(.22,.75,.25,1)':'none'}}>
             {offerTrackItems.map((item,index)=><button type="button" key={index} className="ref-offer-card" onClick={()=>{
               if(item.product){openProduct(item.product);return;}
-              setCategory(item.category||'همه محصولات');
-              document.getElementById('shop')?.scrollIntoView({behavior:'smooth'});
+              openCatalog(item.category||'همه محصولات');
             }}>
               <img src={item.image} alt={item.title} loading={index<3?'eager':'lazy'}/>
               <span className="ref-offer-shade"/>
