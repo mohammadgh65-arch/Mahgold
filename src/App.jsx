@@ -546,7 +546,7 @@ export default function App() {
     </main>
 
     <footer className="bg-ink px-6 pb-28 pt-14 text-center text-xs leading-8 text-ink-muted md:pb-14">
-      <div className="ref-footer-brand"><img alt="نشان اصلی مه‌گلد؛ هلال و الماس طلایی" loading="lazy" src="/mahgold-brand-masthead.jpg"/></div>
+      
       <div>طلایی به زیباییِ لحظه‌های تو</div>
       <div className="mt-3 flex flex-col items-center gap-1 md:flex-row md:justify-center md:gap-6">
         <span className="inline-flex items-center gap-1.5"><Phone className="size-3.5 text-gold"/> شماره تماس: به‌زودی</span>
