@@ -498,11 +498,11 @@ export default function App() {
             </label>
           </div>
           <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="ref-category-filter-groups" aria-label="دسته‌بندی محصولات">
+            {catalogPage&&<div className="ref-category-filter-groups" aria-label="دسته‌بندی محصولات">
               <div className="ref-category-group-tabs">{catalogCategoryGroups.map(group=><button key={group.name} className={categoryGroup===group.name?'active':''} onClick={()=>{setCategoryGroup(group.name);openCatalog(group.value);}}>{group.name}</button>)}</div>
               {categoryGroup!=='همه محصولات'&&<div className="ref-category-subgroups">{catalogCategoryGroups.find(group=>group.name===categoryGroup)?.items.map(item=><button key={item} className={category===item?'active':''} onClick={()=>openCatalog(item)}>{item}</button>)}</div>}
               {categories.filter(item=>!presetCategories.includes(item)).length>0&&<div className="ref-category-subgroups ref-category-extra">{categories.filter(item=>!presetCategories.includes(item)).map(item=><button key={item} className={category===item?'active':''} onClick={()=>openCatalog(item)}>{item}</button>)}</div>}
-            </div>
+            </div>}
             <label className="ref-sort shrink-0"><span>مرتب‌سازی</span><select aria-label="مرتب‌سازی" value={sortMode} onChange={e=>setSortMode(e.target.value)}>
               <option value="newest">جدیدترین</option><option value="cheap">ارزان‌ترین</option><option value="expensive">گران‌ترین</option>
             </select></label>
