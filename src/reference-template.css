@@ -1148,3 +1148,31 @@ footer.bg-ink{padding-top:34px!important}
  .ref-main-header{min-height:62px!important;padding-inline:10px!important}
  .ref-brand img{width:104px!important;height:52px!important}
 }
+
+
+/* MAHGOLD WISHLIST — restrained gold controls, consistent with the green/gold identity */
+.ref-product-card{position:relative}
+.ref-wishlist-toggle{
+  position:absolute;z-index:5;top:12px;right:12px;
+  display:grid;place-items:center;width:40px;height:40px;
+  border:1px solid rgba(199,161,93,.65);border-radius:50%;
+  color:#b18a43;background:rgba(255,253,247,.94);
+  box-shadow:0 4px 14px rgba(20,35,25,.12);
+  transition:transform .18s ease,background .18s ease,color .18s ease;
+}
+.ref-wishlist-toggle:hover{transform:translateY(-1px);background:#062719;color:#e5c477}
+.ref-wishlist-toggle.is-saved{background:#062719;color:#e5c477;border-color:#c7a15d}
+.ref-wishlist-toggle:focus-visible,.ref-wishlist-header:focus-visible{outline:2px solid #d5b46d;outline-offset:3px}
+.ref-header-actions .ref-wishlist-header{
+  position:relative;display:grid;place-items:center;color:#e6c77e!important;
+}
+.ref-wishlist-header b{
+  position:absolute;top:-5px;right:-7px;min-width:17px;height:17px;padding:0 4px;
+  display:grid;place-items:center;border-radius:20px;background:#c7a15d;color:#062719;
+  font:700 10px/1 Tahoma,sans-serif;
+}
+.ref-wishlist-header.active{color:#f3d58c!important}
+@media(max-width:767px){
+  .ref-wishlist-toggle{top:9px;right:9px;width:36px;height:36px}
+  .ref-header-actions .ref-wishlist-header{width:34px}
+}
