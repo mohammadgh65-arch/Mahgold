@@ -1095,3 +1095,71 @@ body{background:var(--mah-paper);color:var(--mah-ink);font-family:'Shabnam',Taho
  .ref-category-text small{font-size:9px!important;line-height:1.7!important}
  .ref-category-text em{font-size:9px!important;margin-top:1px!important}
 }
+
+
+/* CATEGORY DESIGN — circular medallions */
+#categories .ref-category-grid.ref-category-grid-collections{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:clamp(16px,3vw,34px)!important;
+  align-items:start!important;
+  overflow:visible!important;
+  max-width:1100px!important;margin:0 auto!important;
+}
+#categories .ref-category-card,
+#categories .ref-category-card:nth-child(1),
+#categories .ref-category-card:nth-child(2){
+  grid-column:span 1!important;
+  aspect-ratio:1/1!important;
+  width:100%!important;
+  max-width:205px!important;
+  justify-self:center!important;
+  border-radius:50%!important;
+  overflow:hidden!important;
+  box-shadow:0 10px 28px rgba(30,45,29,.13),0 0 0 5px #f7f0e3,0 0 0 6px rgba(176,139,73,.42)!important;
+  background:#173525!important;
+  transition:transform .35s ease,box-shadow .35s ease!important;
+}
+#categories .ref-category-card:hover{
+  transform:translateY(-5px)!important;
+  box-shadow:0 16px 35px rgba(30,45,29,.18),0 0 0 5px #f7f0e3,0 0 0 7px rgba(176,139,73,.68)!important;
+}
+#categories .ref-category-card img{
+  width:100%!important;height:100%!important;object-fit:cover!important;
+  filter:saturate(.88)!important;transform:scale(1.02)!important;
+}
+#categories .ref-category-shade{
+  background:linear-gradient(180deg,rgba(8,20,13,.02) 28%,rgba(5,18,11,.72) 100%)!important;
+}
+#categories .ref-category-text{
+  inset:auto 8px 19px!important;text-align:center!important;align-items:center!important;
+  gap:4px!important;
+}
+#categories .ref-category-text b{
+  font-size:clamp(13px,1.3vw,18px)!important;font-weight:600!important;
+  color:#fffaf0!important;text-shadow:0 2px 8px rgba(0,0,0,.4)!important;
+}
+#categories .ref-category-text small{display:none!important}
+#categories .ref-category-text em{
+  font-size:9px!important;margin:2px auto 0!important;padding-bottom:3px!important;
+  border-color:rgba(239,211,160,.7)!important;color:#f4dfb8!important;
+}
+@media(max-width:767px){
+ #categories{padding:27px 14px 24px!important}
+ #categories .ref-category-grid.ref-category-grid-collections{
+   grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:21px 10px!important;
+ }
+ #categories .ref-category-card,
+ #categories .ref-category-card:nth-child(1),
+ #categories .ref-category-card:nth-child(2){
+   width:100%!important;max-width:132px!important;
+   box-shadow:0 7px 20px rgba(30,45,29,.12),0 0 0 3px #f7f0e3,0 0 0 4px rgba(176,139,73,.45)!important;
+ }
+ #categories .ref-category-text{inset:auto 5px 13px!important}
+ #categories .ref-category-text b{font-size:12px!important;line-height:1.6!important}
+ #categories .ref-category-text em{font-size:8px!important}
+}
+@media(max-width:370px){
+ #categories .ref-category-grid.ref-category-grid-collections{gap:17px 7px!important}
+ #categories .ref-category-card,#categories .ref-category-card:nth-child(1),#categories .ref-category-card:nth-child(2){max-width:105px!important}
+}
