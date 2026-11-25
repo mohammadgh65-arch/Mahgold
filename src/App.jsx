@@ -177,7 +177,8 @@ function AccountContent({onClose,onAuthenticated,notice=''}) {
   </form>;
 }
 export default function App() {
-  const [category,setCategory]=useState('همه محصولات');
+  const [category,setCategory]=useState(()=>{const m=window.location.pathname.match(/^\/category\/([^/]+)\/?$/);return m?decodeURIComponent(m[1]):'همه محصولات';});
+  const [catalogPage,setCatalogPage]=useState(()=>window.location.pathname==='/products'||/^\/category\//.test(window.location.pathname));
   const [query,setQuery]=useState('');
   const [sortMode,setSortMode]=useState('newest');
   const [cart,setCart]=useState(()=>{try{return JSON.parse(localStorage.getItem('mahgold_cart')||'[]');}catch{return [];}});
@@ -210,7 +211,7 @@ export default function App() {
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
   const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||window.location.pathname==='/admin'||window.location.pathname==='/admin/'||window.location.hash==='#mahgold-control');
 
-  const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})).filter(tile=>!['طلای آب‌شده','شمش'].includes(tile.name)),[siteContent]);
+  const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})).filter(Boolean),[siteContent]);
   const offerItems=useMemo(()=>{
     const excludedOfferItem=(category,title='')=>/شمش|آب\\s*شده|آبشده/.test(`${category||''} ${title||''}`.replace(/ي/g,'ی'));
     const current=products.filter(product=>Number(product.price_toman)>0&&!excludedOfferItem(product.category,product.name)).slice(0,5).map(product=>({
@@ -300,7 +301,7 @@ export default function App() {
   },[]);
   useEffect(()=>{try{localStorage.setItem('mahgold_cart',JSON.stringify(cart));}catch{}},[cart]);
   useEffect(()=>{if(!cartToast)return;const timer=setTimeout(()=>setCartToast(''),3200);return()=>clearTimeout(timer);},[cartToast]);
-  useEffect(()=>{const syncProductRoute=()=>{const match=window.location.pathname.match(/^\/product\/([^/]+)\/?$/);if(!match){setSelectedProduct(null);return;}const product=products.find(p=>p.id===decodeURIComponent(match[1]));if(product)setSelectedProduct(product);};syncProductRoute();window.addEventListener('popstate',syncProductRoute);return()=>window.removeEventListener('popstate',syncProductRoute);},[products]);
+  useEffect(()=>{const syncProductRoute=()=>{const path=window.location.pathname;const match=path.match(/^\/product\/([^/]+)\/?$/);if(match){setCatalogPage(false);const product=products.find(p=>p.id===decodeURIComponent(match[1]));if(product)setSelectedProduct(product);return;}setSelectedProduct(null);const cat=path.match(/^\/category\/([^/]+)\/?$/);setCatalogPage(path==='/products'||!!cat);setCategory(cat?decodeURIComponent(cat[1]):'همه محصولات');};syncProductRoute();window.addEventListener('popstate',syncProductRoute);return()=>window.removeEventListener('popstate',syncProductRoute);},[products]);
   useEffect(()=>{setCheckoutRequestKey(null);},[cart,customer]);
 
   const categories=useMemo(()=>{
@@ -321,14 +322,17 @@ export default function App() {
       return new Date(b.created_at||0)-new Date(a.created_at||0);
     });
   },[products,category,query,sortMode]);
+  const homeFeatured=filtered.slice(0,8);
+  const openCatalog=(nextCategory='همه محصولات')=>{setCategory(nextCategory);setCatalogPage(true);const path=nextCategory==='همه محصولات'?'/products':'/category/'+encodeURIComponent(nextCategory);window.history.pushState({mahgoldCatalog:true},'',path);window.scrollTo({top:0,behavior:'auto'});};
+  const showHome=()=>{setCatalogPage(false);setCategory('همه محصولات');window.history.pushState({},'','/');window.scrollTo({top:0,behavior:'smooth'});};
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const cartTotal=cart.reduce((sum,item)=>sum+Number(item.price_toman||0)*Number(item.qty||0),0);
   const quoteObservedAt=quote?.observed_at?Date.parse(quote.observed_at):NaN;
   const quoteIsManual=quote?.source==='manual'&&quote?.is_live===false;
   const quoteFresh=(quote?.is_live===true||quoteIsManual)&&Number.isFinite(quoteObservedAt)&&quoteObservedAt<=clockNow+60000&&clockNow-quoteObservedAt<=300000;
 
-  const openProduct=product=>{setSelectedProduct(product);window.history.pushState({mahgoldProduct:true},'', '/product/'+encodeURIComponent(product.id));window.scrollTo({top:0,behavior:'auto'});};
-  const closeProduct=()=>{setSelectedProduct(null);if(window.location.pathname.startsWith('/product/'))window.history.pushState({},'', '/');};
+  const openProduct=product=>{setCatalogPage(false);setSelectedProduct(product);window.history.pushState({mahgoldProduct:true},'', '/product/'+encodeURIComponent(product.id));window.scrollTo({top:0,behavior:'auto'});};
+  const closeProduct=()=>{setSelectedProduct(null);if(window.location.pathname.startsWith('/product/'))window.history.pushState({},'',catalogPage?(category==='همه محصولات'?'/products':'/category/'+encodeURIComponent(category)):'/');};
   const addToCart=product=>{
     if(!supabase||dataStatus!=='connected'||!product.id){setCheckoutError('اتصال فروشگاه برقرار نیست.');return;}
     if(product.pricing_mode==='auto'&&!quoteFresh){setCheckoutError('نرخ معتبر طلای ۱۸ عیار در دسترس نیست؛ نرخ دستی یا خودکار باید در ۵ دقیقه اخیر ثبت شده باشد.');return;}
@@ -396,17 +400,18 @@ export default function App() {
     <header className="ref-site-header sticky top-0 z-40">
       <div className="ref-main-header mx-auto max-w-[1440px] px-4 md:px-6">
         <button aria-label="منو" className="ref-mobile-menu md:hidden" onClick={()=>setMenuOpen(v=>!v)}><Menu size={20}/></button>
-        <a aria-label="مه‌گلد - صفحه اصلی" className="ref-brand ref-brand-redesigned" href="#home">
+        <a aria-label="مه‌گلد - صفحه اصلی" className="ref-brand ref-brand-redesigned" href="#home" onClick={showHome}>
           <span className="ref-brand-symbol" aria-hidden="true"><Gem size={34} strokeWidth={1.65}/></span>
           <span className="ref-brand-wordmark">مه‌گلد</span>
         </a>
         <nav className="ref-primary-nav">
-          <a className="active" href="#home">خانه</a>
+          <a className="active" href="#home" onClick={showHome}>خانه</a>
+          <button type="button" onClick={()=>openCatalog('همه محصولات')}>همه محصولات</button>
           <button type="button" onClick={()=>setAccountOpen(true)}>پیگیری سفارش</button>
-          <a href="#categories" onClick={()=>setCategory('طلای زینتی')}>طلای زینتی</a>
-          <a href="#categories" onClick={()=>setCategory('طلای آب‌شده')}>طلای آب‌شده</a>
-          <a href="#categories" onClick={()=>setCategory('سکه')}>سکه</a>
-          <a href="#categories" onClick={()=>setCategory('شمش')}>شمش</a>
+          <a href="/category/طلای%20زینتی" onClick={e=>{e.preventDefault();openCatalog('طلای زینتی');}}>طلای زینتی</a>
+          <a href="/category/طلای%20آب‌شده" onClick={e=>{e.preventDefault();openCatalog('طلای آب‌شده');}}>طلای آب‌شده</a>
+          <a href="/category/سکه" onClick={e=>{e.preventDefault();openCatalog('سکه');}}>سکه</a>
+          <a href="/category/شمش" onClick={e=>{e.preventDefault();openCatalog('شمش');}}>شمش</a>
         </nav>
         <label className="ref-header-search"><Search size={16}/><input aria-label="جستجوی محصولات" value={query} onChange={e=>setQuery(e.target.value)} placeholder="جستجو در محصولات..."/></label>
         <div className="ref-header-actions">
@@ -415,13 +420,13 @@ export default function App() {
         </div>
       </div>
       {menuOpen&&<nav className="ref-mobile-links flex flex-col gap-4 border-t border-border bg-background px-5 py-4 text-sm text-muted-foreground md:hidden">
-        <a href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a><a href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a><a href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a><button className="text-right" onClick={()=>{setAccountOpen(true);setMenuOpen(false);}}>پیگیری سفارش</button>
+        <button className="text-right" onClick={()=>{openCatalog('همه محصولات');setMenuOpen(false);}}>همه محصولات</button><a href="#categories" onClick={()=>setMenuOpen(false)}>دسته‌بندی‌ها</a><a href="#shop" onClick={()=>setMenuOpen(false)}>فروشگاه</a><a href="#story" onClick={()=>setMenuOpen(false)}>درباره مه‌گلد</a><button className="text-right" onClick={()=>{setAccountOpen(true);setMenuOpen(false);}}>پیگیری سفارش</button>
         <button className="text-right" onClick={()=>{setAccountOpen(true);setMenuOpen(false);}}>ورود / ثبت‌نام</button>
       </nav>}
     </header>
 
     <main className="min-h-[60vh]" id="home">
-      <section aria-label="پیشنهادات مه‌گلد" aria-roledescription="carousel" className="ref-offers-section">
+      {!catalogPage&&<section aria-label="پیشنهادات مه‌گلد" aria-roledescription="carousel" className="ref-offers-section">
         <div className="ref-offers-heading">
           <div>
             <span className="ref-offers-eyebrow">MAHGOLD SELECTION</span>
@@ -448,7 +453,9 @@ export default function App() {
           </div>
         </div>
         <div className="ref-offers-footer"><span>حرکت خودکار · هر ۳ ثانیه</span><span className="ref-offers-dots">{offerItems.map((item,index)=><i key={index} className={activeOffer%offerItems.length===index?'active':''}/>)}</span></div>
-      </section>
+      </section>}
+
+      {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><span className="eyebrow text-gold-deep">MAHGOLD CATALOG</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></section>}
 
                 <div className="ref-quote-strip">
           <div className="ref-quote-title"><span className="ref-quote-bars">▥</span><div><b>قیمت لحظه‌ای طلای ۱۸ عیار</b><small>{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'به‌روزرسانی لحظه‌ای'):quoteIsManual?'نرخ دستی منقضی‌شده':quote?.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'در انتظار نرخ معتبر'}</small></div></div>
@@ -462,7 +469,7 @@ export default function App() {
           <p className="hidden text-xs text-muted-foreground md:block">جزئیاتی برای سلیقه‌های خاص</p>
         </div>
         <div className="ref-category-grid">
-          {displayTiles.map(tile=><button key={tile.name} className="ref-category-card" onClick={()=>{setCategory(tile.name);document.getElementById('shop')?.scrollIntoView({behavior:'smooth'});}}>
+          {displayTiles.map(tile=><button key={tile.name} className="ref-category-card" onClick={()=>openCatalog(tile.name)}>
             <img src={tile.image} alt={tile.name} loading="lazy"/><span className="ref-category-shade"/>
             <span className="ref-category-text"><b>{tile.name}</b><small>{tile.desc}</small><em>مشاهده <ArrowLeft size={12}/></em></span>
           </button>)}
@@ -474,9 +481,10 @@ export default function App() {
         </div>
       </section>
 
-      <section className="ref-shop-section scroll-mt-16 py-5 md:py-7" id="shop">
+      <section className={'ref-shop-section scroll-mt-16 py-5 md:py-7 '+(catalogPage?'ref-catalog-full':'')} id="shop">
         <div className="mx-auto max-w-7xl px-4 md:px-7">
-        <div className="ref-shop-heading"><span className="eyebrow text-gold-deep">THE CURATED EDIT</span><h2 className="mt-1 text-xl font-semibold md:text-2xl">منتخب‌های مه‌گلد</h2></div>
+        <div className="ref-shop-heading"><span className="eyebrow text-gold-deep">{catalogPage?'COMPLETE COLLECTION':'THE CURATED EDIT'}</span><h2 className="mt-1 text-xl font-semibold md:text-2xl">{catalogPage?(category==='همه محصولات'?'همه محصولات':'تمام محصولات '+category):'منتخب‌های مه‌گلد'}</h2>{!catalogPage&&<p className="mt-2 text-xs text-muted-foreground">چند انتخاب ویژه؛ برای دیدن کل مجموعه وارد فروشگاه شوید.</p>}</div>
+        {!catalogPage&&<button className="ref-all-products-link" onClick={()=>openCatalog('همه محصولات')}>مشاهده همه محصولات <ArrowLeft size={15}/></button>}
         <div className="ref-shop-tools">
             <label className="flex h-10 w-full items-center gap-2 rounded-full border border-border bg-card px-4 text-muted-foreground md:w-72">
               <Search size={16}/><input aria-label="جست‌وجوی محصول" className="w-full bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground" value={query} onChange={e=>setQuery(e.target.value)} placeholder="نام محصول را جستجو کنید..."/>
@@ -484,14 +492,14 @@ export default function App() {
           </div>
           <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="flex gap-2 overflow-x-auto pb-1">
-              {categories.map(item=><button key={item} className={'shrink-0 rounded-full border px-4 py-2 text-xs font-medium transition-all '+(category===item?'border-ink bg-ink text-ink-foreground shadow-soft':'border-input bg-card text-muted-foreground hover:border-gold hover:text-gold-deep')} onClick={()=>setCategory(item)}>{item}</button>)}
+              {categories.map(item=><button key={item} className={'shrink-0 rounded-full border px-4 py-2 text-xs font-medium transition-all '+(category===item?'border-ink bg-ink text-ink-foreground shadow-soft':'border-input bg-card text-muted-foreground hover:border-gold hover:text-gold-deep')} onClick={()=>openCatalog(item)}>{item}</button>)}
             </div>
             <label className="ref-sort shrink-0"><span>مرتب‌سازی</span><select aria-label="مرتب‌سازی" value={sortMode} onChange={e=>setSortMode(e.target.value)}>
               <option value="newest">جدیدترین</option><option value="cheap">ارزان‌ترین</option><option value="expensive">گران‌ترین</option>
             </select></label>
           </div>
           <div className="ref-product-grid">
-            {filtered.map(product=><article className="ref-product-card group" key={product.id}>
+            {(catalogPage?filtered:homeFeatured).map(product=><article className="ref-product-card group" key={product.id}>
               <button className="block w-full overflow-hidden text-right" onClick={()=>openProduct(product)} aria-label={'مشاهده '+product.name}>
                 <ProductImage product={product}/>
               </button>
@@ -508,12 +516,12 @@ export default function App() {
           </div>
           {dataStatus==='loading'&&<div className="ref-state">در حال دریافت محصولات مه‌گلد…</div>}
           {dataStatus==='error'&&<div className="ref-state">{dataMessage}</div>}
-          {dataStatus==='connected'&&filtered.length===0&&<div className="ref-state">محصولی با این مشخصات پیدا نشد.</div>}
+          {dataStatus==='connected'&&(catalogPage?filtered:homeFeatured).length===0&&<div className="ref-state">محصولی با این مشخصات پیدا نشد.</div>}
           <p className="ref-shop-note">{dataStatus==='connected'?'قیمت‌ها و موجودی بر اساس آخرین اطلاعات فروشگاه مه‌گلد نمایش داده می‌شوند.':'قیمت‌ها و موجودی پس از برقراری اتصال نمایش داده می‌شوند.'}</p>
         </div>
       </section>
 
-      <section className="grid scroll-mt-16 bg-ink text-ink-foreground md:min-h-[440px] md:grid-cols-2" id="story">
+      {!catalogPage&&<section className="grid scroll-mt-16 bg-ink text-ink-foreground md:min-h-[440px] md:grid-cols-2" id="story">
         <div className="h-64 overflow-hidden md:h-auto"><img alt="جزئیات زیورآلات مه‌گلد" className="h-full w-full object-cover" loading="lazy" src={siteContent?.story_image||storyImage}/></div>
         <div className="flex flex-col justify-center px-6 py-14 md:px-[10%]">
           <div className="eyebrow text-gold-light">A Story of Elegance</div>
@@ -521,7 +529,7 @@ export default function App() {
           <p className="mt-4 max-w-md text-sm leading-8 text-ink-muted">در مه‌گلد، هر انتخاب فرصتی‌ست برای بیان سلیقه شخصی. ما به طراحی ماندگار، جزئیات دقیق و تجربه‌ای ساده و دلنشین باور داریم.</p>
           <div><button className="mt-8 h-12 rounded-lg bg-gold-gradient px-7 text-sm font-bold text-ink shadow-gold transition-all hover:-translate-y-0.5 hover:brightness-110" onClick={()=>document.getElementById('shop')?.scrollIntoView({behavior:'smooth'})}>مشاهده محصولات</button></div>
         </div>
-      </section>
+      </section>}
     </main>
 
     <footer className="ref-lux-footer">
