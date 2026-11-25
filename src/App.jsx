@@ -1,7 +1,7 @@
 import { MAHGOLD_LOGO } from './mahgold-brand';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn, ZoomOut,
+  Search, ShoppingBag, Menu, X, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Heart,
   ShieldCheck, Gift, Headphones, Plus, Minus, UserRound, LogOut,
   House, LayoutGrid, Phone, MapPin, PackageCheck
 } from 'lucide-react';
@@ -207,6 +207,8 @@ function AccountContent({onClose,onAuthenticated,notice=''}) {
 export default function App() {
   const [category,setCategory]=useState('همه محصولات');
   const [query,setQuery]=useState('');
+  const [wishlist,setWishlist]=useState(()=>{try{return JSON.parse(localStorage.getItem('mahgold_wishlist_v1')||'[]').filter(id=>typeof id==='string'||typeof id==='number');}catch{return [];}});
+  const [favoritesOnly,setFavoritesOnly]=useState(false);
   const [sortMode,setSortMode]=useState('newest');
   const [cart,setCart]=useState(()=>{try{return JSON.parse(localStorage.getItem('mahgold_cart')||'[]');}catch{return [];}});
   const [cartOpen,setCartOpen]=useState(false);
@@ -337,6 +339,7 @@ export default function App() {
     // Products without a positive sale price are kept in Admin but never exposed for sale.
     const rows=products.filter(p=>
       Number(p.price_toman)>0&&
+      (!favoritesOnly||wishlist.includes(p.id))&&
       (category==='همه محصولات'||(category==='طلای زینتی'?jewelryProductCategories.has(p.category):p.category===category)||p.name?.includes(category))&&
       (!query.trim()||p.name?.toLocaleLowerCase('fa').includes(query.trim().toLocaleLowerCase('fa')))
     );
@@ -345,7 +348,9 @@ export default function App() {
       if(sortMode==='expensive')return Number(b.price_toman||0)-Number(a.price_toman||0);
       return new Date(b.created_at||0)-new Date(a.created_at||0);
     });
-  },[products,category,query,sortMode]);
+  },[products,category,query,sortMode,favoritesOnly,wishlist]);
+  useEffect(()=>{try{localStorage.setItem('mahgold_wishlist_v1',JSON.stringify(wishlist));}catch{}},[wishlist]);
+  const toggleWishlist=product=>setWishlist(old=>old.includes(product.id)?old.filter(id=>id!==product.id):[...old,product.id]);
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const cartTotal=cart.reduce((sum,item)=>sum+Number(item.price_toman||0)*Number(item.qty||0),0);
   const quoteObservedAt=quote?.observed_at?Date.parse(quote.observed_at):NaN;
@@ -432,6 +437,7 @@ export default function App() {
         </nav>
         <label className="ref-header-search"><Search size={16}/><input aria-label="جستجوی محصولات" value={query} onChange={e=>setQuery(e.target.value)} placeholder="جستجو در محصولات..."/></label>
         <div className="ref-header-actions">
+          <button aria-label={favoritesOnly?'نمایش همه محصولات':'نمایش علاقه‌مندی‌ها'} className={'ref-wishlist-header '+(favoritesOnly?'active':'')} onClick={()=>{setFavoritesOnly(value=>!value);setCategory('همه محصولات');document.getElementById('shop')?.scrollIntoView({behavior:'smooth'});}}><Heart size={20} fill={favoritesOnly?'currentColor':'none'}/>{wishlist.length>0&&<b>{wishlist.length}</b>}</button>
           <button aria-label="حساب کاربری" onClick={()=>setAccountOpen(true)}><UserRound size={20}/></button>
           <button aria-label="سبد خرید" className="ref-header-cart" onClick={()=>setCartOpen(true)}><ShoppingBag size={20}/>{cartCount>0&&<b>{money(cartCount)}</b>}</button>
         </div>
@@ -513,6 +519,7 @@ export default function App() {
           </div>
           <div className="ref-product-grid">
             {filtered.map(product=><article className="ref-product-card group" key={product.id}>
+              <button type="button" className={'ref-wishlist-toggle '+(wishlist.includes(product.id)?'is-saved':'')} aria-label={wishlist.includes(product.id)?'حذف از علاقه‌مندی‌ها':'افزودن به علاقه‌مندی‌ها'} aria-pressed={wishlist.includes(product.id)} onClick={()=>toggleWishlist(product)}><Heart size={18} fill={wishlist.includes(product.id)?'currentColor':'none'}/></button>
               <button className="block w-full overflow-hidden text-right" onClick={()=>openProduct(product)} aria-label={'مشاهده '+product.name}>
                 <ProductImage product={product}/>
               </button>
