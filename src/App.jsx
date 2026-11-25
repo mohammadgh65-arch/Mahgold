@@ -260,11 +260,22 @@ export default function App() {
   useEffect(()=>{
     const syncAdminRoute=()=>{
       if(forceAdminPreview){setIsAdminPage(true);return;}
-      setIsAdminPage(
-      window.location.pathname==='/admin'||
-      window.location.pathname==='/admin/'||
-      window.location.hash==='#mahgold-control'
-    );
+      const path=window.location.pathname;
+      setIsAdminPage(path==='/admin'||path==='/admin/'||window.location.hash==='#mahgold-control');
+      const categoryMatch=path.match(/^\\/category\\/([^/]+)\\/?$/);
+      const productMatch=path.match(/^\\/product\\/([^/]+)\\/?$/);
+      if(categoryMatch){
+        const next=decodeURIComponent(categoryMatch[1]);
+        setCategory(next);setCategoryGroup(investmentCategories.has(next)?'سرمایه‌گذاری':jewelryProductCategories.has(next)?'طلای زینتی':'همه محصولات');
+        setCatalogPage(true);setSelectedProduct(null);
+      }else if(path==='/products'){
+        setCategory('همه محصولات');setCategoryGroup('همه محصولات');setCatalogPage(true);setSelectedProduct(null);
+      }else if(productMatch){
+        const found=products.find(item=>String(item.id)===decodeURIComponent(productMatch[1]));
+        if(found){setSelectedProduct(found);setCatalogPage(false);}
+      }else if(path==='/'){
+        setSelectedProduct(null);setCatalogPage(false);setCategory('همه محصولات');
+      }
     };
     window.addEventListener('hashchange',syncAdminRoute);
     window.addEventListener('popstate',syncAdminRoute);
@@ -456,7 +467,7 @@ export default function App() {
         <div className="ref-offers-footer"><span>حرکت خودکار · هر ۳ ثانیه</span><span className="ref-offers-dots">{offerItems.map((item,index)=><i key={index} className={activeOffer%offerItems.length===index?'active':''}/>)}</span></div>
       </section>}
 
-      {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><span className="eyebrow text-gold-deep">MAHGOLD CATALOG</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></section>}
+      {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">MAHGOLD CATALOG</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div><img className="ref-catalog-category-image" src={products.find(p=>p.category===category&&p.image_url)?.image_url||displayTiles.find(t=>t.name===category)?.image||displayTiles.find(t=>t.name==='طلای زینتی')?.image||tiles[0].image} alt={'تصویر دسته '+category} loading="eager" decoding="async"/></div></section>}
 
                 <div className="ref-quote-strip">
           <div className="ref-quote-title"><span className="ref-quote-bars">▥</span><div><b>قیمت لحظه‌ای طلای ۱۸ عیار</b><small>{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'به‌روزرسانی لحظه‌ای'):quoteIsManual?'نرخ دستی منقضی‌شده':quote?.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'در انتظار نرخ معتبر'}</small></div></div>
@@ -464,6 +475,7 @@ export default function App() {
           <span className="ref-quote-live"><i/> {quoteFresh?'نرخ معتبر':'بدون نرخ تازه'}</span>
         </div>
 
+      {!catalogPage&&(
       <section className="mx-auto max-w-7xl scroll-mt-20 px-4 py-5 md:px-7 md:py-6" id="categories">
         <div className="mb-8 flex items-end justify-between gap-5">
           <div><div className="eyebrow text-gold-deep">DISCOVER MAHGOLD</div><h2 className="mt-3 text-2xl font-semibold md:text-3xl">از میان مجموعه‌ها انتخاب کنید</h2></div>
@@ -495,6 +507,8 @@ export default function App() {
           <article className="ref-service-card"><Headphones/><div><b>همراهی تا انتخاب</b><small>پشتیبانی در مسیر خرید</small></div></article>
         </div>
       </section>
+
+      )}
 
       <section className={'ref-shop-section scroll-mt-16 py-5 md:py-7 '+(catalogPage?'ref-catalog-full':'')} id="shop">
         <div className="mx-auto max-w-7xl px-4 md:px-7">
