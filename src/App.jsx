@@ -1,12 +1,12 @@
 import { MAHGOLD_LOGO } from './mahgold-brand';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Search, ShoppingBag, Menu, X, Gem, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn, ZoomOut,
   ShieldCheck, Gift, Headphones, Plus, Minus, UserRound, LogOut,
   House, LayoutGrid, Phone, MapPin, PackageCheck
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
-import AdminPanel from './Admin.jsx';
+const AdminPanel = lazy(() => import('./Admin.jsx'));
 
 const forceAdminPreview = import.meta.env.VITE_ADMIN_PREVIEW === 'true';
 const slides = [
@@ -397,7 +397,7 @@ export default function App() {
       setCheckoutError(error?.message||'ارتباط با سرویس ثبت سفارش برقرار نشد. با همان اطلاعات دوباره تلاش کنید.');
     }finally{setCheckoutBusy(false);}
   };
-  if(isAdminPage)return <AdminPanel/>;
+  if(isAdminPage)return <Suspense fallback={<div className="min-h-screen grid place-items-center" dir="rtl">در حال بارگذاری پنل مدیریت…</div>}><AdminPanel/></Suspense>;
 
   return <div dir="rtl" className="min-h-screen bg-background text-foreground">
     {siteContent?.announcement?.active!==false&&<div className="ref-announcement">{siteContent?.announcement?.text||"ارسال امن و بسته‌بندی ویژه ✦ پشتیبانی مه‌گلد ✦ همراه انتخاب شما"}</div>}
