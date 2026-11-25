@@ -9,14 +9,13 @@ import { supabase, isSupabaseConfigured } from './lib/supabase';
 import AdminPanel from './Admin.jsx';
 
 const forceAdminPreview = import.meta.env.VITE_ADMIN_PREVIEW === 'true';
-const BASE = 'https://growth-and-advancement-garden.lovable.app/assets/';
 const slides = [
   {
     eyebrow: 'MAHGOLD · FINE JEWELRY',
     title: 'درخششِ طلا، امضایِ استایلِ شما',
     description: 'زیبایی در سادگی‌ست؛ انتخاب‌هایی ظریف و ماندگار برای لحظه‌هایی که ارزش، معنا پیدا می‌کند.',
     button: 'کشف مجموعه مه‌گلد',
-    image: BASE + 'slide-necklace-Bn1Ooa9V.jpg',
+    image: 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=900&q=72',
     category: 'طلای زینتی'
   },
   {
@@ -24,21 +23,21 @@ const slides = [
     title: 'هدیه‌ای که همیشه می‌ماند',
     description: 'انگشترها و زیورآلات منتخب، با بسته‌بندی ویژه مه‌گلد.',
     button: 'مشاهده طلای زینتی',
-    image: BASE + 'slide-gift-CrjacK5c.jpg',
+    image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=760&q=72',
     category: 'طلای زینتی'
   },
   {
     eyebrow: 'INVEST IN GOLD',
-    title: 'سکه و شمش، انتخابی مطمئن',
+    title: 'سکه، انتخابی ماندگار',
     description: 'سرمایه‌ای آشنا با خلوص و ارزش ماندگار.',
-    button: 'مشاهده سکه و شمش',
-    image: BASE + 'slide-invest-CIEhMTDg.jpg',
+    button: 'مشاهده سکه',
+    image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=760&q=72',
     category: 'سکه'
   }
 ];
 const tiles = [
-  {name:'طلای زینتی',desc:'زیورآلات برای هر روز و هر occasion',image:BASE+'jewelry-CwLx7kUY.jpg'},
-  {name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:BASE+'coin-CsyrnHPB.jpg'}
+  {name:'طلای زینتی',desc:'زیورآلات برای هر روز و هر occasion',image:'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=640&q=70'},
+  {name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=640&q=70'}
 ];
 const displayTileDefaults = tiles;
 const presetCategories = [
@@ -53,7 +52,7 @@ const catalogCategoryGroups = [
   {name:'سرمایه‌گذاری',value:'سرمایه‌گذاری',items:['سکه']}
 ];
 const hiddenProductAttributeKeys = new Set(['has_stone','stone_labor_percent','market_quote_symbol','parent_product_id','variant_model_name','variant_size','variant_sku']);
-const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85';
+const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=900&q=72';
 const money = value => new Intl.NumberFormat('fa-IR').format(Number(value || 0));
 const gram = value => new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(Number(value || 0)) + ' گرم';
 const toLatinDigits = value => value.replace(/[۰-۹٠-٩]/g, d => {
