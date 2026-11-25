@@ -444,7 +444,7 @@ export default function App() {
               if(item.product){openProduct(item.product);return;}
               openCatalog(item.category||'همه محصولات');
             }}>
-              <img src={item.image} alt={item.title} loading={index<3?'eager':'lazy'}/>
+              <img src={item.image} alt={item.title} loading={index===0?'eager':'lazy'} decoding="async" fetchPriority={index===0?'high':'low'}/>
               <span className="ref-offer-shade"/>
               <span className="ref-offer-copy">
                 <small>{item.category||'منتخب مه‌گلد'}</small>
