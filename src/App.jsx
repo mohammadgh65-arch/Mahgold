@@ -38,21 +38,19 @@ const slides = [
 ];
 const tiles = [
   {name:'طلای زینتی',desc:'زیورآلات برای هر روز و هر occasion',image:BASE+'jewelry-CwLx7kUY.jpg'},
-  {name:'طلای آب‌شده',desc:'انتخابی برای نگاه سرمایه‌ای',image:BASE+'melted-nOWRYhbE.jpg'},
-  {name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:BASE+'coin-CsyrnHPB.jpg'},
-  {name:'شمش',desc:'خلوص در ساده‌ترین شکل',image:BASE+'bar-B0yyIRPP.jpg'}
+  {name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:BASE+'coin-CsyrnHPB.jpg'}
 ];
 const displayTileDefaults = tiles;
 const presetCategories = [
-  'همه محصولات','طلای زینتی','طلای آب‌شده','سکه','شمش','انگشتر','گردنبند',
+  'همه محصولات','طلای زینتی','سکه','انگشتر','گردنبند',
   'دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'
 ];
 const jewelryProductCategories = new Set(['طلای زینتی','انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات']);
-const investmentCategories = new Set(['طلای آب‌شده','سکه','شمش']);
+const investmentCategories = new Set(['سکه']);
 const catalogCategoryGroups = [
   {name:'همه محصولات',value:'همه محصولات',items:[]},
   {name:'طلای زینتی',value:'طلای زینتی',items:['انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات']},
-  {name:'سرمایه‌گذاری',value:'سرمایه‌گذاری',items:['طلای آب‌شده','سکه','شمش']}
+  {name:'سرمایه‌گذاری',value:'سرمایه‌گذاری',items:['سکه']}
 ];
 const hiddenProductAttributeKeys = new Set(['has_stone','stone_labor_percent','market_quote_symbol','parent_product_id','variant_model_name','variant_size','variant_sku']);
 const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85';
