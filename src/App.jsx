@@ -489,9 +489,8 @@ export default function App() {
             {name:'سرویس طلا',desc:'هماهنگی در یک انتخاب',image:'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=900&q=85'},
             {name:'سایر زیورآلات',desc:'انتخاب‌های متفاوت مه‌گلد',image:'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=85'}
           ].map(tile=>{
-            const representative=products.find(product=>product.category===tile.name&&product.image_url);
             return <button key={tile.name} className="ref-category-card" onClick={()=>openCatalog(tile.name)} aria-label={'مشاهده مجموعه '+tile.name}>
-              <img src={representative?.image_url||tile.image} alt={'مجموعه '+tile.name} loading="lazy"/><span className="ref-category-shade"/>
+              <img src={tile.image} alt={'تصویر الهام‌بخش مجموعه '+tile.name} loading="lazy"/><span className="ref-category-shade"/>
               <span className="ref-category-text"><b>{tile.name}</b><small>{tile.desc}</small><em>مشاهده مجموعه <ArrowLeft size={12}/></em></span>
             </button>;
           })}
