@@ -475,11 +475,26 @@ export default function App() {
           <div><div className="eyebrow text-gold-deep">DISCOVER MAHGOLD</div><h2 className="mt-3 text-2xl font-semibold md:text-3xl">از میان مجموعه‌ها انتخاب کنید</h2></div>
           <p className="hidden text-xs text-muted-foreground md:block">جزئیاتی برای سلیقه‌های خاص</p>
         </div>
-        <div className="ref-category-grid">
-          {displayTiles.map(tile=><button key={tile.name} className="ref-category-card" onClick={()=>openCatalog(tile.name)}>
-            <img src={tile.image} alt={tile.name} loading="lazy"/><span className="ref-category-shade"/>
-            <span className="ref-category-text"><b>{tile.name}</b><small>{tile.desc}</small><em>مشاهده <ArrowLeft size={12}/></em></span>
-          </button>)}
+        <div className="ref-category-grid ref-category-grid-collections">
+          {[
+            ...displayTiles,
+            {name:'انگشتر',desc:'انگشترهای ظریف و خاص',image:'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=900&q=85'},
+            {name:'گردنبند',desc:'گردنبندهای درخشان',image:'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=85'},
+            {name:'دستبند',desc:'دستبندهای طلایی',image:'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=900&q=85'},
+            {name:'النگو',desc:'النگوهای کلاسیک و مدرن',image:'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=900&q=85'},
+            {name:'گوشواره',desc:'جزئیاتی برای درخشش',image:'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=900&q=85'},
+            {name:'آویز و پلاک',desc:'آویزهای دوست‌داشتنی',image:'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=900&q=85'},
+            {name:'زنجیر',desc:'زنجیرهای طلایی',image:'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=85'},
+            {name:'پابند',desc:'زیور ظریف پا',image:'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=900&q=85'},
+            {name:'سرویس طلا',desc:'هماهنگی در یک انتخاب',image:'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=900&q=85'},
+            {name:'سایر زیورآلات',desc:'انتخاب‌های متفاوت مه‌گلد',image:'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=85'}
+          ].map(tile=>{
+            const representative=products.find(product=>product.category===tile.name&&product.image_url);
+            return <button key={tile.name} className="ref-category-card" onClick={()=>openCatalog(tile.name)} aria-label={'مشاهده مجموعه '+tile.name}>
+              <img src={representative?.image_url||tile.image} alt={'مجموعه '+tile.name} loading="lazy"/><span className="ref-category-shade"/>
+              <span className="ref-category-text"><b>{tile.name}</b><small>{tile.desc}</small><em>مشاهده مجموعه <ArrowLeft size={12}/></em></span>
+            </button>;
+          })}
         </div>
         <div className="ref-service-grid">
           <article className="ref-service-card"><ShieldCheck/><div><b>اصالت و شفافیت</b><small>اطلاعات روشن برای انتخاب آگاهانه</small></div></article>
