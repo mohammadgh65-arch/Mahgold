@@ -291,7 +291,7 @@ export default function App() {
         if(!active)return;
         if(productResult.error){setDataStatus('error');setProducts([]);setDataMessage('دریافت محصولات ناموفق بود؛ برای جلوگیری از نمایش قیمت نادرست، اطلاعات نمونه نمایش داده نمی‌شود.');}
         else{
-          const rows=productResult.data||[];
+          const rows=(productResult.data||[]).filter(p=>!/شمش|آب\s*شده|آبشده/.test(String(p.category||'')+' '+String(p.name||'').replace(/ي/g,'ی')));
           setProducts(rows);setDataStatus('connected');
           setDataMessage(rows.length?'محصولات و قیمت‌ها مستقیماً از پایگاه داده مه‌گلد دریافت می‌شوند.':'اتصال برقرار است؛ هنوز محصول فعالی برای نمایش ثبت نشده است.');
         }
@@ -327,7 +327,7 @@ export default function App() {
       return new Date(b.created_at||0)-new Date(a.created_at||0);
     });
   },[products,category,query,sortMode]);
-  const homeFeatured=filtered.slice(0,8);
+  const homeFeatured=[];
   const openCatalog=(nextCategory='همه محصولات')=>{setCategory(nextCategory);setCategoryGroup(investmentCategories.has(nextCategory)?'سرمایه‌گذاری':jewelryProductCategories.has(nextCategory)?'طلای زینتی':nextCategory==='سرمایه‌گذاری'?'سرمایه‌گذاری':'همه محصولات');setCatalogPage(true);const path=nextCategory==='همه محصولات'?'/products':'/category/'+encodeURIComponent(nextCategory);window.history.pushState({mahgoldCatalog:true},'',path);window.scrollTo({top:0,behavior:'auto'});};
   const showHome=()=>{setCatalogPage(false);setCategory('همه محصولات');window.history.pushState({},'','/');window.scrollTo({top:0,behavior:'smooth'});};
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
@@ -513,9 +513,7 @@ export default function App() {
             {catalogPage&&<div className="ref-collection-image-grid" aria-label="مجموعه‌های فروشگاه">
               {(categoryGroup==='همه محصولات'?[
                 {name:'طلای زینتی',desc:'زیورآلات و مجموعه‌های ظریف',image:displayTiles.find(t=>t.name==='طلای زینتی')?.image},
-                {name:'طلای آب‌شده',desc:'مجموعه طلای آب‌شده',image:displayTiles.find(t=>t.name==='طلای آب‌شده')?.image},
-                {name:'سکه',desc:'مجموعه سکه‌های طلا',image:displayTiles.find(t=>t.name==='سکه')?.image},
-                {name:'شمش',desc:'مجموعه شمش طلا',image:displayTiles.find(t=>t.name==='شمش')?.image}
+                {name:'سکه',desc:'مجموعه سکه‌های طلا',image:displayTiles.find(t=>t.name==='سکه')?.image}
               ]:catalogCategoryGroups.find(group=>group.name===categoryGroup)?.items.map(name=>({name,desc:'مشاهده محصولات '+name,image:products.find(p=>p.category===name&&p.image_url)?.image_url||displayTiles.find(t=>t.name==='طلای زینتی')?.image}))||[]).map(tile=><button type="button" key={tile.name} className="ref-collection-image-card" onClick={()=>openCatalog(tile.name)}>
                 <img src={tile.image||displayTiles[0].image} alt={tile.name} loading="lazy"/><span className="ref-collection-image-shade"/><span className="ref-collection-image-label"><b>{tile.name}</b><small>دیدن مجموعه <ArrowLeft size={12}/></small></span>
               </button>)}
@@ -524,8 +522,8 @@ export default function App() {
               <option value="newest">جدیدترین</option><option value="cheap">ارزان‌ترین</option><option value="expensive">گران‌ترین</option>
             </select></label>
           </div>
-          <div className="ref-product-grid">
-            {(catalogPage?filtered:homeFeatured).map(product=><article className="ref-product-card group" key={product.id}>
+          {catalogPage&&<div className="ref-product-grid">
+            {filtered.map(product=><article className="ref-product-card group" key={product.id}>
               <button className="block w-full overflow-hidden text-right" onClick={()=>openProduct(product)} aria-label={'مشاهده '+product.name}>
                 <ProductImage product={product}/>
               </button>
@@ -539,10 +537,10 @@ export default function App() {
                 </div>
               </div>
             </article>)}
-          </div>
-          {dataStatus==='loading'&&<div className="ref-state">در حال دریافت محصولات مه‌گلد…</div>}
+          </div>}
+          {catalogPage&&dataStatus==='loading'&&<div className="ref-state">در حال دریافت محصولات مه‌گلد…</div>}
           {dataStatus==='error'&&<div className="ref-state">{dataMessage}</div>}
-          {dataStatus==='connected'&&(catalogPage?filtered:homeFeatured).length===0&&<div className="ref-state">محصولی با این مشخصات پیدا نشد.</div>}
+          {catalogPage&&dataStatus==='connected'&&filtered.length===0&&<div className="ref-state">محصولی با این مشخصات پیدا نشد.</div>}
           <p className="ref-shop-note">{dataStatus==='connected'?'قیمت‌ها و موجودی بر اساس آخرین اطلاعات فروشگاه مه‌گلد نمایش داده می‌شوند.':'قیمت‌ها و موجودی پس از برقراری اتصال نمایش داده می‌شوند.'}</p>
         </div>
       </section>
