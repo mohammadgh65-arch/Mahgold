@@ -48,6 +48,12 @@ const presetCategories = [
   'دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'
 ];
 const jewelryProductCategories = new Set(['طلای زینتی','انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات']);
+const investmentCategories = new Set(['طلای آب‌شده','سکه','شمش']);
+const catalogCategoryGroups = [
+  {name:'همه محصولات',value:'همه محصولات',items:[]},
+  {name:'طلای زینتی',value:'طلای زینتی',items:['انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات']},
+  {name:'سرمایه‌گذاری',value:'سرمایه‌گذاری',items:['طلای آب‌شده','سکه','شمش']}
+];
 const hiddenProductAttributeKeys = new Set(['has_stone','stone_labor_percent','market_quote_symbol','parent_product_id','variant_model_name','variant_size','variant_sku']);
 const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1200&q=85';
 const money = value => new Intl.NumberFormat('fa-IR').format(Number(value || 0));
@@ -178,6 +184,7 @@ function AccountContent({onClose,onAuthenticated,notice=''}) {
 }
 export default function App() {
   const [category,setCategory]=useState(()=>{const m=window.location.pathname.match(/^\/category\/([^/]+)\/?$/);return m?decodeURIComponent(m[1]):'همه محصولات';});
+  const [categoryGroup,setCategoryGroup]=useState('طلای زینتی');
   const [catalogPage,setCatalogPage]=useState(()=>window.location.pathname==='/products'||/^\/category\//.test(window.location.pathname));
   const [query,setQuery]=useState('');
   const [sortMode,setSortMode]=useState('newest');
@@ -313,7 +320,7 @@ export default function App() {
     // Products without a positive sale price are kept in Admin but never exposed for sale.
     const rows=products.filter(p=>
       Number(p.price_toman)>0&&
-      (category==='همه محصولات'||(category==='طلای زینتی'?jewelryProductCategories.has(p.category):p.category===category)||p.name?.includes(category))&&
+      (category==='همه محصولات'||(category==='طلای زینتی'?jewelryProductCategories.has(p.category):category==='سرمایه‌گذاری'?investmentCategories.has(p.category):p.category===category)||p.name?.includes(category))&&
       (!query.trim()||p.name?.toLocaleLowerCase('fa').includes(query.trim().toLocaleLowerCase('fa')))
     );
     return rows.sort((a,b)=>{
@@ -323,7 +330,7 @@ export default function App() {
     });
   },[products,category,query,sortMode]);
   const homeFeatured=filtered.slice(0,8);
-  const openCatalog=(nextCategory='همه محصولات')=>{setCategory(nextCategory);setCatalogPage(true);const path=nextCategory==='همه محصولات'?'/products':'/category/'+encodeURIComponent(nextCategory);window.history.pushState({mahgoldCatalog:true},'',path);window.scrollTo({top:0,behavior:'auto'});};
+  const openCatalog=(nextCategory='همه محصولات')=>{setCategory(nextCategory);setCategoryGroup(investmentCategories.has(nextCategory)?'سرمایه‌گذاری':jewelryProductCategories.has(nextCategory)?'طلای زینتی':nextCategory==='سرمایه‌گذاری'?'سرمایه‌گذاری':'همه محصولات');setCatalogPage(true);const path=nextCategory==='همه محصولات'?'/products':'/category/'+encodeURIComponent(nextCategory);window.history.pushState({mahgoldCatalog:true},'',path);window.scrollTo({top:0,behavior:'auto'});};
   const showHome=()=>{setCatalogPage(false);setCategory('همه محصولات');window.history.pushState({},'','/');window.scrollTo({top:0,behavior:'smooth'});};
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const cartTotal=cart.reduce((sum,item)=>sum+Number(item.price_toman||0)*Number(item.qty||0),0);
@@ -491,8 +498,10 @@ export default function App() {
             </label>
           </div>
           <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {categories.map(item=><button key={item} className={'shrink-0 rounded-full border px-4 py-2 text-xs font-medium transition-all '+(category===item?'border-ink bg-ink text-ink-foreground shadow-soft':'border-input bg-card text-muted-foreground hover:border-gold hover:text-gold-deep')} onClick={()=>openCatalog(item)}>{item}</button>)}
+            <div className="ref-category-filter-groups" aria-label="دسته‌بندی محصولات">
+              <div className="ref-category-group-tabs">{catalogCategoryGroups.map(group=><button key={group.name} className={categoryGroup===group.name?'active':''} onClick={()=>{setCategoryGroup(group.name);openCatalog(group.value);}}>{group.name}</button>)}</div>
+              {categoryGroup!=='همه محصولات'&&<div className="ref-category-subgroups">{catalogCategoryGroups.find(group=>group.name===categoryGroup)?.items.map(item=><button key={item} className={category===item?'active':''} onClick={()=>openCatalog(item)}>{item}</button>)}</div>}
+              {categories.filter(item=>!presetCategories.includes(item)).length>0&&<div className="ref-category-subgroups ref-category-extra">{categories.filter(item=>!presetCategories.includes(item)).map(item=><button key={item} className={category===item?'active':''} onClick={()=>openCatalog(item)}>{item}</button>)}</div>}
             </div>
             <label className="ref-sort shrink-0"><span>مرتب‌سازی</span><select aria-label="مرتب‌سازی" value={sortMode} onChange={e=>setSortMode(e.target.value)}>
               <option value="newest">جدیدترین</option><option value="cheap">ارزان‌ترین</option><option value="expensive">گران‌ترین</option>
