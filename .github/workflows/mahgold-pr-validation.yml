@@ -32,6 +32,23 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Production build
         run: npm run build
+      - name: Install Chromium for storefront smoke test
+        run: npx --yes playwright install --with-deps chromium
+      - name: Run storefront smoke test and capture screenshot
+        env:
+          VITE_SUPABASE_URL: https://nzvvvpbwavaodhxrnkdr.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_8UgFkQuDJNNeez2O1CNv3Q_Jf44Pr9L
+        run: |
+          npm run preview -- --host 127.0.0.1 > /tmp/mahgold-preview.log 2>&1 &
+          echo $! > /tmp/mahgold-preview.pid
+          node --input-type=module -e 'const u="http://127.0.0.1:4173";let ok=false;for(let i=0;i<40;i++){try{const r=await fetch(u);if(r.ok){ok=true;break}}catch{}await new Promise(r=>setTimeout(r,1500))}if(!ok){console.error(await (await import("node:fs/promises")).readFile("/tmp/mahgold-preview.log","utf8"));process.exit(1)}'
+          npx --yes playwright screenshot --browser chromium --wait-for-timeout 5000 http://127.0.0.1:4173 mahgold-smoke.png
+      - name: Upload storefront screenshot for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: mahgold-storefront-smoke-screenshot
+          path: mahgold-smoke.png
+          retention-days: 7
       - name: Export reconciled lockfile for review
         if: always()
         uses: actions/upload-artifact@v4
