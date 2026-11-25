@@ -1029,3 +1029,19 @@ footer.bg-ink>div:not(.ref-footer-brand){color:#ead6aa!important}
   .ref-footer-brand:before{inset:6px}
   footer.bg-ink{padding-inline:10px!important;padding-bottom:84px!important}
 }
+
+
+/* MAHGOLD V2 — mobile footer clearance and safe-area support */
+@media(max-width:767px){
+  footer.bg-ink{
+    padding-bottom:calc(112px + env(safe-area-inset-bottom))!important;
+  }
+  .ref-mobile-nav{
+    padding-bottom:max(8px,env(safe-area-inset-bottom))!important;
+  }
+  .ref-offers-section{
+    width:calc(100% - 24px);
+    padding-top:30px;
+    padding-bottom:24px;
+  }
+}
