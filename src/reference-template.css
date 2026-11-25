@@ -1286,3 +1286,104 @@ body{background:var(--mah-pv-paper)!important;color:var(--mah-pv-ink)!important}
  .ref-add-button{width:31px!important;height:31px!important}
 }
 @media(prefers-reduced-motion:reduce){.ref-product-card,.ref-category-card,.ref-category-card img{transition:none!important}}
+
+
+/* MAHGOLD TOTAL VISUAL REDESIGN — editorial atelier / architectural luxury */
+:root{--mg-night:#10291f;--mg-forest:#183f2d;--mg-brass:#b99552;--mg-paper:#f6f2e9;--mg-white:#fffdf8;--mg-type:#25342a;--mg-muted:#7c8178}
+html{scroll-behavior:smooth;scroll-padding-top:95px}
+body{background:var(--mg-paper)!important;color:var(--mg-type)!important;font-family:Shabnam,Tahoma,sans-serif!important}
+/* Quiet, architectural masthead: original artwork remains untouched */
+.ref-brand-masthead{height:clamp(112px,13vw,172px)!important;background:#10291f!important;border:0!important}
+.ref-brand-masthead:before{filter:blur(5px) brightness(.42) saturate(.72)!important}
+.ref-brand-masthead:after{background:linear-gradient(90deg,#06190f66,transparent 28%,transparent 72%,#06190f66)!important}
+.ref-brand-masthead img{filter:drop-shadow(0 2px 8px #0003)!important}
+.ref-site-header{position:sticky;top:0;z-index:40;background:#fffdf8!important;border:0!important;border-bottom:1px solid #e8dfce!important;box-shadow:0 4px 18px #172a1c08!important}
+.ref-main-header{min-height:70px!important;padding-inline:clamp(14px,4vw,54px)!important;gap:clamp(12px,2vw,26px)!important}
+.ref-primary-nav{gap:clamp(12px,2.1vw,30px)!important}
+.ref-primary-nav a{font-size:12px!important;font-weight:600!important;color:#34483a!important;border-bottom:1px solid transparent!important;padding-block:25px 22px!important}
+.ref-primary-nav a:hover,.ref-primary-nav a.active{color:#a17b3d!important;border-color:#b99552!important}
+.ref-header-search{background:#f5f1e8!important;border:1px solid #e7dece!important;border-radius:4px!important;box-shadow:none!important}
+.ref-header-actions button{color:#193d2b!important}
+/* Hero as a magazine cover, not a generic rounded banner */
+.ref-hero{min-height:clamp(330px,43vw,560px)!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:#10291f!important;overflow:hidden!important}
+.ref-hero:after{height:1px!important;background:linear-gradient(90deg,transparent,#c8a35d,transparent)!important}
+.ref-hero-copy{max-width:650px!important;padding-inline:clamp(22px,6vw,90px)!important}
+.ref-hero-copy h1,.ref-hero-copy h2{font-size:clamp(30px,4.4vw,58px)!important;font-weight:500!important;letter-spacing:-.035em!important;line-height:1.45!important;color:#f0d8a2!important}
+.ref-hero-copy p{font-size:clamp(12px,1.2vw,15px)!important;line-height:2.2!important;color:#e4e6d9!important;max-width:430px!important}
+.ref-hero .ref-button,.ref-hero button{border-radius:3px!important;min-height:48px!important;padding-inline:26px!important;background:#d1b16e!important;color:#142d20!important;border:0!important;box-shadow:none!important;font-weight:700!important}
+/* section rhythm and editorial labels */
+#categories{max-width:1440px!important;margin:clamp(34px,5vw,68px) auto!important;padding:0 clamp(16px,4.5vw,68px)!important;background:transparent!important;border:0!important}
+#categories>div:first-child{display:flex!important;align-items:end!important;justify-content:space-between!important;margin-bottom:25px!important}
+#categories>div:first-child h2,.ref-shop-heading h2{font-size:clamp(23px,3vw,37px)!important;font-weight:500!important;letter-spacing:-.025em!important;color:#183d2b!important}
+#categories>div:first-child .eyebrow{font-size:10px!important;letter-spacing:.16em!important;color:#a1814b!important}
+#categories .ref-category-grid.ref-category-grid-collections{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:16px!important;max-width:none!important;margin:0!important}
+#categories .ref-category-card,#categories .ref-category-card:nth-child(1),#categories .ref-category-card:nth-child(2){grid-column:span 1!important;aspect-ratio:1.05/1!important;max-width:none!important;width:100%!important;border-radius:0!important;box-shadow:none!important;outline:0!important;border:0!important;overflow:hidden!important;background:#183d2b!important}
+#categories .ref-category-card img{filter:saturate(.78)!important;transition:transform .65s ease,filter .4s ease!important}
+#categories .ref-category-card:hover img{transform:scale(1.04)!important;filter:saturate(1)!important}
+#categories .ref-category-shade{background:linear-gradient(0deg,#071d15d9,transparent 68%)!important}
+#categories .ref-category-text{inset:auto 18px 18px!important;align-items:flex-start!important;text-align:right!important;gap:7px!important}
+#categories .ref-category-text b{font-size:clamp(15px,1.55vw,22px)!important;font-weight:500!important;color:#fff9ed!important}
+#categories .ref-category-text small{display:none!important}
+#categories .ref-category-text em{display:flex!important;font-size:10px!important;border:0!important;color:#e6c77e!important;margin:0!important}
+/* Product catalog: gallery-like images, clean typography, crisp borders */
+.ref-shop-section{padding:clamp(28px,5vw,64px) clamp(14px,4.5vw,68px)!important;background:#f6f2e9!important}
+.ref-shop-heading{margin:0 0 25px!important;text-align:right!important}
+.ref-shop-heading h2{margin:0!important}
+.ref-product-grid{gap:clamp(10px,1.5vw,20px)!important}
+.ref-product-card{border:1px solid #e6dece!important;border-radius:0!important;background:#fffdf8!important;box-shadow:none!important;transition:border-color .2s,transform .25s!important}
+.ref-product-card:hover{transform:translateY(-3px)!important;border-color:#c3a366!important;box-shadow:0 10px 24px #172a1c0c!important}
+.ref-product-image{aspect-ratio:1/1.12!important;background:#f1ece2!important}
+.ref-product-image img{object-fit:contain!important;mix-blend-mode:multiply!important;padding:7%!important;transition:transform .35s!important}
+.ref-product-card:hover .ref-product-image img{transform:scale(1.035)!important}
+.ref-product-body{padding:15px!important}
+.ref-product-meta{font-size:9px!important;letter-spacing:.04em!important;color:#8b8b7e!important}
+.ref-product-name{font-size:13px!important;font-weight:600!important;color:#27392d!important;line-height:1.9!important}
+.ref-product-bottom{padding-top:12px!important}
+.ref-product-bottom strong{font-size:13px!important;color:#244b35!important}
+.ref-add-button{width:36px!important;height:36px!important;border-radius:2px!important;background:#183f2d!important;color:#f4dfb0!important;border:0!important}
+.ref-add-button:hover{background:#b99552!important;color:#172c20!important}
+/* Offers, story and service areas share one restrained design language */
+.ref-offers-section{background:#183f2d!important;border:0!important;border-block:1px solid #b99552!important;border-radius:0!important;padding-block:clamp(34px,5vw,68px)!important}
+.ref-offers-heading h2,.ref-offers-eyebrow{color:#f0d8a2!important}
+.ref-offer-card{border:1px solid #d6bd8b!important;border-radius:0!important;box-shadow:none!important}
+.ref-service-card{border-radius:0!important;border:1px solid #e4dac7!important;background:#fffdf8!important}
+.ref-lux-footer,footer.bg-ink{background:#10291f!important;border-top:1px solid #b99552!important;color:#e9dfc8!important}
+.ref-footer-frame{border-radius:0!important;border-color:#b99552!important}
+/* Product detail: gallery + information are a coherent editorial spread */
+.ref-product-page{max-width:1440px!important;margin:auto!important;padding:clamp(14px,4vw,56px)!important}
+.ref-product-page-grid{gap:clamp(18px,3vw,44px)!important}
+.ref-product-page-image{border-radius:0!important;border:1px solid #e6dece!important;background:#f0ece3!important}
+.ref-product-page-copy{border-radius:0!important;background:#fffdf8!important;border:1px solid #e6dece!important;box-shadow:none!important;padding:clamp(18px,3vw,40px)!important}
+.ref-product-page-copy h1{font-size:clamp(24px,3vw,38px)!important;font-weight:500!important;color:#183d2b!important;line-height:1.7!important}
+.ref-product-page-copy p{line-height:2.2!important;color:#737b70!important}
+.ref-product-specs-wrap{border-radius:0!important;border:1px solid #e6dece!important;background:#fffdf8!important}
+.ref-product-specs-title{background:#183f2d!important;color:#f0d8a2!important}
+.ref-product-specs>div:nth-child(even){background:#f6f2e9!important}
+.ref-dialog,.ref-drawer{border-radius:0!important}
+.ref-dialog{background:#fffdf8!important;color:#27392d!important;border:1px solid #d9c9a8!important}
+.ref-mobile-nav{background:#10291f!important;border-top:1px solid #b99552!important;border-radius:0!important}
+@media(max-width:767px){
+ .ref-brand-masthead{height:104px!important}
+ .ref-main-header{min-height:60px!important;padding-inline:12px!important}
+ .ref-brand-masthead img{max-width:95%!important}
+ .ref-hero{min-height:300px!important}
+ .ref-hero-copy{padding:20px!important}
+ .ref-hero-copy h1,.ref-hero-copy h2{font-size:clamp(25px,7vw,34px)!important}
+ #categories{margin:28px auto!important;padding-inline:13px!important}
+ #categories>div:first-child{margin-bottom:15px!important}
+ #categories .ref-category-grid.ref-category-grid-collections{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+ #categories .ref-category-card,#categories .ref-category-card:nth-child(1),#categories .ref-category-card:nth-child(2){aspect-ratio:1/1.12!important}
+ #categories .ref-category-text{inset:auto 10px 11px!important}
+ #categories .ref-category-text b{font-size:12px!important}
+ #categories .ref-category-text em{font-size:9px!important}
+ .ref-shop-section{padding:24px 12px!important}
+ .ref-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+ .ref-product-image{aspect-ratio:1/1!important}
+ .ref-product-body{padding:9px!important}
+ .ref-product-name{font-size:11px!important}
+ .ref-product-bottom strong{font-size:10px!important}
+ .ref-add-button{width:31px!important;height:31px!important}
+ .ref-product-page{padding:12px!important}
+ .ref-product-page-copy{padding:16px!important}
+}
+@media(prefers-reduced-motion:reduce){.ref-product-card,.ref-category-card,.ref-category-card img{transition:none!important}}
