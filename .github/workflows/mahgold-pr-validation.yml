@@ -1,0 +1,33 @@
+name: Mahgold pull request validation
+
+on:
+  pull_request:
+    branches:
+      - mahgold-canonical-20261125
+      - mahgold-development
+  push:
+    branches:
+      - mahgold-canonical-20261125
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mahgold-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install from lockfile
+        run: npm ci
+      - name: Production build
+        run: npm run build
