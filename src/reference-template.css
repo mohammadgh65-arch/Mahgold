@@ -1061,3 +1061,47 @@ footer.bg-ink{padding-top:34px!important}
  .ref-brand span{font-size:12px!important}
  footer.bg-ink{padding-top:26px!important}
 }
+
+
+/* Header redesigned to echo the ORIGINAL Mahgold logo artwork: ivory field, gold mark, no separate badge */
+.ref-site-header{
+  background:#fffefa!important;
+  border-top:1px solid #d8bd7a!important;
+  border-bottom:2px solid #c4a04f!important;
+  box-shadow:0 5px 18px rgba(116,83,24,.10)!important;
+}
+.ref-main-header{
+  background:#fffefa!important;
+  border:0!important;
+  min-height:76px!important;
+}
+.ref-brand{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  gap:0!important;padding:0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;
+}
+.ref-brand img{
+  display:block!important;width:clamp(116px,13vw,166px)!important;height:70px!important;
+  object-fit:contain!important;object-position:center!important;filter:none!important;
+}
+.ref-brand span{display:none!important}
+.ref-primary-nav a,.ref-header-actions button,.ref-mobile-menu{
+  color:#9b7836!important;background:transparent!important;
+}
+.ref-primary-nav a{border-bottom:2px solid transparent!important}
+.ref-primary-nav a:hover,.ref-primary-nav a.active{
+  color:#c4a04f!important;border-bottom-color:#c4a04f!important;
+}
+.ref-header-search{
+  background:#fffefa!important;border:1px solid rgba(196,160,79,.48)!important;
+  color:#9b7836!important;border-radius:24px!important;
+}
+.ref-header-search input{color:#5b4828!important}
+.ref-header-search input::placeholder{color:#a99670!important}
+.ref-header-cart b{background:#c4a04f!important;color:#fffefa!important}
+.ref-mobile-links{background:#fffefa!important;border-color:#d8bd7a!important}
+.ref-mobile-links a{color:#8e6c2d!important}
+@media(max-width:767px){
+ .ref-main-header{min-height:62px!important;padding-inline:10px!important}
+ .ref-brand img{width:108px!important;height:54px!important}
+}
