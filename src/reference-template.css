@@ -1174,3 +1174,49 @@ body{background:var(--mah-paper);color:var(--mah-ink);font-family:'Shabnam',Taho
 #categories .ref-category-card{box-shadow:0 8px 22px rgba(30,45,29,.11),0 0 0 4px #f7f0e3,0 0 0 5px rgba(176,139,73,.42)!important;transition:transform .22s ease,box-shadow .22s ease!important}
 #categories .ref-category-card:hover{transform:translateY(-3px)!important;box-shadow:0 12px 26px rgba(30,45,29,.15),0 0 0 4px #f7f0e3,0 0 0 5px rgba(176,139,73,.58)!important}
 @media(prefers-reduced-motion:reduce){#categories .ref-category-card{transition:none!important}}
+
+
+/* Mahgold approved homepage direction — editorial luxury, clean commerce */
+:root{--mah-forest:#052b1c;--mah-forest-2:#0a3b28;--mah-gold:#d7ad4d;--mah-champagne:#f4e4c2;--mah-cream:#fbf4e7}
+body{background:var(--mah-cream);color:#20180e}
+.ref-site-header{background:linear-gradient(180deg,#031e14,#073522)!important;border-bottom:1px solid #c99e42!important;box-shadow:0 10px 32px #071b1230}
+.ref-main-header{background:transparent!important}
+.ref-primary-nav a{transition:color .2s,border-color .2s}
+.ref-primary-nav a:hover{color:#f0ca70!important;border-color:#d7ad4d!important}
+.ref-hero{position:relative;overflow:hidden;background:linear-gradient(115deg,#031e14 0%,#0b3827 57%,#041e14 100%)!important;border:1px solid #b99243!important;border-radius:0 0 34px 34px;box-shadow:0 20px 55px #06271824}
+.ref-hero:after{content:"";position:absolute;inset:auto 0 0;height:3px;background:linear-gradient(90deg,transparent,#f4d47b,#b8892f,#f4d47b,transparent);pointer-events:none}
+.ref-hero-copy{color:#fff3d4!important}
+.ref-hero-copy h1,.ref-hero-copy h2{color:#f5d98e!important;text-wrap:balance;line-height:1.55}
+.ref-hero-copy p{color:#e8dfc9!important;line-height:2}
+.ref-hero .ref-button,.ref-hero button{border:1px solid #f0c65f!important;background:linear-gradient(135deg,#f8df91,#c68b24)!important;color:#17301f!important;border-radius:999px!important;box-shadow:0 5px 22px #d4a74335}
+.ref-hero-image{border-radius:24px!important;overflow:hidden;box-shadow:0 22px 50px #0005}
+.ref-category-grid{gap:clamp(12px,2vw,24px)!important}
+.ref-category-card{border:1px solid #d6b66b!important;border-radius:22px!important;background:linear-gradient(160deg,#073622,#031e14)!important;box-shadow:0 12px 30px #06271820;overflow:hidden;transition:transform .25s,box-shadow .25s}
+.ref-category-card:hover{transform:translateY(-5px);box-shadow:0 18px 38px #06271836}
+.ref-category-shade{background:linear-gradient(0deg,#031e14e8,transparent 82%)!important}
+.ref-category-text{color:#f3d783!important;font-weight:700!important}
+.ref-shop-section,.ref-offers-section{padding-block:clamp(30px,5vw,68px)!important}
+.ref-product-grid{gap:18px!important}
+.ref-product-card{border:1px solid #e8d7b6!important;border-radius:20px!important;background:#fffaf1!important;box-shadow:0 8px 26px #3b2b1510!important;overflow:hidden;transition:transform .22s,box-shadow .22s}
+.ref-product-card:hover{transform:translateY(-4px);box-shadow:0 16px 34px #3b2b1520!important}
+.ref-product-image{background:#f4e8d4!important}
+.ref-product-image img{transition:transform .35s!important}
+.ref-product-card:hover .ref-product-image img{transform:scale(1.045)}
+.ref-product-body{padding:16px!important}
+.ref-product-name{color:#302316!important;font-weight:700!important}
+.ref-product-price,.ref-product-bottom{color:#174c32!important}
+.ref-product-card button,.ref-all-products-link{border-radius:999px!important}
+.ref-offers-section{background:linear-gradient(145deg,#05291b,#0b3b28)!important;color:#f6e5bc!important;border-block:1px solid #c9a04c}
+.ref-offers-heading h2,.ref-offers-eyebrow{color:#f0ce7b!important}
+.ref-offer-card{border:1px solid #d6b66b!important;border-radius:18px!important;background:#fff8e9!important;color:#2b2114!important;overflow:hidden}
+.ref-lux-footer{background:linear-gradient(160deg,#031e14,#0b3b28)!important;color:#f5e7c7!important;border-top:2px solid #cda74e!important}
+.ref-footer-frame{border-color:#b99142!important}
+.ref-footer-tagline{color:#f2d47f!important}
+.ref-footer-links a:hover,.ref-footer-contact a:hover{color:#f0ca70!important}
+.ref-product-page{color:#2c2115}
+.ref-product-page-image{background:#f5ead8!important;border:1px solid #e5d2af!important;border-radius:24px!important;overflow:hidden}
+.ref-product-page-copy{background:#fffaf2;border:1px solid #ead9b9;border-radius:22px;padding:clamp(18px,3vw,32px)}
+.ref-product-page-copy h1{color:#173b28!important;line-height:1.7}
+.ref-product-specs{border-color:#e4d2ad!important;background:#fff7e8!important;border-radius:16px}
+@media(max-width:700px){.ref-hero{border-radius:0 0 22px 22px!important}.ref-category-grid{gap:10px!important}.ref-category-card{border-radius:15px!important}.ref-product-grid{gap:11px!important}.ref-product-card{border-radius:14px!important}.ref-product-body{padding:10px!important}}
+@media(prefers-reduced-motion:reduce){.ref-category-card,.ref-product-card,.ref-product-image img{transition:none!important}}
