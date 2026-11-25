@@ -1165,47 +1165,12 @@ body{background:var(--mah-paper);color:var(--mah-ink);font-family:'Shabnam',Taho
 }
 
 
-/* Mahgold subtle premium motion: lightweight CSS-only logo shimmer + rotating gold category halo */
-@keyframes mah-logo-glint{
-  0%,68%,100%{filter:drop-shadow(0 2px 9px rgba(0,0,0,.32)) brightness(1)}
-  78%{filter:drop-shadow(0 0 7px rgba(255,224,145,.72)) brightness(1.13)}
-  88%{filter:drop-shadow(0 0 13px rgba(255,238,190,.9)) brightness(1.2)}
-}
-@keyframes mah-gold-orbit{to{transform:rotate(360deg)}}
-.ref-brand-masthead img{
-  animation:mah-logo-glint 6.8s ease-in-out infinite;
-  will-change:filter;
-}
-#categories .ref-category-card{
-  isolation:isolate;
-  box-shadow:0 10px 28px rgba(30,45,29,.13),0 0 0 5px #f7f0e3!important;
-}
-#categories .ref-category-card:before{
-  content:"";position:absolute;inset:-3px;border-radius:inherit;padding:3px;
-  background:conic-gradient(from 0deg,#8b6527 0deg,#f3d995 42deg,#fff1bf 70deg,#b78b42 112deg,#73501c 160deg,#f0d18a 210deg,#fff0bd 250deg,#9b7131 300deg,#8b6527 360deg);
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;
-  pointer-events:none;z-index:3;animation:mah-gold-orbit 8s linear infinite;
-  filter:drop-shadow(0 0 2px rgba(211,171,91,.38));
-}
-@media(prefers-reduced-motion:reduce){
- .ref-brand-masthead img{animation:none!important}
- #categories .ref-category-card:before{animation:none!important}
-}
 
-/* MAHGOLD SPECIAL FX V2 — gemstone light refraction + polished orbit, CSS-only */
-@keyframes mah-jewel-refraction{
-  0%,58%,100%{filter:drop-shadow(0 3px 14px rgba(0,0,0,.34)) brightness(1) saturate(1)}
-  66%{filter:drop-shadow(0 0 8px rgba(246,211,132,.72)) brightness(1.12) saturate(1.13)}
-  73%{filter:drop-shadow(0 0 20px rgba(255,239,190,.96)) brightness(1.24) saturate(1.2)}
-  81%{filter:drop-shadow(0 0 9px rgba(216,171,83,.68)) brightness(1.08)}
-}
-@keyframes mah-logo-light-sweep{0%,62%{transform:translateX(145%) skewX(-18deg);opacity:0}67%{opacity:.7}78%{transform:translateX(-145%) skewX(-18deg);opacity:0}100%{transform:translateX(-145%) skewX(-18deg);opacity:0}}
-@keyframes mah-ring-spark{0%,100%{opacity:.75;filter:drop-shadow(0 0 2px #c79a48)}50%{opacity:1;filter:drop-shadow(0 0 7px #ffe7a4) drop-shadow(0 0 13px #d6aa59)}}
-.ref-brand-masthead{isolation:isolate}
-.ref-brand-masthead img{position:relative;animation:mah-jewel-refraction 7s ease-in-out infinite!important}
-.ref-brand-masthead:after{pointer-events:none;background:linear-gradient(112deg,transparent 35%,rgba(255,239,190,.12) 47%,rgba(255,250,222,.38) 50%,rgba(255,226,157,.12) 53%,transparent 66%),linear-gradient(90deg,rgba(2,17,11,.28),rgba(2,17,11,.02) 48%,rgba(2,17,11,.28))!important;background-size:230% 100%,100% 100%!important;animation:mah-logo-light-sweep 9s ease-in-out infinite}
-#categories .ref-category-card:before{inset:-4px!important;padding:4px!important;animation:mah-gold-orbit 5.5s linear infinite,mah-ring-spark 2.4s ease-in-out infinite!important;background:conic-gradient(from 0deg,#6e4b19 0deg,#c99b4d 28deg,#fff0b9 52deg,#f8dda0 72deg,#98702e 105deg,#62451a 145deg,#d9b66d 190deg,#fff4c9 225deg,#b68739 270deg,#f4d58c 315deg,#6e4b19 360deg)!important}
-#categories .ref-category-card{overflow:hidden!important}
-#categories .ref-category-card:hover:before{filter:drop-shadow(0 0 7px rgba(255,220,139,.8))!important}
-@media(prefers-reduced-motion:reduce){.ref-brand-masthead img,.ref-brand-masthead:after,#categories .ref-category-card:before{animation:none!important}}
+
+/* MAHGOLD — restrained premium finish: static gold details, no continuous spectacle */
+.ref-brand-masthead img{animation:none!important;filter:drop-shadow(0 3px 12px rgba(0,0,0,.24))!important}
+.ref-brand-masthead:after{animation:none!important;background:linear-gradient(90deg,rgba(2,17,11,.28),rgba(2,17,11,.02) 48%,rgba(2,17,11,.28)),linear-gradient(0deg,rgba(2,17,11,.12),transparent 24%,transparent 78%,rgba(2,17,11,.12))!important;background-size:100% 100%!important}
+#categories .ref-category-card:before{display:none!important;animation:none!important;content:none!important}
+#categories .ref-category-card{box-shadow:0 8px 22px rgba(30,45,29,.11),0 0 0 4px #f7f0e3,0 0 0 5px rgba(176,139,73,.42)!important;transition:transform .22s ease,box-shadow .22s ease!important}
+#categories .ref-category-card:hover{transform:translateY(-3px)!important;box-shadow:0 12px 26px rgba(30,45,29,.15),0 0 0 4px #f7f0e3,0 0 0 5px rgba(176,139,73,.58)!important}
+@media(prefers-reduced-motion:reduce){#categories .ref-category-card{transition:none!important}}
