@@ -941,3 +941,18 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 .ref-collection-image-label b{font-size:clamp(12px,1.3vw,17px);font-weight:750}
 .ref-collection-image-label small{display:flex;align-items:center;gap:5px;color:#f4d58c;font-size:10px}
 @media(max-width:767px){.ref-collection-image-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px}.ref-collection-image-card{aspect-ratio:1/1.05;border-radius:12px}.ref-collection-image-label{right:10px;bottom:10px}.ref-collection-image-label b{font-size:13px}}
+
+
+/* Editorial collection tiles: each product family has its own image destination */
+.ref-category-grid-collections{grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.ref-category-grid-collections .ref-category-card{aspect-ratio:4/5}
+.ref-category-grid-collections .ref-category-text{right:15px;bottom:15px;gap:6px}
+.ref-category-grid-collections .ref-category-text b{font-size:15px}
+.ref-category-grid-collections .ref-category-text em{font-size:10px}
+@media(max-width:767px){
+ .ref-category-grid-collections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;overflow:visible}
+ .ref-category-grid-collections .ref-category-card{min-width:0;aspect-ratio:3/4;border-radius:13px}
+ .ref-category-grid-collections .ref-category-text{right:11px;bottom:12px}
+ .ref-category-grid-collections .ref-category-text b{font-size:13px}
+ .ref-category-grid-collections .ref-category-text small{font-size:9px}
+}
