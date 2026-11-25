@@ -413,7 +413,7 @@ export default function App() {
           <a href="/category/سکه" onClick={e=>{e.preventDefault();openCatalog('سکه');}}>سکه</a>
           <a href="/category/شمش" onClick={e=>{e.preventDefault();openCatalog('شمش');}}>شمش</a>
         </nav>
-        <label className="ref-header-search"><Search size={16}/><input aria-label="جستجوی محصولات" value={query} onChange={e=>setQuery(e.target.value)} placeholder="جستجو در محصولات..."/></label>
+        <label className="ref-header-search"><Search size={16}/><input aria-label="جستجوی محصولات" value={query} onChange={e=>{setQuery(e.target.value);if(e.target.value.trim()&&!catalogPage)openCatalog("همه محصولات");}} placeholder="جستجو در محصولات..."/></label>
         <div className="ref-header-actions">
           <button aria-label="حساب کاربری" onClick={()=>setAccountOpen(true)}><UserRound size={20}/></button>
           <button aria-label="سبد خرید" className="ref-header-cart" onClick={()=>setCartOpen(true)}><ShoppingBag size={20}/>{cartCount>0&&<b>{money(cartCount)}</b>}</button>
