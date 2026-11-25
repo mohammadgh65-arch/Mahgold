@@ -918,3 +918,15 @@ footer.bg-ink .text-gold,footer.bg-ink svg{color:#e5bd70!important}
 .ref-catalog-full .ref-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 @media(min-width:640px){.ref-catalog-full .ref-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
 @media(min-width:1024px){.ref-catalog-full .ref-product-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+
+
+/* Catalog filters: clear parent groups and nested product types */
+.ref-category-filter-groups{display:grid;gap:12px;width:100%;margin:2px 0 4px}
+.ref-category-group-tabs,.ref-category-subgroups{display:flex;flex-wrap:wrap;gap:8px}
+.ref-category-group-tabs button{padding:10px 18px;border:1px solid #d5c4a0;border-radius:22px;background:#fffaf0;color:#31513d;font-size:13px;font-weight:700;transition:all .18s}
+.ref-category-group-tabs button.active{background:#123d2b;border-color:#123d2b;color:#f1d38c;box-shadow:0 4px 12px #153d2b20}
+.ref-category-subgroups{padding:12px 14px;border:1px solid #e5d8c0;border-radius:14px;background:#fffdf8}
+.ref-category-subgroups button{padding:7px 12px;border:1px solid #e4d7bf;border-radius:18px;background:#fff;color:#5d5a4d;font-size:12px}
+.ref-category-subgroups button.active{border-color:#b99148;background:#f3e5c7;color:#173c2b;font-weight:700}
+.ref-category-extra{background:#f7f1e7}
+@media(max-width:600px){.ref-category-group-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.ref-category-group-tabs button{padding:10px 6px;font-size:11px}.ref-category-subgroups{gap:7px;padding:10px}.ref-category-subgroups button{font-size:11px;padding:7px 10px}}
