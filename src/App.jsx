@@ -192,7 +192,10 @@ export default function App() {
   const [selectedProduct,setSelectedProduct]=useState(null);
   const [zoomOpen,setZoomOpen]=useState(false);
   const [zoomScale,setZoomScale]=useState(1);
-  const pinchZoomRef=useRef({distance:0,scale:1});
+  const [zoomOffset,setZoomOffset]=useState({x:0,y:0});
+  const zoomStageRef=useRef(null);
+  const zoomPointersRef=useRef(new Map());
+  const zoomGestureRef=useRef({distance:0,scale:1,x:0,y:0,midX:0,midY:0,startX:0,startY:0});
   const [cartToast,setCartToast]=useState('');
   const [customer,setCustomer]=useState({name:'',phone:'',email:'',address:'',city:'',postalCode:'',note:''});
   const [menuOpen,setMenuOpen]=useState(false);
@@ -588,7 +591,7 @@ export default function App() {
     {selectedProduct&&<div className="ref-product-page">
       <div className="ref-product-page-top"><button className="ref-product-back" onClick={closeProduct}><ArrowLeft size={17}/> بازگشت به فروشگاه</button><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span></div>
       <div className="ref-product-page-grid">
-        <ProductImage product={selectedProduct} className="ref-product-page-image" onClick={()=>{setZoomScale(1);setZoomOpen(true);}}/>
+        <ProductImage product={selectedProduct} className="ref-product-page-image" onClick={()=>{setZoomScale(1);setZoomOffset({x:0,y:0});zoomPointersRef.current.clear();setZoomOpen(true);}}/>
         <section className="ref-product-specs-wrap" aria-label="جدول مشخصات محصول">
           <div className="ref-product-specs-title">مشخصات محصول</div>
           <div className="ref-product-specs" role="table">
@@ -609,7 +612,23 @@ export default function App() {
       </div>
     </div>}
 
-    {zoomOpen&&selectedProduct&&<div className="ref-product-zoom" role="dialog" aria-modal="true" aria-label="نمایش بزرگ تصویر محصول" onClick={()=>setZoomOpen(false)}><button className="ref-product-zoom-close" aria-label="بستن بزرگ‌نمایی" onClick={()=>setZoomOpen(false)}><X/></button><div className="ref-product-zoom-tools" onClick={e=>e.stopPropagation()}><button aria-label="کوچک‌نمایی" onClick={()=>setZoomScale(v=>Math.max(1,v-.25))}><ZoomOut/></button><span>{Math.round(zoomScale*100)}٪</span><button aria-label="بزرگ‌نمایی" onClick={()=>setZoomScale(v=>Math.min(3,v+.25))}><ZoomIn/></button></div><div className="ref-product-zoom-stage" onClick={e=>e.stopPropagation()} onTouchStart={e=>{if(e.touches.length===2){const dx=e.touches[0].clientX-e.touches[1].clientX;const dy=e.touches[0].clientY-e.touches[1].clientY;pinchZoomRef.current={distance:Math.hypot(dx,dy),scale:zoomScale};}}} onTouchMove={e=>{if(e.touches.length===2&&pinchZoomRef.current.distance>0){e.preventDefault();const dx=e.touches[0].clientX-e.touches[1].clientX;const dy=e.touches[0].clientY-e.touches[1].clientY;const distance=Math.hypot(dx,dy);setZoomScale(Math.min(3,Math.max(1,pinchZoomRef.current.scale*distance/pinchZoomRef.current.distance)));}}} onTouchEnd={e=>{if(e.touches.length<2)pinchZoomRef.current={distance:0,scale:zoomScale};}}><ProductImage product={selectedProduct} className="ref-product-zoom-image"/><img src={selectedProduct.image_url||tiles.find(t=>t.name===selectedProduct.category)?.image||tiles[0].image} alt={selectedProduct.name} style={{transform:`scale(${zoomScale})`}} onWheel={e=>{e.preventDefault();setZoomScale(v=>Math.min(3,Math.max(1,v+(e.deltaY<0?.2:-.2))));}} onDoubleClick={()=>setZoomScale(v=>v>1?1:2)}/></div></div>}
+    {zoomOpen&&selectedProduct&&<div className="ref-product-zoom" role="dialog" aria-modal="true" aria-label="گالری بزرگ‌نمایی تصویر محصول" onClick={()=>setZoomOpen(false)}>
+      <button className="ref-product-zoom-close" aria-label="بستن گالری" onClick={()=>setZoomOpen(false)}><X/></button>
+      <div className="ref-product-zoom-tools" onClick={e=>e.stopPropagation()}>
+        <button aria-label="کوچک‌نمایی" onClick={()=>{setZoomScale(v=>{const next=Math.max(1,v-.25);if(next===1)setZoomOffset({x:0,y:0});return next;});}}><ZoomOut/></button>
+        <span aria-live="polite">{Math.round(zoomScale*100)}٪</span>
+        <button aria-label="بزرگ‌نمایی" onClick={()=>setZoomScale(v=>Math.min(3,v+.25))}><ZoomIn/></button>
+        <button aria-label="بازگشت به اندازه اصلی" className="ref-zoom-reset" onClick={()=>{setZoomScale(1);setZoomOffset({x:0,y:0});}}>۱۰۰٪</button>
+      </div>
+      <div ref={zoomStageRef} className="ref-product-zoom-stage" onClick={e=>e.stopPropagation()}
+        onPointerDown={e=>{e.currentTarget.setPointerCapture?.(e.pointerId);zoomPointersRef.current.set(e.pointerId,{x:e.clientX,y:e.clientY});const pts=[...zoomPointersRef.current.values()];if(pts.length===1){zoomGestureRef.current={...zoomGestureRef.current,startX:e.clientX,startY:e.clientY,x:zoomOffset.x,y:zoomOffset.y};}else if(pts.length===2){const dx=pts[0].x-pts[1].x,dy=pts[0].y-pts[1].y;zoomGestureRef.current={...zoomGestureRef.current,distance:Math.hypot(dx,dy),scale:zoomScale,midX:(pts[0].x+pts[1].x)/2,midY:(pts[0].y+pts[1].y)/2,x:zoomOffset.x,y:zoomOffset.y};}}}
+        onPointerMove={e=>{if(!zoomPointersRef.current.has(e.pointerId))return;zoomPointersRef.current.set(e.pointerId,{x:e.clientX,y:e.clientY});const pts=[...zoomPointersRef.current.values()];if(pts.length===2&&zoomGestureRef.current.distance){const dx=pts[0].x-pts[1].x,dy=pts[0].y-pts[1].y;setZoomScale(Math.min(3,Math.max(1,zoomGestureRef.current.scale*Math.hypot(dx,dy)/zoomGestureRef.current.distance)));}else if(pts.length===1&&zoomScale>1){setZoomOffset({x:Math.max(-260,Math.min(260,zoomGestureRef.current.x+e.clientX-zoomGestureRef.current.startX)),y:Math.max(-300,Math.min(300,zoomGestureRef.current.y+e.clientY-zoomGestureRef.current.startY))});}}}
+        onPointerUp={e=>{zoomPointersRef.current.delete(e.pointerId);if(zoomPointersRef.current.size===1){const p=[...zoomPointersRef.current.values()][0];zoomGestureRef.current={...zoomGestureRef.current,startX:p.x,startY:p.y,x:zoomOffset.x,y:zoomOffset.y,distance:0};}else zoomGestureRef.current.distance=0;}}
+        onPointerCancel={e=>{zoomPointersRef.current.delete(e.pointerId);zoomGestureRef.current.distance=0;}}>
+        <img className="ref-product-zoom-image" src={selectedProduct.image_url||tiles.find(t=>t.name===selectedProduct.category)?.image||tiles[0].image} alt={selectedProduct.name} draggable="false" style={{transform: `translate3d(${zoomOffset.x}px,${zoomOffset.y}px,0) scale(${zoomScale})`}} onWheel={e=>{e.preventDefault();setZoomScale(v=>Math.min(3,Math.max(1,v+(e.deltaY<0?.2:-.2))));}} onDoubleClick={()=>{setZoomScale(v=>v>1?1:2);if(zoomScale>1)setZoomOffset({x:0,y:0});}}/>
+      </div>
+      <p className="ref-zoom-hint">برای جزئیات، دو انگشت را باز کنید · برای حرکت روی عکس، آن را بکشید</p>
+    </div>}
 
     {cartToast&&<div className="ref-cart-toast" role="status"><span className="ref-cart-toast-check">✓</span><span>{cartToast}</span><button onClick={()=>setCartOpen(true)}>مشاهده سبد</button><button aria-label="بستن پیام" onClick={()=>setCartToast('')}>×</button></div>}
 
