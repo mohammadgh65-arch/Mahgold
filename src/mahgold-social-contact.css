@@ -26,3 +26,8 @@
 .ref-footer-bale{color:#168de2}
 .ref-footer-copy{font-size:10px;color:#a99aa4;text-align:center;padding-top:8px}
 @media(max-width:520px){.ref-lux-footer{padding:17px 12px 12px!important}.ref-footer-frame{gap:10px}.ref-footer-links{gap:12px 18px;padding-bottom:10px}.ref-footer-links a{font-size:11px}.ref-footer-contact{gap:9px 12px;font-size:10px}}
+
+/* Official full logo artwork: header only */
+.ref-brand-redesigned{display:flex;align-items:center;justify-content:center;min-width:0;}
+.ref-header-logo-image{display:block;width:clamp(112px,15vw,176px);height:auto;max-height:58px;object-fit:contain;}
+@media(max-width:640px){.ref-header-logo-image{width:clamp(100px,29vw,138px);max-height:48px;}}
