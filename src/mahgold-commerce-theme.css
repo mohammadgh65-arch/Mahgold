@@ -85,3 +85,51 @@
  .ref-dialog,.ref-drawer{max-height:calc(100dvh - 24px)!important;overflow-y:auto!important}
  .ref-checkout-form{padding-bottom:calc(18px + env(safe-area-inset-bottom))!important}
 }
+
+/* Explicit high-specificity override for legacy green navigation and commerce controls */
+html body #root nav.ref-mobile-links.flex.flex-col{
+ background:#172f50!important;background-image:linear-gradient(145deg,#0c1d35 0%,#172f50 100%)!important;
+ color:#fff!important;border-color:#e99bb4!important;
+}
+html body #root nav.ref-mobile-links.flex.flex-col>a,
+html body #root nav.ref-mobile-links.flex.flex-col>button{
+ background:transparent!important;background-color:transparent!important;
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+}
+html body #root nav.ref-mobile-links.flex.flex-col>a:hover,
+html body #root nav.ref-mobile-links.flex.flex-col>button:hover{
+ color:#f6c5d5!important;-webkit-text-fill-color:#f6c5d5!important;
+}
+html body #root .ref-overlay .ref-dialog,
+html body #root .ref-overlay .ref-drawer,
+html body #root .ref-overlay .ref-checkout-form{
+ background:#fffdfd!important;color:#172f50!important;
+}
+html body #root .ref-overlay .ref-dialog-head,
+html body #root .ref-overlay .ref-drawer-head{
+ background:#f8f7fb!important;color:#172f50!important;
+}
+html body #root .ref-overlay .ref-dialog-head *,
+html body #root .ref-overlay .ref-drawer-head *{
+ color:#172f50!important;
+}
+html body #root .ref-overlay .ref-dialog p,
+html body #root .ref-overlay .ref-drawer p,
+html body #root .ref-overlay .ref-checkout-form p{
+ color:#52647c!important;
+}
+html body #root .ref-overlay .ref-checkout-form label,
+html body #root .ref-overlay .ref-auth-form label{
+ color:#172f50!important;
+}
+html body #root .ref-overlay .ref-checkout-form input,
+html body #root .ref-overlay .ref-checkout-form textarea,
+html body #root .ref-overlay .ref-auth-form input{
+ background:#fff!important;color:#172f50!important;border:1px solid #cbd5e1!important;
+}
+html body #root .ref-overlay .ref-checkout-form button.ref-full,
+html body #root .ref-overlay .ref-auth-form button.ref-full,
+html body #root .ref-overlay .ref-dialog button.ref-full{
+ background:linear-gradient(115deg,#e99bb4,#f6c5d5)!important;
+ color:#172f50!important;-webkit-text-fill-color:#172f50!important;
+}
