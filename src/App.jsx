@@ -433,8 +433,7 @@ export default function App() {
       <div className="ref-main-header mx-auto max-w-[1440px] px-4 md:px-6">
         <button aria-label="منو" className="ref-mobile-menu md:hidden" onClick={()=>setMenuOpen(v=>!v)}><Menu size={20}/></button>
         <a aria-label="مه‌گلد - صفحه اصلی" className="ref-brand ref-brand-redesigned" href="#home" onClick={showHome}>
-          <span className="ref-brand-symbol" aria-hidden="true"><Gem size={34} strokeWidth={1.65}/></span>
-          <span className="ref-brand-wordmark">مه‌گلد</span>
+          <img className="ref-header-logo-image" src={MAHGOLD_LOGO} alt="لوگوی اصلی مه‌گلد" />
         </a>
         <nav className="ref-primary-nav">
           <a className="active" href="#home" onClick={showHome}>خانه</a>
