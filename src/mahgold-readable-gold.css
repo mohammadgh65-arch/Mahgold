@@ -1,0 +1,12 @@
+/* Accessible gold typography: retain the brand's gold character without sacrificing legibility. */
+:root{--mh-gold-readable:#76551f;--mh-gold-readable-soft:#85652d;}
+/* Gold utility labels and eyebrow text appear on cream/white surfaces throughout the shop. */
+html body #root .text-gold-deep,
+html body #root .eyebrow.text-gold-deep,
+html body #root .text-gold-light,
+html body #root .text-gold{color:var(--mh-gold-readable)!important;}
+/* Typographic category initials were previously too pale against the warm tile. */
+html body #root .ref-category-initial{color:var(--mh-gold-readable-soft)!important;}
+/* Preserve readable text on gold action surfaces. */
+html body #root .bg-gold-gradient,
+html body #root button.bg-gold-gradient{color:#17283d!important;}
