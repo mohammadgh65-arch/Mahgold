@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
 import './admin.css';
+import './mahgold-admin-storefront-theme.css';
 import { MAHGOLD_LOGO } from './mahgold-brand';
 
 const sections = [
