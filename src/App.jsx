@@ -10,6 +10,7 @@ import { supabase, isSupabaseConfigured } from './lib/supabase';
 const AdminPanel = lazy(() => import('./Admin.jsx'));
 
 const forceAdminPreview = import.meta.env.VITE_ADMIN_PREVIEW === 'true';
+const forceAdminRoute = typeof window !== 'undefined' && window.__MAHGOLD_ADMIN_ROUTE__ === true;
 const tiles = [
   {name:'طلای زینتی',desc:'زیورآلات روزمره و مناسب هدیه',image:'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=640&q=70'},
   {name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=640&q=70'}
@@ -223,7 +224,7 @@ export default function App() {
   const [siteContent,setSiteContent]=useState(null);
   const [dataStatus,setDataStatus]=useState(isSupabaseConfigured?'loading':'error');
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
-  const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||/^\/admin(?:\/|$)/.test(window.location.pathname));
+  const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||forceAdminRoute||/^\/admin(?:\/|$)/.test(window.location.pathname));
 
   const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})).filter(Boolean),[siteContent]);
   const categoryImageFor=name=>(siteContent?.tiles||[]).find(item=>item.name===name)?.image||products.find(item=>item.category===name)?.image_url||(name==='طلای زینتی'?products.find(item=>jewelryProductCategories.has(item.category))?.image_url:null)||'';
@@ -248,7 +249,7 @@ export default function App() {
   useEffect(()=>{if(!supabase)return;let active=true;supabase.from('site_content').select('content').eq('id',1).maybeSingle().then(({data})=>{if(active&&data?.content)setSiteContent(data.content);});return()=>{active=false;};},[]);
   useEffect(()=>{
     const syncAdminRoute=()=>{
-      if(forceAdminPreview){setIsAdminPage(true);return;}
+      if(forceAdminPreview||forceAdminRoute){setIsAdminPage(true);return;}
       const path=window.location.pathname;
       setIsAdminPage(/^\/admin(?:\/|$)/.test(path));
       const categoryMatch=path.match(/^\/category\/([^/]+)\/?$/);
