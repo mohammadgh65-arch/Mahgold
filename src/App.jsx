@@ -301,7 +301,54 @@ export default function App() {
       window.removeEventListener('hashchange',syncAdminRoute);
       window.removeEventListener('popstate',syncAdminRoute);
     };
-  },[]);
+  },[products]);
+  useEffect(()=>{
+    const path=window.location.pathname;
+    const canonicalUrl='https://mah-gold.ir'+(path==='/'?'/':path);
+    const categoryMatch=path.match(/^\/category\/([^/]+)\/?$/);
+    const productMatch=path.match(/^\/product\/([^/]+)\/?$/);
+    let title='مه‌گلد | خرید آنلاین طلا، زیورآلات و سکه';
+    let description='خرید آنلاین طلای زینتی و سکه از مه‌گلد؛ مجموعه‌ای از زیورآلات منتخب با طراحی ماندگار، اطلاعات شفاف و تجربه خرید آسان.';
+    let robots='index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
+    let structuredData={ '@context':'https://schema.org','@type':'OnlineStore',name:'مه‌گلد',url:'https://mah-gold.ir/' };
+    if(isAdminPage){title='مدیریت فروشگاه | مه‌گلد';robots='noindex,nofollow';}
+    else if(productMatch){
+      const product=selectedProduct||products.find(item=>String(item.id)===decodeURIComponent(productMatch[1]));
+      if(product){
+        title=String(product.name||'محصول').trim()+' | خرید از مه‌گلد';
+        description=String(product.description||('مشخصات، وزن و عیار '+(product.name||'محصول')+' در فروشگاه مه‌گلد.')).trim().slice(0,300);
+        structuredData={ '@context':'https://schema.org','@type':'Product',name:product.name,description,image:product.image_url||undefined,sku:String(product.id),category:product.category,brand:{'@type':'Brand',name:'مه‌گلد'} };
+      }
+    }else if(categoryMatch){
+      const name=decodeURIComponent(categoryMatch[1]);
+      title='خرید '+name+' | مجموعه مه‌گلد';
+      description='مشاهده و انتخاب محصولات '+name+' در فروشگاه مه‌گلد؛ بررسی مشخصات، وزن، عیار و قیمت ثبت‌شده محصولات.';
+      structuredData={ '@context':'https://schema.org','@type':'CollectionPage',name:title,description,url:canonicalUrl };
+    }else if(path==='/products'){
+      title='تمام محصولات طلا و زیورآلات | مه‌گلد';
+      description='جست‌وجو و مقایسه مجموعه محصولات مه‌گلد؛ طلای زینتی، سکه و انتخاب‌های ویژه.';
+      structuredData={ '@context':'https://schema.org','@type':'CollectionPage',name:title,description,url:canonicalUrl };
+    }
+    document.title=title;
+    const setMeta=(selector,attribute,value)=>{
+      let node=document.head.querySelector(selector);
+      if(!node){node=document.createElement('meta');if(selector.startsWith('meta[property='))node.setAttribute('property',attribute);else node.setAttribute('name',attribute);document.head.appendChild(node);}
+      node.setAttribute('content',value);
+    };
+    setMeta('meta[name="description"]','description',description);
+    setMeta('meta[name="robots"]','robots',robots);
+    setMeta('meta[property="og:title"]','og:title',title);
+    setMeta('meta[property="og:description"]','og:description',description);
+    setMeta('meta[property="og:url"]','og:url',canonicalUrl);
+    setMeta('meta[name="twitter:title"]','twitter:title',title);
+    setMeta('meta[name="twitter:description"]','twitter:description',description);
+    let canonical=document.head.querySelector('link[rel="canonical"]');
+    if(!canonical){canonical=document.createElement('link');canonical.rel='canonical';document.head.appendChild(canonical);}
+    canonical.href=canonicalUrl;
+    let schema=document.getElementById('mahgold-route-schema');
+    if(!schema){schema=document.createElement('script');schema.type='application/ld+json';schema.id='mahgold-route-schema';document.head.appendChild(schema);}
+    schema.textContent=JSON.stringify(structuredData);
+  },[category,catalogPage,selectedProduct,products,isAdminPage]);
   useEffect(()=>{
     if(!supabase){setDataStatus('error');setDataMessage('اتصال فروشگاه پیکربندی نشده است.');return;}
     let active=true;
