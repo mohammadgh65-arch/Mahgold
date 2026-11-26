@@ -171,3 +171,29 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
  .ref-home-arrival-card .ref-product-bottom strong{font-size:11px!important}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Product detail: keep the established image -> specifications order, with a calm light presentation */
+.ref-product-page{background:var(--mh-paper)!important;color:var(--mh-ink)!important;padding:clamp(16px,4vw,54px)!important}
+.ref-product-page-top{max-width:1320px!important;margin:0 auto 22px!important;padding-bottom:14px!important;border-bottom:1px solid var(--mh-line)!important}
+.ref-product-page-top .eyebrow{color:var(--mh-rose)!important}
+.ref-product-back{background:transparent!important;color:var(--mh-ink)!important;border:0!important;padding:8px 0!important}
+.ref-product-page-grid{max-width:1320px!important;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr)!important;grid-template-areas:"image copy" "specs copy"!important;align-items:start!important;gap:18px!important}
+.ref-product-page-image{grid-area:image!important;min-height:520px!important;border:1px solid var(--mh-line)!important;border-radius:2px!important;background:var(--mh-surface)!important;box-shadow:none!important}
+.ref-product-specs-wrap{grid-area:specs!important;overflow:hidden!important;border:1px solid var(--mh-line)!important;border-radius:2px!important;background:var(--mh-surface)!important}
+.ref-product-specs-title{background:#eeece6!important;color:var(--mh-ink)!important;border-bottom:1px solid var(--mh-line)!important;font-size:13px!important}
+.ref-product-specs>div{border-color:var(--mh-line)!important;color:var(--mh-muted)!important}
+.ref-product-specs b{color:var(--mh-ink)!important}
+.ref-product-page-copy{grid-area:copy!important;position:sticky!important;top:104px!important;padding:24px!important;border:1px solid var(--mh-line)!important;background:var(--mh-surface)!important;color:var(--mh-ink)!important}
+.ref-product-page-copy h1{color:var(--mh-ink)!important;font-size:clamp(23px,2.6vw,32px)!important;font-weight:600!important}
+.ref-product-page-copy p{color:var(--mh-muted)!important;font-size:13px!important;line-height:2.2!important}
+.ref-product-page-price{color:var(--mh-ink)!important;font-size:25px!important}
+.ref-product-page-copy .ref-full{background:var(--mh-ink)!important;color:white!important;border:0!important;border-radius:2px!important}
+.ref-product-page-copy .mahgold-product-price-breakdown{background:#f7f5f0!important;border-color:var(--mh-line)!important;border-radius:2px!important;color:var(--mh-ink)!important}
+.ref-product-page-copy .mahgold-product-price-breakdown h3{color:var(--mh-ink)!important}
+.ref-product-zoom{background:rgba(13,22,36,.97)!important}
+@media(max-width:767px){
+ .ref-product-page{padding:14px!important}
+ .ref-product-page-grid{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"image" "specs" "copy"!important;gap:12px!important}
+ .ref-product-page-image{min-height:0!important;aspect-ratio:1/1!important}
+ .ref-product-page-copy{position:static!important;padding:18px!important}
+}
