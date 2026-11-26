@@ -1,0 +1,112 @@
+/* MAHGOLD EDITORIAL COMPONENT UNIFICATION
+   Final overrides for category filters, cart drawer and mobile menu.
+   Keep commerce behavior untouched. */
+:root{
+  --mh-panel:#fffefa;
+  --mh-panel-soft:#f7f4ed;
+  --mh-panel-line:#e5ded2;
+  --mh-panel-ink:#24364b;
+  --mh-panel-muted:#687486;
+  --mh-panel-accent:#a86f83;
+}
+/* Category selector: replace legacy emerald/gold pills with the editorial palette. */
+html body #root .ref-category-group-tabs button{
+  min-height:42px!important;padding:10px 16px!important;
+  border:1px solid var(--mh-panel-line)!important;border-radius:3px!important;
+  background:var(--mh-panel)!important;color:var(--mh-panel-ink)!important;
+  box-shadow:none!important;font-size:12px!important;font-weight:600!important;
+}
+html body #root .ref-category-group-tabs button.active{
+  background:var(--mh-panel-ink)!important;border-color:var(--mh-panel-ink)!important;
+  color:#fffefa!important;box-shadow:none!important;
+}
+html body #root .ref-category-subgroups{
+  background:var(--mh-panel-soft)!important;border:1px solid var(--mh-panel-line)!important;
+  border-radius:3px!important;
+}
+html body #root .ref-category-subgroups button{
+  background:var(--mh-panel)!important;border:1px solid var(--mh-panel-line)!important;
+  border-radius:3px!important;color:var(--mh-panel-muted)!important;
+}
+html body #root .ref-category-subgroups button.active{
+  background:#f3e8ec!important;border-color:#c99aaa!important;color:#75485a!important;font-weight:700!important;
+}
+/* Mobile hamburger and expanded menu use the same light editorial header language. */
+html body #root .ref-site-header .ref-mobile-menu{
+  width:40px!important;height:40px!important;border:1px solid var(--mh-panel-line)!important;
+  border-radius:3px!important;background:var(--mh-panel)!important;color:var(--mh-panel-ink)!important;
+  box-shadow:none!important;
+}
+html body #root .ref-site-header .ref-mobile-menu svg{color:var(--mh-panel-ink)!important}
+html body #root nav.ref-mobile-links.flex.flex-col{
+  background:var(--mh-panel)!important;color:var(--mh-panel-ink)!important;
+  border:1px solid var(--mh-panel-line)!important;border-top:1px solid var(--mh-panel-line)!important;
+  border-radius:0 0 3px 3px!important;box-shadow:0 14px 28px rgba(24,38,56,.10)!important;
+  padding:14px 18px!important;gap:0!important;
+}
+html body #root nav.ref-mobile-links.flex.flex-col>a,
+html body #root nav.ref-mobile-links.flex.flex-col>button{
+  display:flex!important;align-items:center!important;min-height:46px!important;
+  padding:10px 2px!important;border-bottom:1px solid var(--mh-panel-line)!important;
+  background:transparent!important;color:var(--mh-panel-ink)!important;
+  font-size:13px!important;font-weight:550!important;text-align:right!important;
+}
+html body #root nav.ref-mobile-links.flex.flex-col>a:last-child,
+html body #root nav.ref-mobile-links.flex.flex-col>button:last-child{border-bottom:0!important}
+html body #root nav.ref-mobile-links.flex.flex-col>a:active,
+html body #root nav.ref-mobile-links.flex.flex-col>button:active{color:var(--mh-panel-accent)!important;background:#f8f1f3!important}
+/* Cart icon/button in header. */
+html body #root .ref-site-header .ref-header-cart{
+  color:var(--mh-panel-ink)!important;background:transparent!important;
+  border:1px solid transparent!important;border-radius:3px!important;
+}
+html body #root .ref-site-header .ref-header-cart svg{color:var(--mh-panel-ink)!important}
+html body #root .ref-site-header .ref-header-cart b{
+  background:var(--mh-panel-accent)!important;color:#fff!important;
+}
+/* Cart drawer: remove the old dark emerald glass treatment and normalize every text layer. */
+html body #root .ref-overlay .ref-drawer{
+  background:var(--mh-panel)!important;color:var(--mh-panel-ink)!important;
+  border:1px solid var(--mh-panel-line)!important;border-radius:0!important;
+  box-shadow:-18px 0 50px rgba(24,38,56,.13)!important;backdrop-filter:none!important;
+}
+html body #root .ref-overlay .ref-drawer-head{
+  background:var(--mh-panel-soft)!important;border-bottom:1px solid var(--mh-panel-line)!important;
+}
+html body #root .ref-overlay .ref-drawer-head *,
+html body #root .ref-overlay .ref-drawer h2,
+html body #root .ref-overlay .ref-drawer h3,
+html body #root .ref-overlay .ref-drawer p,
+html body #root .ref-overlay .ref-drawer label,
+html body #root .ref-overlay .ref-drawer span,
+html body #root .ref-overlay .ref-drawer small,
+html body #root .ref-overlay .ref-drawer .eyebrow{
+  color:var(--mh-panel-ink)!important;text-shadow:none!important;
+}
+html body #root .ref-overlay .ref-drawer .text-muted-foreground,
+html body #root .ref-overlay .ref-drawer .ref-home-arrival-meta{color:var(--mh-panel-muted)!important}
+html body #root .ref-overlay .ref-drawer .ref-cart-line,
+html body #root .ref-overlay .ref-drawer .ref-cart-summary{
+  background:var(--mh-panel)!important;color:var(--mh-panel-ink)!important;
+  border-color:var(--mh-panel-line)!important;
+}
+html body #root .ref-overlay .ref-drawer .ref-cart-line strong,
+html body #root .ref-overlay .ref-drawer .ref-cart-summary b{color:#75485a!important;text-shadow:none!important}
+html body #root .ref-overlay .ref-drawer .ref-close,
+html body #root .ref-overlay .ref-drawer .ref-qty button{
+  background:#f3e8ec!important;border:1px solid #e5cbd4!important;color:#75485a!important;
+}
+html body #root .ref-overlay .ref-drawer .ref-remove{color:#9a536a!important}
+html body #root .ref-overlay .ref-drawer input,
+html body #root .ref-overlay .ref-drawer textarea,
+html body #root .ref-overlay .ref-drawer select{
+  background:#fff!important;color:var(--mh-panel-ink)!important;border:1px solid var(--mh-panel-line)!important;
+}
+html body #root .ref-overlay .ref-drawer input::placeholder{color:#89919b!important;opacity:1!important}
+html body #root .ref-overlay .ref-drawer .mahgold-cart-breakdown{
+  background:var(--mh-panel-soft)!important;border-color:var(--mh-panel-line)!important;
+}
+@media(max-width:767px){
+  html body #root nav.ref-mobile-links.flex.flex-col{padding-inline:16px!important}
+  html body #root .ref-overlay .ref-drawer{width:min(440px,94vw)!important;padding:20px 16px!important}
+}
