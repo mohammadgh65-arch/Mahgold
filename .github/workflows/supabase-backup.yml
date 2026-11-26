@@ -1,0 +1,44 @@
+name: Encrypted Supabase Database Backup
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "41 3 * * *" # daily 03:41 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17 gnupg
+
+      - name: Create encrypted database dump
+        env:
+          DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_ENCRYPTION_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          test -n "$DB_PASSWORD" || { echo "Missing SUPABASE_DB_PASSWORD secret"; exit 1; }
+          test -n "$BACKUP_PASSPHRASE" || { echo "Missing BACKUP_ENCRYPTION_PASSPHRASE secret"; exit 1; }
+          export PGPASSWORD="$DB_PASSWORD"
+          DB_HOST="db.nzvvvpbwavaodhxrnkdr.supabase.co"
+          DB_PORT="5432"
+          DB_USER="postgres"
+          DB_NAME="postgres"
+          pg_dump --host="$DB_HOST" --port="$DB_PORT" --username="$DB_USER" --dbname="$DB_NAME" --format=custom --no-owner --no-acl --verbose --file=mahgold.dump
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$BACKUP_PASSPHRASE" --symmetric --cipher-algo AES256 --output "mahgold-$(date -u +%Y-%m-%d).dump.gpg" mahgold.dump
+          shred -u mahgold.dump || rm -f mahgold.dump
+
+      - name: Store encrypted backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mahgold-encrypted-db-backup-${{ github.run_id }}
+          path: mahgold-*.dump.gpg
+          retention-days: 7
+          if-no-files-found: error
