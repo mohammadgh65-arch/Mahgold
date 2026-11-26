@@ -506,7 +506,7 @@ export default function App() {
         <div className="ref-offers-heading">
           <div>
             <span className="ref-offers-eyebrow">MAHGOLD SELECTION</span>
-            <h1>پیشنهادات مه‌گلد</h1>
+            <h1>طلای زینتی و سکه؛ انتخاب مه‌گلد</h1>
             <p>انتخاب‌هایی چشم‌نواز از مجموعه مه‌گلد</p>
           </div>
           <span className="ref-offers-count">۰۵ انتخاب منتخب</span>
