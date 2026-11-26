@@ -1,4 +1,4 @@
-const CACHE='mahgold-shell-v2';
+const CACHE='mahgold-shell-v3-recovery';
 const SHELL=['/','/admin','/manifest.webmanifest','/mahgold-app-icon.svg'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('mahgold-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));});
@@ -12,12 +12,24 @@ self.addEventListener('fetch',event=>{
   event.respondWith(fetch(request).then(response=>{if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put('/index.html',copy));}return response;}).catch(()=>caches.match('/index.html')));
   return;
  }
- if(['script','style','image','font'].includes(request.destination)){
+ if(['script','style'].includes(request.destination)){
   event.respondWith(caches.open(CACHE).then(async cache=>{
    const cached=await cache.match(request);
-   const network=fetch(request).then(response=>{if(response.ok&&response.type==='basic')cache.put(request,response.clone());return response;}).catch(()=>null);
-   if(cached){event.waitUntil(network);return cached;}
-   return (await network)||Response.error();
+   try{
+    const response=await fetch(request,{cache:'no-store'});
+    if(response.ok&&response.type==='basic')cache.put(request,response.clone());
+    return response;
+   }catch{return cached||Response.error();}
+  }));
+  return;
+ }
+ if(['image','font'].includes(request.destination)){
+  event.respondWith(caches.open(CACHE).then(async cache=>{
+   const cached=await cache.match(request);
+   if(cached)return cached;
+   const response=await fetch(request);
+   if(response.ok&&response.type==='basic')cache.put(request,response.clone());
+   return response;
   }));
  }
 });
