@@ -1,9 +1,10 @@
 import { MAHGOLD_LOGO } from './mahgold-brand';
+import './mahgold-social-contact.css';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Search, ShoppingBag, Menu, X, Gem, ArrowLeft, ChevronLeft, ChevronRight, ZoomIn, ZoomOut,
   ShieldCheck, Gift, Headphones, Plus, Minus, UserRound, LogOut,
-  House, LayoutGrid, Phone, MapPin, PackageCheck
+  House, LayoutGrid, Phone, MapPin, PackageCheck, MessageCircle, Send
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from './lib/supabase';
 const AdminPanel = lazy(() => import('./Admin.jsx'));
@@ -602,6 +603,21 @@ export default function App() {
           <span><Phone size={15}/> شماره تماس: به‌زودی</span>
           <span><MapPin size={15}/> نشانی: به‌زودی اعلام می‌شود</span>
         </div>
+        <section className="ref-social-contact" aria-label="راه‌های ارتباط با مه‌گلد">
+          <div className="ref-social-heading"><span className="ref-social-kicker">STAY IN TOUCH</span><strong>همراه مه‌گلد باشید</strong><small>پشتیبانی و پاسخ‌گویی از مسیرهای رسمی مه‌گلد</small></div>
+          <div className="ref-social-grid">
+            <div className="ref-social-card ref-social-whatsapp" aria-disabled="true">
+              <span className="ref-social-icon"><MessageCircle size={21}/></span>
+              <span className="ref-social-copy"><b>واتس‌اپ</b><small>گفت‌وگوی مستقیم با پشتیبانی</small></span>
+              <span className="ref-social-status">به‌زودی</span>
+            </div>
+            <div className="ref-social-card ref-social-bale" aria-disabled="true">
+              <span className="ref-social-icon"><Send size={20}/></span>
+              <span className="ref-social-copy"><b>بله</b><small>ارتباط در پیام‌رسان بله</small></span>
+              <span className="ref-social-status">به‌زودی</span>
+            </div>
+          </div>
+        </section>
         <div className="ref-footer-copy">© ۱۴۰۵ فروشگاه آنلاین مه‌گلد · زیورآلات طلا</div>
       </div>
     </footer>
