@@ -583,7 +583,7 @@ export default function App() {
         {(()=>{const arrivals=products.filter(p=>Number(p.price_toman)>0).slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,4);return arrivals.length?<div className="ref-home-arrivals-grid">{arrivals.map(product=><article className="ref-product-card ref-home-arrival-card" key={product.id}>
           <button type="button" className="ref-home-arrival-image" onClick={()=>openProduct(product)} aria-label={'مشاهده '+product.name}><ProductImage product={product}/></button>
           <div className="ref-product-body"><span className="ref-home-arrival-category">{product.category}</span><button type="button" className="ref-product-name" onClick={()=>openProduct(product)}>{product.name}</button><div className="ref-home-arrival-meta">{product.weight_grams?gram(product.weight_grams):'طلای منتخب مه‌گلد'}{product.karat?' · '+money(product.karat)+' عیار':''}</div>
-            <div className="ref-product-bottom"><strong>{money(product.price_toman)} <small>تومان</small></strong><button type="button" aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(product)}><Plus size={17}/></button></div><div className={Number(product.stock||0)>0?'ref-home-stock':'ref-home-stock is-empty'}>{Number(product.stock||0)>0?'موجود برای سفارش':'ناموجود'}</div>
+            <div className="ref-product-bottom"><strong>{product.pricing_mode==='auto'&&!quoteFresh?'قیمت پس از نرخ معتبر':<>{money(product.price_toman)} <small>تومان</small></>}</strong><button type="button" aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(product)}><Plus size={17}/></button></div><div className={Number(product.stock||0)>0?'ref-home-stock':'ref-home-stock is-empty'}>{Number(product.stock||0)>0?'موجود برای سفارش':'ناموجود'}</div>
           </div></article>)}</div>:<div className="ref-home-arrivals-empty">{dataStatus==='loading'?'در حال دریافت محصولات…':'محصول جدیدی برای نمایش ثبت نشده است.'}</div>})()}
       </section>}
 
@@ -591,7 +591,7 @@ export default function App() {
 
                 {!catalogPage&&<div className="ref-quote-strip">
           <div className="ref-quote-title"><span className="ref-quote-bars">▥</span><div><b>قیمت لحظه‌ای طلای ۱۸ عیار</b><small>{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'به‌روزرسانی لحظه‌ای'):quoteIsManual?'نرخ دستی منقضی‌شده':quote?.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'در انتظار نرخ معتبر'}</small></div></div>
-          <strong>{quote?money(quote.price_toman)+' تومان':'— تومان'}</strong>
+          <strong>{quoteFresh?money(quote.price_toman)+' تومان':'— تومان'}</strong>
           <span className="ref-quote-live"><i/> {quoteFresh?'نرخ معتبر':'بدون نرخ تازه'}</span>
         </div>}
 
