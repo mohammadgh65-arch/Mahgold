@@ -1,0 +1,137 @@
+/* MAHGOLD FINAL COMPONENT OVERRIDE — mobile menu, account dialog and cart drawer.
+   Loaded last. Replaces legacy velvet/emerald/gold-glass rules without changing behavior. */
+:root{
+ --mh-final-paper:#fffefa;--mh-final-soft:#f7f4ed;--mh-final-ink:#24364b;
+ --mh-final-muted:#687486;--mh-final-line:#e5ded2;--mh-final-rose:#a86f83;
+}
+/* Mobile navigation: force visible text despite legacy header selectors. */
+html body #root header.ref-site-header nav.ref-mobile-links,
+html body #root header.ref-site-header nav.ref-mobile-links *{
+ visibility:visible!important;opacity:1!important;filter:none!important;
+ mix-blend-mode:normal!important;text-shadow:none!important;
+ color:var(--mh-final-ink)!important;-webkit-text-fill-color:var(--mh-final-ink)!important;
+ font-family:"Shabnam",Tahoma,sans-serif!important;font-size:14px!important;
+ line-height:1.9!important;letter-spacing:normal!important;text-indent:0!important;
+}
+html body #root header.ref-site-header nav.ref-mobile-links{
+ display:flex!important;position:relative!important;z-index:100!important;
+ height:auto!important;max-height:70vh!important;overflow-y:auto!important;
+ background:var(--mh-final-paper)!important;background-image:none!important;
+ border:1px solid var(--mh-final-line)!important;border-top:1px solid var(--mh-final-line)!important;
+ padding:12px 18px!important;gap:0!important;box-shadow:0 14px 30px rgba(24,38,56,.12)!important;
+}
+html body #root header.ref-site-header nav.ref-mobile-links>a,
+html body #root header.ref-site-header nav.ref-mobile-links>button{
+ display:flex!important;visibility:visible!important;opacity:1!important;
+ align-items:center!important;justify-content:flex-start!important;
+ width:100%!important;min-height:49px!important;height:auto!important;
+ padding:10px 5px!important;margin:0!important;
+ background:var(--mh-final-paper)!important;background-image:none!important;
+ border:0!important;border-bottom:1px solid var(--mh-final-line)!important;
+ color:var(--mh-final-ink)!important;-webkit-text-fill-color:var(--mh-final-ink)!important;
+ font-family:"Shabnam",Tahoma,sans-serif!important;font-size:14px!important;
+ font-weight:600!important;line-height:1.9!important;text-align:right!important;
+ text-indent:0!important;transform:none!important;
+}
+html body #root header.ref-site-header nav.ref-mobile-links>a:last-child,
+html body #root header.ref-site-header nav.ref-mobile-links>button:last-child{border-bottom:0!important}
+html body #root header.ref-site-header nav.ref-mobile-links>a *,
+html body #root header.ref-site-header nav.ref-mobile-links>button *{
+ color:var(--mh-final-ink)!important;-webkit-text-fill-color:var(--mh-final-ink)!important;
+}
+/* Account dialog and cart/checkout drawers: light paper surfaces and consistent ink. */
+html body #root .ref-overlay .ref-dialog,
+html body #root .ref-overlay .ref-drawer,
+html body #root .ref-overlay form.ref-drawer{
+ background:var(--mh-final-paper)!important;background-image:none!important;
+ color:var(--mh-final-ink)!important;border:1px solid var(--mh-final-line)!important;
+ border-radius:4px!important;box-shadow:0 22px 65px rgba(24,38,56,.16)!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}
+html body #root .ref-overlay .ref-dialog *,
+html body #root .ref-overlay .ref-drawer *,
+html body #root .ref-overlay form.ref-drawer *{
+ text-shadow:none!important;
+}
+html body #root .ref-overlay .ref-dialog-head,
+html body #root .ref-overlay .ref-drawer-head{
+ background:var(--mh-final-soft)!important;background-image:none!important;
+ border-color:var(--mh-final-line)!important;
+}
+html body #root .ref-overlay .ref-dialog h2,
+html body #root .ref-overlay .ref-dialog h3,
+html body #root .ref-overlay .ref-dialog p,
+html body #root .ref-overlay .ref-dialog label,
+html body #root .ref-overlay .ref-dialog span,
+html body #root .ref-overlay .ref-dialog small,
+html body #root .ref-overlay .ref-dialog .eyebrow,
+html body #root .ref-overlay .ref-drawer h2,
+html body #root .ref-overlay .ref-drawer h3,
+html body #root .ref-overlay .ref-drawer h4,
+html body #root .ref-overlay .ref-drawer p,
+html body #root .ref-overlay .ref-drawer label,
+html body #root .ref-overlay .ref-drawer span,
+html body #root .ref-overlay .ref-drawer small,
+html body #root .ref-overlay .ref-drawer .eyebrow{
+ color:var(--mh-final-ink)!important;-webkit-text-fill-color:var(--mh-final-ink)!important;
+}
+html body #root .ref-overlay .ref-dialog .text-muted-foreground,
+html body #root .ref-overlay .ref-drawer .text-muted-foreground,
+html body #root .ref-overlay .ref-dialog .ref-note,
+html body #root .ref-overlay .ref-drawer .ref-note{
+ color:var(--mh-final-muted)!important;-webkit-text-fill-color:var(--mh-final-muted)!important;
+}
+html body #root .ref-overlay .ref-dialog input,
+html body #root .ref-overlay .ref-dialog textarea,
+html body #root .ref-overlay .ref-dialog select,
+html body #root .ref-overlay .ref-drawer input,
+html body #root .ref-overlay .ref-drawer textarea,
+html body #root .ref-overlay .ref-drawer select{
+ background:#fff!important;color:var(--mh-final-ink)!important;
+ -webkit-text-fill-color:var(--mh-final-ink)!important;border:1px solid var(--mh-final-line)!important;
+ border-radius:3px!important;box-shadow:none!important;
+}
+html body #root .ref-overlay .ref-dialog input::placeholder,
+html body #root .ref-overlay .ref-drawer input::placeholder{color:#89919b!important;opacity:1!important}
+html body #root .ref-overlay .ref-dialog button.bg-gold-gradient,
+html body #root .ref-overlay .ref-drawer button.bg-gold-gradient,
+html body #root .ref-overlay .ref-dialog .ref-full,
+html body #root .ref-overlay .ref-drawer .ref-full{
+ background:var(--mh-final-ink)!important;background-image:none!important;
+ color:#fffefa!important;-webkit-text-fill-color:#fffefa!important;
+ border:1px solid var(--mh-final-ink)!important;border-radius:3px!important;
+ box-shadow:none!important;
+}
+html body #root .ref-overlay .ref-dialog .ref-auth-tabs{
+ display:flex!important;gap:5px!important;padding:4px!important;
+ background:var(--mh-final-soft)!important;border:1px solid var(--mh-final-line)!important;
+ border-radius:3px!important;
+}
+html body #root .ref-overlay .ref-dialog .ref-auth-tabs button{
+ background:transparent!important;color:var(--mh-final-ink)!important;
+ -webkit-text-fill-color:var(--mh-final-ink)!important;border:0!important;border-radius:2px!important;
+}
+html body #root .ref-overlay .ref-dialog .ref-auth-tabs button.active{
+ background:#f3e8ec!important;color:#75485a!important;
+ -webkit-text-fill-color:#75485a!important;
+}
+html body #root .ref-overlay .ref-dialog .ref-close,
+html body #root .ref-overlay .ref-drawer .ref-close,
+html body #root .ref-overlay .ref-drawer .ref-qty button{
+ background:#f3e8ec!important;background-image:none!important;
+ color:#75485a!important;-webkit-text-fill-color:#75485a!important;
+ border:1px solid #e5cbd4!important;border-radius:3px!important;
+}
+html body #root .ref-overlay .ref-drawer .ref-cart-line,
+html body #root .ref-overlay .ref-drawer .ref-cart-summary,
+html body #root .ref-overlay .ref-drawer .mahgold-cart-breakdown,
+html body #root .ref-overlay .ref-dialog .ref-order-item{
+ background:var(--mh-final-soft)!important;color:var(--mh-final-ink)!important;
+ border-color:var(--mh-final-line)!important;box-shadow:none!important;
+}
+html body #root .ref-overlay .ref-drawer .ref-cart-line strong,
+html body #root .ref-overlay .ref-drawer .ref-cart-summary b,
+html body #root .ref-overlay .ref-dialog .ref-order-item b{
+ color:#75485a!important;-webkit-text-fill-color:#75485a!important;
+}
+html body #root .ref-overlay .ref-drawer .ref-remove{color:#9a536a!important;-webkit-text-fill-color:#9a536a!important}
