@@ -1,0 +1,27 @@
+/* MAHGOLD — single final theme layer; neutralizes leftover legacy forest/gold rules */
+:root{--background:222 34% 98%;--foreground:220 48% 24%;--card:0 0% 100%;--card-foreground:220 48% 24%;--popover:0 0% 100%;--popover-foreground:220 48% 24%;--primary:220 48% 24%;--primary-foreground:0 0% 100%;--secondary:335 58% 93%;--secondary-foreground:220 48% 24%;--muted:220 25% 95%;--muted-foreground:220 15% 48%;--accent:335 58% 93%;--accent-foreground:220 48% 24%;--border:220 20% 88%;--input:220 20% 88%;--ring:335 62% 76%;--gold:#e99bb4;--gold-light:#f6c5d5;--gold-deep:#c45f83;--ink:#172f50;--ink-foreground:#fffdfd;--ink-muted:#e4e9f1;--forest:#172f50;--forest-deep:#0c1d35;--cream:#f8f7fb}
+html,body,#root{background:#f8f7fb!important;color:#172f50!important}
+.ref-announcement,.ref-site-header,.ref-main-header,.ref-brand-masthead{background-color:#0c1d35!important}
+.ref-brand-masthead{background:#0c1d35!important}
+.ref-site-header{background:linear-gradient(112deg,#0c1d35,#18385d 58%,#24476c)!important;border-bottom:1px solid #e99bb4!important}
+.ref-mobile-links,.ref-mobile-nav{background:#0c1d35!important;color:#fff!important;border-color:#e99bb4!important}
+.ref-mobile-links a,.ref-mobile-links button,.ref-mobile-nav button{color:#f9f5fa!important}
+.ref-quote-strip,.ref-catalog-heading,.ref-home-new-arrivals{background:#f8f7fb!important;color:#172f50!important}
+.ref-quote-strip [class*="green"],.ref-quote-strip [class*="emerald"],.ref-quote-strip [class*="yellow"],.ref-quote-strip [class*="amber"]{color:#c45f83!important}
+.ref-catalog-category-image,.ref-collection-image-card,.ref-category-card{border-color:#e99bb4!important}
+.ref-service-card{background:linear-gradient(145deg,#172f50,#203f64)!important;color:#fff!important;border-color:#e99bb4!important}
+.ref-dialog,.ref-drawer,.ref-account-panel,.ref-auth-form,.ref-cart-summary,.ref-checkout-form{background:#fffdfd!important;color:#172f50!important;border-color:#e5d7e0!important}
+.ref-dialog-head,.ref-drawer-head{background:#f8f7fb!important;color:#172f50!important;border-color:#e5d7e0!important}
+.ref-mobile-nav .bg-gold,.ref-mobile-nav [class*="bg-yellow"],.ref-mobile-nav [class*="bg-amber"]{background:#e99bb4!important;color:#172f50!important}
+.bg-gold-gradient{background:linear-gradient(115deg,#e99bb4,#f6c5d5)!important;color:#172f50!important}
+.text-gold-deep,.text-gold-light,.text-gold{color:#c45f83!important}
+.border-gold,.border-gold\/40{border-color:#e99bb4!important}
+.bg-ink{background:#0c1d35!important;color:#fff!important}
+.text-ink{color:#172f50!important}.text-ink-foreground{color:#fff!important}.text-ink-muted{color:#e4e9f1!important}
+[class*="text-green-"],[class*="text-emerald-"],[class*="text-forest"],[class*="text-olive"],[class*="text-lime-"]{color:#c45f83!important}
+[class*="bg-green-"],[class*="bg-emerald-"],[class*="bg-forest"],[class*="bg-olive"],[class*="bg-lime-"]{background-color:#172f50!important}
+[class*="border-green-"],[class*="border-emerald-"],[class*="border-forest"],[class*="border-olive"]{border-color:#e99bb4!important}
+[class*="text-yellow-"],[class*="text-amber-"]{color:#c45f83!important}
+[class*="bg-yellow-"],[class*="bg-amber-"]{background-color:#e99bb4!important}
+[class*="border-yellow-"],[class*="border-amber-"]{border-color:#e99bb4!important}
+@media(max-width:767px){.ref-mobile-nav{background:rgba(12,29,53,.97)!important}.ref-mobile-nav svg{color:#f2a9c1!important}}
