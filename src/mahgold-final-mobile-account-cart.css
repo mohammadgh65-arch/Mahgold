@@ -135,3 +135,35 @@ html body #root .ref-overlay .ref-dialog .ref-order-item b{
  color:#75485a!important;-webkit-text-fill-color:#75485a!important;
 }
 html body #root .ref-overlay .ref-drawer .ref-remove{color:#9a536a!important;-webkit-text-fill-color:#9a536a!important}
+
+
+/* Render each navigation caption as its own painted inline box.
+   This avoids inherited text effects from legacy button/anchor typography. */
+html body #root header.ref-site-header nav.ref-mobile-links .ref-mobile-link-label{
+  display:inline-block!important;
+  position:relative!important;
+  visibility:visible!important;
+  opacity:1!important;
+  color:#24364b!important;
+  -webkit-text-fill-color:#24364b!important;
+  font-family:"Shabnam",Tahoma,sans-serif!important;
+  font-size:14px!important;
+  font-weight:600!important;
+  line-height:1.9!important;
+  letter-spacing:normal!important;
+  text-indent:0!important;
+  text-shadow:none!important;
+  filter:none!important;
+  transform:none!important;
+  clip:auto!important;
+  clip-path:none!important;
+  white-space:normal!important;
+}
+html body #root header.ref-site-header nav.ref-mobile-links>a,
+html body #root header.ref-site-header nav.ref-mobile-links>button{
+  min-height:49px!important;
+  height:auto!important;
+  overflow:visible!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+}
