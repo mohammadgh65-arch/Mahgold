@@ -427,6 +427,7 @@ export default function App() {
   const showHome=()=>{setCatalogPage(false);setCategory('همه محصولات');window.history.pushState({},'','/');window.scrollTo({top:0,behavior:'smooth'});};
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const cartTotal=cart.reduce((sum,item)=>sum+Number(item.price_toman||0)*Number(item.qty||0),0);
+  const quoteIsManual=quote?.source==='manual'&&quote?.is_live===false;
   const quoteFresh=isQuoteFresh(quote,clockNow);
   const cartNeedsFreshQuote=cart.some(item=>item.pricing_mode==='auto')&&!quoteFresh;
 
