@@ -551,7 +551,7 @@ export default function App() {
     </header>
 
     <main className="min-h-[60vh]" id="home">
-      {!catalogPage&&<section aria-label="پیشنهادات مه‌گلد" aria-roledescription="carousel" className="ref-offers-section">
+      {!catalogPage&&<section role="region" aria-label="پیشنهادات مه‌گلد" aria-roledescription="carousel" className="ref-offers-section">
         <div className="ref-offers-heading">
           <div>
             <span className="ref-offers-eyebrow">MAHGOLD SELECTION</span>
@@ -579,14 +579,7 @@ export default function App() {
         <div className="ref-offers-footer"><span>حرکت خودکار · هر ۳ ثانیه</span><span className="ref-offers-dots">{offerItems.map((item,index)=><i key={index} className={activeOffer%offerItems.length===index?'active':''}/>)}</span></div>
       </section>}
 
-      {!catalogPage&&<section className="ref-home-new-arrivals mx-auto max-w-7xl px-4 py-8 md:px-7 md:py-12" aria-label="جدیدترین محصولات">
-        <div className="ref-home-shelf-heading"><div><span className="eyebrow text-gold-deep">JUST ARRIVED · MAHGOLD</span><h2>جدیدترین محصولات</h2><p>تازه‌ترین انتخاب‌های ثبت‌شده در فروشگاه</p></div><button type="button" onClick={()=>openCatalog('همه محصولات')}>مشاهده همه <ArrowLeft size={15}/></button></div>
-        {(()=>{const arrivals=products.filter(p=>Number(p.price_toman)>0).slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,4);return arrivals.length?<div className="ref-home-arrivals-grid">{arrivals.map(product=><article className="ref-product-card ref-home-arrival-card" key={product.id}>
-          <button type="button" className="ref-home-arrival-image" onClick={()=>openProduct(product)} aria-label={'مشاهده '+product.name}><ProductImage product={product}/></button>
-          <div className="ref-product-body"><span className="ref-home-arrival-category">{product.category}</span><button type="button" className="ref-product-name" onClick={()=>openProduct(product)}>{product.name}</button><div className="ref-home-arrival-meta">{product.weight_grams?gram(product.weight_grams):'طلای منتخب مه‌گلد'}{product.karat?' · '+money(product.karat)+' عیار':''}</div>
-            <div className="ref-product-bottom"><strong>{product.pricing_mode==='auto'&&!quoteFresh?'قیمت پس از نرخ معتبر':<>{money(product.price_toman)} <small>تومان</small></>}</strong><button type="button" aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(product)}><Plus size={17}/></button></div><div className={Number(product.stock||0)>0?'ref-home-stock':'ref-home-stock is-empty'}>{Number(product.stock||0)>0?'موجود برای سفارش':'ناموجود'}</div>
-          </div></article>)}</div>:<div className="ref-home-arrivals-empty">{dataStatus==='loading'?'در حال دریافت محصولات…':'محصول جدیدی برای نمایش ثبت نشده است.'}</div>})()}
-      </section>}
+
 
       {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">MAHGOLD CATALOG</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div><img className="ref-catalog-category-image" src={optimizeUnsplashImage(editorialImageFor(category)||displayTiles.find(t=>t.name===category)?.image||tiles[0].image,640)} srcSet={unsplashResponsiveSrcSet(editorialImageFor(category)||displayTiles.find(t=>t.name===category)?.image||tiles[0].image)} sizes="(max-width: 767px) 90vw, 420px" alt={'تصویر دسته '+category} loading="eager" decoding="async" fetchPriority="high"/></div></section>}
 
@@ -696,8 +689,8 @@ export default function App() {
           <span><Phone size={14}/> پشتیبانی مه‌گلد</span>
           <span className="ref-footer-social-label">شبکه‌های ارتباطی</span>
           <div className="ref-footer-social-icons">
-            <span title="واتس‌اپ" aria-label="واتس‌اپ" className="ref-footer-wa"><svg viewBox="0 0 32 32" width="21" height="21" role="img"><path fill="currentColor" d="M16 3.2A12.6 12.6 0 0 0 5.2 23.9L3.5 29l5.3-1.7A12.6 12.6 0 1 0 16 3.2Zm0 22.8a10.1 10.1 0 0 1-5.1-1.4l-.4-.2-3.1 1 1-3-.3-.4A10.1 10.1 0 1 1 16 26Zm5.6-7.6c-.3-.2-1.8-.9-2.1-1s-.5-.2-.7.2-.8 1-1 1.1-.4.2-.7 0a8.3 8.3 0 0 1-2.5-1.5 9.3 9.3 0 0 1-1.7-2.1c-.2-.4 0-.5.2-.7l.5-.6.2-.5a.6.6 0 0 0 0-.5c0-.2-.7-1.7-.9-2.3s-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.7 3.7 0 0 0-1.2 2.8 6.4 6.4 0 0 0 1.3 3.4 14.6 14.6 0 0 0 5.6 4.9c.7.3 1.3.5 1.8.6.8.3 1.5.2 2.1.1.7-.1 1.8-.7 2-1.4s.3-1.3.2-1.4-.3-.2-.6-.4Z"/></svg></span>
-            <span title="بله" aria-label="بله" className="ref-footer-bale"><svg viewBox="0 0 32 32" width="21" height="21" role="img"><circle cx="16" cy="16" r="15" fill="#168de2"/><path d="M7.5 15.2 23.8 8.8c.8-.3 1.5.2 1.2 1.2l-2.8 13.1c-.2 1-.8 1.2-1.6.7l-4.4-3.2-2.2 2.1c-.3.3-.6.5-1 .4l.4-4.8 8.7-7.8-10.7 6.7-4.5-1.4c-1-.3-1-1 .6-1.6Z" fill="#fff"/></svg></span>
+            <span role="img" aria-label="واتس‌اپ" title="واتس‌اپ" className="ref-footer-wa"><svg viewBox="0 0 32 32" width="21" height="21" aria-hidden="true"><path fill="currentColor" d="M16 3.2A12.6 12.6 0 0 0 5.2 23.9L3.5 29l5.3-1.7A12.6 12.6 0 1 0 16 3.2Zm0 22.8a10.1 10.1 0 0 1-5.1-1.4l-.4-.2-3.1 1 1-3-.3-.4A10.1 10.1 0 1 1 16 26Zm5.6-7.6c-.3-.2-1.8-.9-2.1-1s-.5-.2-.7.2-.8 1-1 1.1-.4.2-.7 0a8.3 8.3 0 0 1-2.5-1.5 9.3 9.3 0 0 1-1.7-2.1c-.2-.4 0-.5.2-.7l.5-.6.2-.5a.6.6 0 0 0 0-.5c0-.2-.7-1.7-.9-2.3s-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.7 3.7 0 0 0-1.2 2.8 6.4 6.4 0 0 0 1.3 3.4 14.6 14.6 0 0 0 5.6 4.9c.7.3 1.3.5 1.8.6.8.3 1.5.2 2.1.1.7-.1 1.8-.7 2-1.4s.3-1.3.2-1.4-.3-.2-.6-.4Z"/></svg></span>
+            <span role="img" aria-label="بله" title="بله" className="ref-footer-bale"><svg viewBox="0 0 32 32" width="21" height="21" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#168de2"/><path d="M7.5 15.2 23.8 8.8c.8-.3 1.5.2 1.2 1.2l-2.8 13.1c-.2 1-.8 1.2-1.6.7l-4.4-3.2-2.2 2.1c-.3.3-.6.5-1 .4l.4-4.8 8.7-7.8-10.7 6.7-4.5-1.4c-1-.3-1-1 .6-1.6Z" fill="#fff"/></svg></span>
           </div>
         </div>
         <div className="ref-footer-copy">© ۱۴۰۵ مه‌گلد · زیورآلات طلا</div>
