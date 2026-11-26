@@ -41,7 +41,15 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root" data-booting="true"><div dir="rtl" style="min-height:100vh;display:grid;place-content:center;background:#f8f7fb;color:#172f50;font-family:sans-serif">در حال بارگذاری مه‌گلد…</div></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      window.setTimeout(function(){
+        var root=document.getElementById('root');
+        if(root&&root.dataset.booting==='true'){
+          root.innerHTML='<div dir="rtl" style="min-height:100vh;display:grid;place-content:center;padding:24px;text-align:center;background:#f8f7fb;color:#172f50;font-family:sans-serif"><h2>بارگذاری فروشگاه کامل نشد</h2><p>اتصال یا فایل برنامه از نسخه قبلی در مرورگر باقی مانده است.</p><button onclick="location.reload()" style="padding:12px 22px;border:0;border-radius:12px;background:#172f50;color:white">تلاش دوباره</button></div>';
+        }
+      },7000);
+    </script>
   </body>
 </html>
