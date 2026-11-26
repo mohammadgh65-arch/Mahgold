@@ -16,7 +16,7 @@ button,a,input,select,textarea{font-family:inherit}
 /* Announcement and header: no decorative gradients or excessive shine */
 .ref-announcement{min-height:30px!important;height:auto!important;padding:6px 16px!important;background:var(--mh-deep)!important;color:#e9dfe0!important;border:0!important;text-align:center;font-size:10px!important;letter-spacing:0!important}
 .ref-site-header{background:rgba(255,254,250,.97)!important;color:var(--mh-ink)!important;border:0!important;border-bottom:1px solid var(--mh-line)!important;box-shadow:none!important;backdrop-filter:blur(12px)}
-.ref-main-header{min-height:76px!important}
+.ref-main-header{min-height:76px!important;background:transparent!important}
 .ref-brand-redesigned{min-height:62px!important}
 .ref-header-logo-image{display:block!important;width:auto!important;height:50px!important;max-width:min(190px,42vw)!important;object-fit:contain!important;filter:none!important}
 .ref-primary-nav{gap:clamp(12px,2vw,28px)!important}
