@@ -10,32 +10,6 @@ import { supabase, isSupabaseConfigured } from './lib/supabase';
 const AdminPanel = lazy(() => import('./Admin.jsx'));
 
 const forceAdminPreview = import.meta.env.VITE_ADMIN_PREVIEW === 'true';
-const slides = [
-  {
-    eyebrow: 'MAHGOLD · FINE JEWELRY',
-    title: 'درخششِ طلا، امضایِ استایلِ شما',
-    description: 'زیبایی در سادگی‌ست؛ انتخاب‌هایی ظریف و ماندگار برای لحظه‌هایی که ارزش، معنا پیدا می‌کند.',
-    button: 'کشف مجموعه مه‌گلد',
-    image: 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=900&q=72',
-    category: 'طلای زینتی'
-  },
-  {
-    eyebrow: 'A GIFT TO REMEMBER',
-    title: 'هدیه‌ای که همیشه می‌ماند',
-    description: 'انگشترها و زیورآلات منتخب، با بسته‌بندی ویژه مه‌گلد.',
-    button: 'مشاهده طلای زینتی',
-    image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=760&q=72',
-    category: 'طلای زینتی'
-  },
-  {
-    eyebrow: 'INVEST IN GOLD',
-    title: 'سکه، انتخابی ماندگار',
-    description: 'سرمایه‌ای آشنا با خلوص و ارزش ماندگار.',
-    button: 'مشاهده سکه',
-    image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=760&q=72',
-    category: 'سکه'
-  }
-];
 const tiles = [
   {name:'طلای زینتی',desc:'زیورآلات برای هر روز و هر occasion',image:'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=640&q=70'},
   {name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=640&q=70'}
@@ -255,7 +229,7 @@ export default function App() {
   const offerItems=useMemo(()=>products
     .filter(product=>Number(product.price_toman)>0&&product.image_url&&!/شمش|آب\\s*شده|آبشده/.test(`${product.category||''} ${product.name||''}`.replace(/ي/g,'ی')))
     .slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))
-    .slice(0,5)
+    .slice(0,4)
     .map(product=>({id:product.id,title:product.name,category:product.category,image:product.image_url,product})),[products]);
   useEffect(()=>{const timer=setInterval(()=>setClockNow(Date.now()),15000);return()=>clearInterval(timer);},[]);
   useEffect(()=>{
@@ -586,8 +560,8 @@ export default function App() {
             {name:'سکه',desc:'سکه‌های طلا'}
           ].map(tile=>{
             const product=products.find(item=>tile.name==='طلای زینتی'?jewelryProductCategories.has(item.category):item.category===tile.name);
-            const configured=displayTiles.find(item=>item.name===tile.name);
-            const image=product?.image_url||configured?.image||editorialImageFor(tile.name);
+            const configured=(siteContent?.tiles||[]).find(item=>item.name===tile.name);
+            const image=configured?.image||product?.image_url||editorialImageFor(tile.name);
             return <button key={tile.name} className="ref-category-card" onClick={()=>openCatalog(tile.name)} aria-label={'مشاهده مجموعه '+tile.name}>
               <img src={image} alt={'تصویر '+tile.name} loading="lazy" decoding="async"/>
               <span className="ref-category-shade"/>
