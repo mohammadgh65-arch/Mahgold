@@ -1,0 +1,22 @@
+/* Simgallery-inspired storefront refinements: responsive discovery with verified catalog data. */
+.ref-home-new-arrivals{border-top:1px solid hsl(var(--border))}
+.ref-home-shelf-heading{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:22px}
+.ref-home-shelf-heading h2{font-size:clamp(22px,3vw,32px);font-weight:600;margin:8px 0 5px}
+.ref-home-shelf-heading p{font-size:12px;color:hsl(var(--muted-foreground));margin:0}
+.ref-home-shelf-heading>button{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;border:1px solid hsl(var(--border));border-radius:999px;padding:10px 15px;font-size:12px;transition:background .2s,border-color .2s}
+.ref-home-shelf-heading>button:hover{background:hsl(var(--muted));border-color:hsl(var(--gold))}
+.ref-home-arrivals-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.ref-home-arrival-card{min-width:0;overflow:hidden;border:1px solid hsl(var(--border));border-radius:14px;background:hsl(var(--card));transition:transform .22s,box-shadow .22s}
+.ref-home-arrival-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px #0000000d}
+.ref-home-arrival-image{display:block;width:100%;text-align:right}
+.ref-home-arrival-image .ref-product-image{aspect-ratio:1/1;border-radius:0}
+.ref-home-arrival-category{font-size:10px;color:hsl(var(--muted-foreground))}
+.ref-home-arrival-card .ref-product-name{display:block;width:100%;margin:7px 0;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ref-home-arrival-meta{font-size:10px;color:hsl(var(--muted-foreground));min-height:17px}
+.ref-home-arrival-card .ref-product-body{padding:12px}
+.ref-home-arrival-card .ref-product-bottom{margin-top:12px;gap:8px}
+.ref-home-arrival-card .ref-product-bottom strong{font-size:13px;white-space:nowrap}
+.ref-home-stock{font-size:10px;color:#43835d;margin-top:8px}
+.ref-home-stock.is-empty{color:#a65d50}
+.ref-home-arrivals-empty{padding:24px;border:1px dashed hsl(var(--border));border-radius:12px;text-align:center;color:hsl(var(--muted-foreground));font-size:13px}
+@media(max-width:767px){.ref-home-new-arrivals{padding-top:28px;padding-bottom:30px}.ref-home-shelf-heading{align-items:center;margin-bottom:16px}.ref-home-shelf-heading h2{font-size:22px}.ref-home-shelf-heading p{font-size:10px}.ref-home-shelf-heading>button{font-size:10px;padding:8px 11px}.ref-home-arrivals-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ref-home-arrival-card .ref-product-body{padding:9px}.ref-home-arrival-card .ref-product-name{font-size:12px}.ref-home-arrival-card .ref-product-bottom strong{font-size:12px}}
