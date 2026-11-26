@@ -226,6 +226,8 @@ export default function App() {
   const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||window.location.pathname==='/admin'||window.location.pathname==='/admin/'||window.location.hash==='#mahgold-control');
 
   const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})).filter(Boolean),[siteContent]);
+  const categoryImageFor=name=>(siteContent?.tiles||[]).find(item=>item.name===name)?.image||products.find(item=>item.category===name)?.image_url||(name==='طلای زینتی'?products.find(item=>jewelryProductCategories.has(item.category))?.image_url:null)||'';
+  const categoryHeroImage=categoryImageFor(category);
   const offerItems=useMemo(()=>products
     .filter(product=>Number(product.price_toman)>0&&product.image_url&&!/شمش|آب\\s*شده|آبشده/.test(`${product.category||''} ${product.name||''}`.replace(/ي/g,'ی')))
     .slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))
@@ -534,7 +536,7 @@ export default function App() {
           </div></article>)}</div>:<div className="ref-home-arrivals-empty">{dataStatus==='loading'?'در حال دریافت محصولات…':'محصول جدیدی برای نمایش ثبت نشده است.'}</div>})()}
       </section>}
 
-      {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">فروشگاه مه‌گلد</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div><img className="ref-catalog-category-image" src={optimizeUnsplashImage((siteContent?.tiles||[]).find(t=>t.name===category)?.image||products.find(p=>p.category===category)?.image_url||editorialImageFor(category)||tiles[0].image,640)} srcSet={unsplashResponsiveSrcSet((siteContent?.tiles||[]).find(t=>t.name===category)?.image||products.find(p=>p.category===category)?.image_url||editorialImageFor(category)||tiles[0].image)} sizes="(max-width: 767px) 90vw, 420px" alt={'تصویر دسته '+category} loading="eager" decoding="async" fetchPriority="high"/></div></section>}
+      {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">فروشگاه مه‌گلد</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div>{categoryHeroImage&&<img className="ref-catalog-category-image" src={categoryHeroImage} alt={'تصویر '+category} loading="eager" decoding="async" fetchPriority="high"/>}</div></section>}
 
                 {!catalogPage&&<div className="ref-quote-strip">
           <div className="ref-quote-title"><span className="ref-quote-bars">▥</span><div><b>قیمت لحظه‌ای طلای ۱۸ عیار</b><small>{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'به‌روزرسانی لحظه‌ای'):quoteIsManual?'نرخ دستی منقضی‌شده':quote?.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'در انتظار نرخ معتبر'}</small></div></div>
@@ -560,10 +562,9 @@ export default function App() {
             {name:'سکه',desc:'سکه‌های طلا'}
           ].map(tile=>{
             const product=products.find(item=>tile.name==='طلای زینتی'?jewelryProductCategories.has(item.category):item.category===tile.name);
-            const configured=(siteContent?.tiles||[]).find(item=>item.name===tile.name);
-            const image=configured?.image||product?.image_url||editorialImageFor(tile.name);
-            return <button key={tile.name} className="ref-category-card" onClick={()=>openCatalog(tile.name)} aria-label={'مشاهده مجموعه '+tile.name}>
-              <img src={image} alt={'تصویر '+tile.name} loading="lazy" decoding="async"/>
+            const image=categoryImageFor(tile.name)||product?.image_url||'';
+            return <button key={tile.name} className={'ref-category-card '+(!image?'ref-category-card-text-only':'')} onClick={()=>openCatalog(tile.name)} aria-label={'مشاهده مجموعه '+tile.name}>
+              {image?<img src={image} alt={'تصویر '+tile.name} loading="lazy" decoding="async"/>:<span className="ref-category-initial" aria-hidden="true">{tile.name.slice(0,1)}</span> }
               <span className="ref-category-shade"/>
               <span className="ref-category-text"><b>{tile.name}</b><small>{tile.desc}</small><em>مشاهده محصولات <ArrowLeft size={12}/></em></span>
             </button>;
@@ -589,10 +590,10 @@ export default function App() {
           <div className="mb-7 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             {catalogPage&&category==='همه محصولات'&&<div className="ref-collection-image-grid" aria-label="مجموعه‌های فروشگاه">
               {(categoryGroup==='همه محصولات'?[
-                {name:'طلای زینتی',desc:'زیورآلات و مجموعه‌های ظریف',image:displayTiles.find(t=>t.name==='طلای زینتی')?.image},
-                {name:'سکه',desc:'مجموعه سکه‌های طلا',image:displayTiles.find(t=>t.name==='سکه')?.image}
-              ]:catalogCategoryGroups.find(group=>group.name===categoryGroup)?.items.map(name=>({name,desc:'مشاهده محصولات '+name,image:editorialImageFor(name)}))||[]).map(tile=><button type="button" key={tile.name} className="ref-collection-image-card" onClick={()=>openCatalog(tile.name)}>
-                <img src={tile.image||displayTiles[0].image} alt={tile.name} loading="lazy"/><span className="ref-collection-image-shade"/><span className="ref-collection-image-label"><b>{tile.name}</b><small>دیدن مجموعه <ArrowLeft size={12}/></small></span>
+                {name:'طلای زینتی',desc:'زیورآلات و مجموعه‌های ظریف',image:categoryImageFor('طلای زینتی')},
+                {name:'سکه',desc:'مجموعه سکه‌های طلا',image:categoryImageFor('سکه')}
+              ]:catalogCategoryGroups.find(group=>group.name===categoryGroup)?.items.map(name=>({name,desc:'مشاهده محصولات '+name,image:categoryImageFor(name)}))||[]).map(tile=><button type="button" key={tile.name} className={'ref-collection-image-card '+(!tile.image?'ref-collection-image-card-text-only':'')} onClick={()=>openCatalog(tile.name)}>
+                {tile.image?<img src={tile.image} alt={tile.name} loading="lazy"/>:<span className="ref-category-initial" aria-hidden="true">{tile.name.slice(0,1)}</span>}<span className="ref-collection-image-shade"/><span className="ref-collection-image-label"><b>{tile.name}</b><small>دیدن مجموعه <ArrowLeft size={12}/></small></span>
               </button>)}
             </div>}
             <label className="ref-sort shrink-0"><span>مرتب‌سازی</span><select aria-label="مرتب‌سازی" value={sortMode} onChange={e=>setSortMode(e.target.value)}>

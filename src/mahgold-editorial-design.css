@@ -197,3 +197,18 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
  .ref-product-page-image{min-height:0!important;aspect-ratio:1/1!important}
  .ref-product-page-copy{position:static!important;padding:18px!important}
 }
+
+/* A considered typographic tile replaces stock photography when a category has no real product image yet */
+.ref-category-card-text-only,.ref-collection-image-card-text-only{
+ background:linear-gradient(135deg,#f1efe9 0%,#e8e4db 100%)!important;
+ border:1px solid #ded8cc!important;
+}
+.ref-category-card-text-only .ref-category-shade,.ref-collection-image-card-text-only .ref-collection-image-shade{display:none!important}
+.ref-category-initial{
+ display:grid!important;place-items:center!important;width:100%!important;height:100%!important;
+ color:#c8bda9!important;font-family:Georgia,serif!important;font-size:clamp(74px,9vw,128px)!important;
+ font-weight:400!important;line-height:1!important;pointer-events:none!important;
+}
+.ref-category-card-text-only .ref-category-text b,.ref-collection-image-card-text-only .ref-collection-image-label b{color:var(--mh-ink)!important}
+.ref-category-card-text-only .ref-category-text small,.ref-collection-image-card-text-only .ref-collection-image-label small{color:var(--mh-muted)!important}
+.ref-category-card-text-only .ref-category-text em,.ref-collection-image-card-text-only .ref-collection-image-label small svg{color:var(--mh-rose)!important}
