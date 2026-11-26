@@ -56,6 +56,24 @@ const editorialCategoryImages = {
 };
 const editorialImageFor = name => editorialCategoryImages[name] || editorialCategoryImages['طلای زینتی'];
 
+// Serve appropriately sized, modern-format images from Unsplash without changing
+// customer-uploaded product image URLs or their original quality.
+function optimizeUnsplashImage(source, width = 640, quality = 70) {
+  try {
+    const url = new URL(source);
+    if (url.hostname !== 'images.unsplash.com') return source;
+    url.searchParams.set('auto', 'format'); url.searchParams.set('fit', 'crop');
+    url.searchParams.set('w', String(width)); url.searchParams.set('q', String(quality));
+    return url.toString();
+  } catch { return source; }
+}
+function unsplashResponsiveSrcSet(source) {
+  try {
+    if (new URL(source).hostname !== 'images.unsplash.com') return undefined;
+    return `${optimizeUnsplashImage(source,360)} 360w, ${optimizeUnsplashImage(source,640)} 640w, ${optimizeUnsplashImage(source,900)} 900w`;
+  } catch { return undefined; }
+}
+
 const displayTileDefaults = tiles.map(tile=>({...tile,image:editorialImageFor(tile.name)}));
 const presetCategories = [
   'همه محصولات','طلای زینتی','سکه','انگشتر','گردنبند',
@@ -81,7 +99,7 @@ function ProductImage({product, className='', onClick}) {
   const [failed,setFailed] = useState(false);
   const src = !failed && product.image_url ? product.image_url : tiles.find(t=>t.name===product.category)?.image || tiles[0].image;
   return <div className={'ref-product-image ' + className} onClick={onClick} role={onClick?'button':undefined} tabIndex={onClick?0:undefined} onKeyDown={onClick?(e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick();}}):undefined}>
-    <img src={src} alt={product.name || 'محصول مه‌گلد'} loading="lazy" decoding="async" fetchPriority="low" onError={()=>setFailed(true)}/>
+    <img src={optimizeUnsplashImage(src,640)} srcSet={unsplashResponsiveSrcSet(src)} sizes="(max-width: 767px) 46vw, (max-width: 1200px) 24vw, 280px" alt={product.name || 'محصول مه‌گلد'} loading="lazy" decoding="async" fetchPriority="low" onError={()=>setFailed(true)}/>
   </div>;
 }
 
@@ -517,7 +535,7 @@ export default function App() {
               if(item.product){openProduct(item.product);return;}
               openCatalog(item.category||'همه محصولات');
             }}>
-              <img src={item.image} alt={item.title} loading={index===0?'eager':'lazy'} decoding="async" fetchPriority={index===0?'high':'low'}/>
+              <img src={optimizeUnsplashImage(item.image,640)} srcSet={unsplashResponsiveSrcSet(item.image)} sizes="(max-width: 767px) 82vw, (max-width: 1200px) 31vw, 390px" alt={item.title} loading={index===0?'eager':'lazy'} decoding="async" fetchPriority={index===0?'high':'low'}/>
               <span className="ref-offer-shade"/>
               <span className="ref-offer-copy">
                 <small>{item.category||'منتخب مه‌گلد'}</small>
@@ -539,7 +557,7 @@ export default function App() {
           </div></article>)}</div>:<div className="ref-home-arrivals-empty">{dataStatus==='loading'?'در حال دریافت محصولات…':'محصول جدیدی برای نمایش ثبت نشده است.'}</div>})()}
       </section>}
 
-      {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">MAHGOLD CATALOG</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div><img className="ref-catalog-category-image" src={editorialImageFor(category)||displayTiles.find(t=>t.name===category)?.image||tiles[0].image} alt={'تصویر دسته '+category} loading="eager" decoding="async"/></div></section>}
+      {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">MAHGOLD CATALOG</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div><img className="ref-catalog-category-image" src={optimizeUnsplashImage(editorialImageFor(category)||displayTiles.find(t=>t.name===category)?.image||tiles[0].image,640)} srcSet={unsplashResponsiveSrcSet(editorialImageFor(category)||displayTiles.find(t=>t.name===category)?.image||tiles[0].image)} sizes="(max-width: 767px) 90vw, 420px" alt={'تصویر دسته '+category} loading="eager" decoding="async" fetchPriority="high"/></div></section>}
 
                 {!catalogPage&&<div className="ref-quote-strip">
           <div className="ref-quote-title"><span className="ref-quote-bars">▥</span><div><b>قیمت لحظه‌ای طلای ۱۸ عیار</b><small>{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'به‌روزرسانی لحظه‌ای'):quoteIsManual?'نرخ دستی منقضی‌شده':quote?.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'در انتظار نرخ معتبر'}</small></div></div>
@@ -568,7 +586,7 @@ export default function App() {
             {name:'سایر زیورآلات',desc:'انتخاب‌های متفاوت مه‌گلد',image:'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=85'}
           ].map(tile=>{
             return <button key={tile.name} className="ref-category-card" onClick={()=>openCatalog(tile.name)} aria-label={'مشاهده مجموعه '+tile.name}>
-              <img src={tile.image} alt={'تصویر الهام‌بخش مجموعه '+tile.name} loading="lazy"/><span className="ref-category-shade"/>
+              <img src={optimizeUnsplashImage(tile.image,720)} srcSet={unsplashResponsiveSrcSet(tile.image)} sizes="(max-width: 767px) 46vw, (max-width: 1200px) 30vw, 260px" alt={'تصویر الهام‌بخش مجموعه '+tile.name} loading="lazy" decoding="async"/><span className="ref-category-shade"/>
               <span className="ref-category-text"><b>{tile.name}</b><small>{tile.desc}</small><em>مشاهده مجموعه <ArrowLeft size={12}/></em></span>
             </button>;
           })}
