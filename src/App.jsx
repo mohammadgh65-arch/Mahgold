@@ -592,9 +592,9 @@ export default function App() {
       </section>}
     </main>
 
-    <footer className="ref-lux-footer">
+    <footer className="ref-lux-footer" style={{background:"#101a2b",color:"#f5eaf0",borderTop:"1px solid #d7a9bf"}}>
       <div className="ref-footer-frame">
-        <a className="ref-footer-brand ref-footer-brand-current" href="#home" aria-label="مه‌گلد - صفحه اصلی"><span className="ref-brand-symbol" aria-hidden="true"><Gem size={34} strokeWidth={1.65}/></span><span className="ref-brand-wordmark">مه‌گلد</span></a>
+        <a className="ref-footer-brand ref-footer-brand-current" href="#home" aria-label="مه‌گلد - صفحه اصلی"><img src={MAHGOLD_LOGO} alt="لوگوی مه‌گلد" style={{display:"block",width:"min(260px,72vw)",height:"auto",objectFit:"contain"}}/></a>
         <div className="ref-footer-tagline">طلایی به زیباییِ لحظه‌های تو</div>
         <div className="ref-footer-links">
           <a href="#home">صفحه اصلی</a><a href="#categories">دسته‌بندی‌ها</a><a href="#shop">فروشگاه</a><a href="#story">درباره مه‌گلد</a>
@@ -607,12 +607,12 @@ export default function App() {
           <div className="ref-social-heading"><span className="ref-social-kicker">STAY IN TOUCH</span><strong>همراه مه‌گلد باشید</strong><small>پشتیبانی و پاسخ‌گویی از مسیرهای رسمی مه‌گلد</small></div>
           <div className="ref-social-grid">
             <div className="ref-social-card ref-social-whatsapp" aria-disabled="true">
-              <span className="ref-social-icon"><MessageCircle size={21}/></span>
+              <span className="ref-social-icon" aria-label="WhatsApp"><svg viewBox="0 0 32 32" width="25" height="25" role="img"><path fill="currentColor" d="M16 3.2A12.6 12.6 0 0 0 5.2 23.9L3.5 29l5.3-1.7A12.6 12.6 0 1 0 16 3.2Zm0 22.8a10.1 10.1 0 0 1-5.1-1.4l-.4-.2-3.1 1 1-3-.3-.4A10.1 10.1 0 1 1 16 26Zm5.6-7.6c-.3-.2-1.8-.9-2.1-1s-.5-.2-.7.2-.8 1-1 1.1-.4.2-.7 0a8.3 8.3 0 0 1-2.5-1.5 9.3 9.3 0 0 1-1.7-2.1c-.2-.4 0-.5.2-.7l.5-.6.2-.5a.6.6 0 0 0 0-.5c0-.2-.7-1.7-.9-2.3s-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.7 3.7 0 0 0-1.2 2.8 6.4 6.4 0 0 0 1.3 3.4 14.6 14.6 0 0 0 5.6 4.9c.7.3 1.3.5 1.8.6.8.3 1.5.2 2.1.1.7-.1 1.8-.7 2-1.4s.3-1.3.2-1.4-.3-.2-.6-.4Z"/></svg></span>
               <span className="ref-social-copy"><b>واتس‌اپ</b><small>گفت‌وگوی مستقیم با پشتیبانی</small></span>
               <span className="ref-social-status">به‌زودی</span>
             </div>
             <div className="ref-social-card ref-social-bale" aria-disabled="true">
-              <span className="ref-social-icon"><Send size={20}/></span>
+              <span className="ref-social-icon" aria-label="پیام‌رسان بله"><svg viewBox="0 0 32 32" width="25" height="25" role="img"><circle cx="16" cy="16" r="15" fill="#168de2"/><path d="M7.5 15.2 23.8 8.8c.8-.3 1.5.2 1.2 1.2l-2.8 13.1c-.2 1-.8 1.2-1.6.7l-4.4-3.2-2.2 2.1c-.3.3-.6.5-1 .4l.4-4.8 8.7-7.8-10.7 6.7-4.5-1.4c-1-.3-1-1 .6-1.6Z" fill="#fff"/></svg></span>
               <span className="ref-social-copy"><b>بله</b><small>ارتباط در پیام‌رسان بله</small></span>
               <span className="ref-social-status">به‌زودی</span>
             </div>
