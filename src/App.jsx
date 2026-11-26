@@ -594,7 +594,7 @@ export default function App() {
 
     <footer className="ref-lux-footer">
       <div className="ref-footer-frame">
-        <div className="ref-footer-brand"><img alt="نشان اصلی مه‌گلد" loading="lazy" src="/mahgold-brand-masthead.jpg"/></div>
+        <a className="ref-footer-brand ref-footer-brand-current" href="#home" aria-label="مه‌گلد - صفحه اصلی"><span className="ref-brand-symbol" aria-hidden="true"><Gem size={34} strokeWidth={1.65}/></span><span className="ref-brand-wordmark">مه‌گلد</span></a>
         <div className="ref-footer-tagline">طلایی به زیباییِ لحظه‌های تو</div>
         <div className="ref-footer-links">
           <a href="#home">صفحه اصلی</a><a href="#categories">دسته‌بندی‌ها</a><a href="#shop">فروشگاه</a><a href="#story">درباره مه‌گلد</a>
