@@ -10,7 +10,7 @@ import './mahgold-header-footer-fix.css';
 import './mahgold-logo-refinement.css';
 import './mahgold-theme-unification.css';
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(registration=>registration.update()).catch(() => {}));
 }
 class MahgoldRenderBoundary extends React.Component {
   constructor(props){super(props);this.state={failed:false};}
