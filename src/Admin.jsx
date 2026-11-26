@@ -77,7 +77,7 @@ export default function AdminPanel(){
    }
    if(!blob||blob.type!=='image/webp')throw new Error('فشرده‌سازی تصویر ناموفق بود؛ فایل اصلی بارگذاری نشد.');
    if(blob.size>HARD_OUTPUT_BYTES)throw new Error('حجم تصویر پس از فشرده‌سازی هنوز بیشتر از ۲ مگابایت است. لطفاً تصویر کم‌حجم‌تری انتخاب کنید.');
-   const optimizedFile=new File([blob],(file.name.replace(/\\.[^.]+$/,'')||'mahgold-image')+'.webp',{type:'image/webp',lastModified:Date.now()});
+   const optimizedFile=new File([blob],((file.name.split('.').slice(0,-1).join('.')||'mahgold-image'))+'.webp',{type:'image/webp',lastModified:Date.now()});
    const reduction=Math.max(0,Math.round((1-optimizedFile.size/originalSize)*100));
    const storagePath=folder+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.webp';
    const {error}=await supabase.storage.from('product-images').upload(storagePath,optimizedFile,{cacheControl:'31536000',upsert:false,contentType:'image/webp'});
