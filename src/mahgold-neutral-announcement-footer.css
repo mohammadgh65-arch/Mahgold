@@ -1,0 +1,52 @@
+/* MAHGOLD — replace legacy navy announcement strip and emerald footer with the warm editorial surface. */
+html body #root .ref-announcement{
+  min-height:30px!important;
+  padding:7px 14px!important;
+  background:#f7f4ed!important;
+  background-image:none!important;
+  color:#344256!important;
+  border:0!important;
+  border-bottom:1px solid #e5ded2!important;
+  box-shadow:none!important;
+  font-family:"Shabnam",Tahoma,sans-serif!important;
+  font-size:11px!important;
+  font-weight:500!important;
+}
+html body #root .ref-announcement::before,
+html body #root .ref-announcement::after{display:none!important;content:none!important}
+html body #root .ref-lux-footer,
+html body #root footer.bg-ink{
+  background:#f7f4ed!important;
+  background-image:none!important;
+  color:#24364b!important;
+  border:0!important;
+  border-top:1px solid #e5ded2!important;
+  box-shadow:none!important;
+}
+html body #root .ref-footer-frame{
+  max-width:1360px!important;
+  padding:18px 18px 16px!important;
+  background:#f7f4ed!important;
+  background-image:none!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+html body #root .ref-footer-frame::before,
+html body #root .ref-footer-frame::after{display:none!important;content:none!important}
+html body #root .ref-footer-links{
+  border-top:1px solid #e5ded2!important;
+  border-bottom:1px solid #e5ded2!important;
+}
+html body #root .ref-footer-links a,
+html body #root .ref-footer-contact span,
+html body #root .ref-footer-copy,
+html body #root .ref-footer-tagline,
+html body #root .ref-lux-footer p,
+html body #root footer.bg-ink span{
+  color:#344256!important;
+  text-shadow:none!important;
+}
+html body #root .ref-footer-contact svg{color:#a86f83!important}
+html body #root .ref-footer-links a:hover,
+html body #root .ref-footer-contact a:hover{color:#75485a!important}
