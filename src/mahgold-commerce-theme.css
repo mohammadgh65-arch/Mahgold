@@ -225,3 +225,74 @@ html body #root .ref-overlay .ref-dialog h2{color:#172f50!important}
  html body #root .ref-cart-line{grid-template-columns:70px minmax(0,1fr) auto!important;gap:9px!important}
  html body #root .ref-cart-line img{width:70px!important;height:82px!important}
 }
+
+/* MAHGOLD PREMIUM PALETTE — warm ivory, midnight navy, rose, champagne */
+:root{
+ --mh-navy:#14243a;--mh-navy-deep:#0b1728;--mh-navy-mid:#263d59;
+ --mh-blush:#dfa0b5;--mh-blush-soft:#f2d0dc;--mh-pink-ink:#98516b;
+ --mh-paper:#faf7f1;--mh-white:#fffdf9;--mh-line:#e8dfd7;--mh-muted:#687486;
+ --mh-champagne:#c9ad7a;
+}
+html body #root .ref-product-page{
+ background:var(--mh-paper)!important;color:var(--mh-navy)!important;
+}
+html body #root .ref-product-page-top{border-color:var(--mh-line)!important}
+html body #root .ref-product-page-top>.eyebrow,
+html body #root .ref-product-page-copy h1{color:var(--mh-pink-ink)!important}
+html body #root .ref-product-back{
+ background:#fffdf9!important;color:var(--mh-navy)!important;border:1px solid var(--mh-champagne)!important;
+}
+html body #root .ref-product-page-image{
+ background:#fffdf9!important;border:1px solid var(--mh-line)!important;
+ box-shadow:0 16px 44px #14243a12!important;
+}
+html body #root .ref-product-specs-wrap{
+ background:#fffdf9!important;border:1px solid var(--mh-line)!important;
+}
+html body #root .ref-product-specs-title{
+ background:#f2e8dc!important;color:var(--mh-navy)!important;
+}
+html body #root .ref-product-specs>div{
+ background:#faf7f1!important;border:1px solid #e8dfd7!important;color:#263d59!important;
+}
+html body #root .ref-product-specs span{color:#687486!important}
+html body #root .ref-product-specs b,
+html body #root .ref-product-page-price{color:var(--mh-pink-ink)!important}
+html body #root .ref-product-page-copy>p,
+html body #root .ref-product-page-copy .text-muted-foreground{color:#687486!important}
+html body #root .mahgold-product-price-breakdown,
+html body #root .mahgold-cart-breakdown{
+ background:#fffdf9!important;border:1px solid var(--mh-line)!important;color:var(--mh-navy)!important;
+ box-shadow:0 8px 24px #14243a08!important;
+}
+html body #root .mahgold-product-price-breakdown h3,
+html body #root .mahgold-product-price-breakdown span,
+html body #root .mahgold-cart-breakdown span{color:#687486!important}
+html body #root .mahgold-product-price-breakdown b,
+html body #root .mahgold-cart-breakdown b{color:var(--mh-pink-ink)!important}
+html body #root .mahgold-product-price-breakdown .border-t{border-color:var(--mh-line)!important}
+html body #root .ref-overlay .ref-drawer,
+html body #root .ref-overlay .ref-dialog,
+html body #root .ref-overlay .ref-checkout-form{
+ background:#fffdf9!important;color:var(--mh-navy)!important;border-color:var(--mh-line)!important;
+}
+html body #root .ref-overlay .ref-dialog-head,
+html body #root .ref-overlay .ref-drawer-head{background:#faf7f1!important;color:var(--mh-navy)!important}
+html body #root .ref-cart-summary,
+html body #root .ref-cart-line,
+html body #root .ref-account-panel{background:#fffdf9!important;color:var(--mh-navy)!important;border-color:var(--mh-line)!important}
+html body #root .ref-cart-summary b,
+html body #root .ref-cart-line strong{color:var(--mh-pink-ink)!important}
+html body #root .ref-order-item{background:#faf7f1!important;border-color:var(--mh-line)!important}
+html body #root .ref-cart-toast{background:var(--mh-navy)!important;border-color:var(--mh-champagne)!important}
+html body #root .ref-cart-toast-check{background:var(--mh-blush-soft)!important;color:var(--mh-navy)!important}
+html body #root .ref-product-zoom{background:#0b1728!important}
+html body #root .ref-product-zoom-tools button{border-color:var(--mh-champagne)!important}
+html body #root .ref-full,
+html body #root .ref-overlay button.ref-full{
+ background:linear-gradient(115deg,#dfa0b5,#f2d0dc)!important;
+ color:#14243a!important;border-color:#d28ba4!important;
+}
+html body #root .ref-mobile-links.flex.flex-col{
+ background:linear-gradient(145deg,#0b1728,#14243a)!important;border-color:#dfa0b5!important;
+}
