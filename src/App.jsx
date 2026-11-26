@@ -11,7 +11,7 @@ const AdminPanel = lazy(() => import('./Admin.jsx'));
 
 const forceAdminPreview = import.meta.env.VITE_ADMIN_PREVIEW === 'true';
 const tiles = [
-  {name:'طلای زینتی',desc:'زیورآلات برای هر روز و هر occasion',image:'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=640&q=70'},
+  {name:'طلای زینتی',desc:'زیورآلات روزمره و مناسب هدیه',image:'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=640&q=70'},
   {name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=640&q=70'}
 ];
 const editorialCategoryImages = {
@@ -149,7 +149,7 @@ function AccountContent({onClose,onAuthenticated,notice=''}) {
   };
 
   if(session)return <div className="ref-account-panel">
-    <span className="eyebrow text-gold-deep">MAHGOLD ACCOUNT</span>
+    <span className="eyebrow text-gold-deep">حساب کاربری مه‌گلد</span>
     <h3>حساب کاربری شما</h3>
     <p className="text-sm text-muted-foreground">{session.user.email||session.user.phone||'حساب تأییدشده مه‌گلد'}</p>
     <div className="mt-3 border-t border-border pt-4">
@@ -167,7 +167,7 @@ function AccountContent({onClose,onAuthenticated,notice=''}) {
   </div>;
 
   return <form className="ref-auth-form" onSubmit={sent?verifyCode:sendCode}>
-    <span className="eyebrow text-gold-deep">WELCOME TO MAHGOLD</span>
+    <span className="eyebrow text-gold-deep">به مه‌گلد خوش آمدید</span>
     <h3>ورود یا ایجاد حساب مشتری</h3>
     <p className="ref-auth-intro">برای ثبت سفارش و مشاهده امن وضعیت خرید، ابتدا حساب خود را با کد یک‌بارمصرف تأیید کنید.</p>
     <div className="ref-auth-tabs">
@@ -529,12 +529,12 @@ export default function App() {
         <div className="ref-home-shelf-heading"><div><span className="eyebrow">تازه به ویترین اضافه شده</span><h2>جدیدترین محصولات</h2><p>تازه‌ترین انتخاب‌های ثبت‌شده در فروشگاه</p></div><button type="button" onClick={()=>openCatalog('همه محصولات')}>مشاهده همه <ArrowLeft size={15}/></button></div>
         {(()=>{const arrivals=products.filter(p=>Number(p.price_toman)>0).slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,4);return arrivals.length?<div className="ref-home-arrivals-grid">{arrivals.map(product=><article className="ref-product-card ref-home-arrival-card" key={product.id}>
           <button type="button" className="ref-home-arrival-image" onClick={()=>openProduct(product)} aria-label={'مشاهده '+product.name}><ProductImage product={product}/></button>
-          <div className="ref-product-body"><span className="ref-home-arrival-category">{product.category}</span><button type="button" className="ref-product-name" onClick={()=>openProduct(product)}>{product.name}</button><div className="ref-home-arrival-meta">{product.weight_grams?gram(product.weight_grams):'طلای منتخب مه‌گلد'}{product.karat?' · '+money(product.karat)+' عیار':''}</div>
+          <div className="ref-product-body"><span className="ref-home-arrival-category">{product.category}</span><button type="button" className="ref-product-name" onClick={()=>openProduct(product)}>{product.name}</button><div className="ref-home-arrival-meta">{product.weight_grams?gram(product.weight_grams):'مشخصات ثبت‌شده'}{product.karat?' · '+money(product.karat)+' عیار':''}</div>
             <div className="ref-product-bottom"><strong>{product.pricing_mode==='auto'&&!quoteFresh?'قیمت پس از نرخ معتبر':<>{money(product.price_toman)} <small>تومان</small></>}</strong><button type="button" aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(product)}><Plus size={17}/></button></div><div className={Number(product.stock||0)>0?'ref-home-stock':'ref-home-stock is-empty'}>{Number(product.stock||0)>0?'موجود برای سفارش':'ناموجود'}</div>
           </div></article>)}</div>:<div className="ref-home-arrivals-empty">{dataStatus==='loading'?'در حال دریافت محصولات…':'محصول جدیدی برای نمایش ثبت نشده است.'}</div>})()}
       </section>}
 
-      {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">MAHGOLD CATALOG</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div><img className="ref-catalog-category-image" src={optimizeUnsplashImage((siteContent?.tiles||[]).find(t=>t.name===category)?.image||products.find(p=>p.category===category)?.image_url||editorialImageFor(category)||tiles[0].image,640)} srcSet={unsplashResponsiveSrcSet((siteContent?.tiles||[]).find(t=>t.name===category)?.image||products.find(p=>p.category===category)?.image_url||editorialImageFor(category)||tiles[0].image)} sizes="(max-width: 767px) 90vw, 420px" alt={'تصویر دسته '+category} loading="eager" decoding="async" fetchPriority="high"/></div></section>}
+      {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">فروشگاه مه‌گلد</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div><img className="ref-catalog-category-image" src={optimizeUnsplashImage((siteContent?.tiles||[]).find(t=>t.name===category)?.image||products.find(p=>p.category===category)?.image_url||editorialImageFor(category)||tiles[0].image,640)} srcSet={unsplashResponsiveSrcSet((siteContent?.tiles||[]).find(t=>t.name===category)?.image||products.find(p=>p.category===category)?.image_url||editorialImageFor(category)||tiles[0].image)} sizes="(max-width: 767px) 90vw, 420px" alt={'تصویر دسته '+category} loading="eager" decoding="async" fetchPriority="high"/></div></section>}
 
                 {!catalogPage&&<div className="ref-quote-strip">
           <div className="ref-quote-title"><span className="ref-quote-bars">▥</span><div><b>قیمت لحظه‌ای طلای ۱۸ عیار</b><small>{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'به‌روزرسانی لحظه‌ای'):quoteIsManual?'نرخ دستی منقضی‌شده':quote?.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'در انتظار نرخ معتبر'}</small></div></div>
@@ -665,7 +665,7 @@ export default function App() {
 
     {cartOpen&&<div className="ref-overlay" onClick={()=>setCartOpen(false)}>
       <aside className="ref-drawer" onClick={e=>e.stopPropagation()}>
-        <div className="ref-drawer-head"><div><div className="eyebrow text-gold-deep">YOUR SELECTION</div><h2>سبد خرید <small className="text-sm text-muted-foreground">({money(cartCount)})</small></h2></div><button className="ref-close" aria-label="بستن" onClick={()=>setCartOpen(false)}><X/></button></div>
+        <div className="ref-drawer-head"><div><div className="eyebrow text-gold-deep">سبد خرید شما</div><h2>سبد خرید <small className="text-sm text-muted-foreground">({money(cartCount)})</small></h2></div><button className="ref-close" aria-label="بستن" onClick={()=>setCartOpen(false)}><X/></button></div>
         {cart.length===0?<div className="ref-empty"><ShoppingBag size={38}/><h3>سبد خرید شما خالی است</h3><p>از میان مجموعه‌های مه‌گلد انتخاب کنید.</p><button className="mt-4 h-11 rounded-lg bg-gold-gradient px-7 text-xs font-bold text-ink" onClick={()=>{setCartOpen(false);document.getElementById('shop')?.scrollIntoView({behavior:'smooth'});}}>مشاهده محصولات</button></div>:
           <>
             <div>{cart.map(item=><div className="ref-cart-line" key={item.id}>
@@ -686,7 +686,7 @@ export default function App() {
 
     {checkoutOpen&&<div className="ref-overlay" onClick={()=>setCheckoutOpen(false)}>
       <form className="ref-drawer ref-checkout-form" onClick={e=>e.stopPropagation()} onSubmit={submitOrder}>
-        <div className="ref-drawer-head"><div><div className="eyebrow text-gold-deep">SECURE CHECKOUT</div><h2>اطلاعات سفارش</h2></div><button type="button" className="ref-close" aria-label="بستن" onClick={()=>setCheckoutOpen(false)}><X/></button></div>
+        <div className="ref-drawer-head"><div><div className="eyebrow text-gold-deep">ثبت سفارش</div><h2>اطلاعات سفارش</h2></div><button type="button" className="ref-close" aria-label="بستن" onClick={()=>setCheckoutOpen(false)}><X/></button></div>
         <label>نام و نام خانوادگی<input required minLength="2" value={customer.name} onChange={e=>setCustomer({...customer,name:e.target.value})}/></label>
         <label>شماره تماس<input required type="tel" minLength="8" value={customer.phone} onChange={e=>setCustomer({...customer,phone:e.target.value})}/></label>
         <label>ایمیل (اختیاری)<input type="email" value={customer.email} onChange={e=>setCustomer({...customer,email:e.target.value})}/></label>
@@ -702,7 +702,7 @@ export default function App() {
     </div>}
 
     {selectedProduct&&<div className="ref-product-page">
-      <div className="ref-product-page-top"><button className="ref-product-back" onClick={closeProduct}><ArrowLeft size={17}/> بازگشت به فروشگاه</button><span className="eyebrow text-gold-deep">MAHGOLD · PRODUCT DETAILS</span></div>
+      <div className="ref-product-page-top"><button className="ref-product-back" onClick={closeProduct}><ArrowLeft size={17}/> بازگشت به فروشگاه</button><span className="eyebrow text-gold-deep">جزئیات محصول</span></div>
       <div className="ref-product-page-grid">
         <ProductImage product={selectedProduct} className="ref-product-page-image" onClick={()=>{setZoomScale(1);setZoomOffset({x:0,y:0});zoomPointersRef.current.clear();setZoomOpen(true);}}/>
         <section className="ref-product-specs-wrap" aria-label="جدول مشخصات محصول">
@@ -748,7 +748,7 @@ export default function App() {
 
     {orderResult&&<div className="ref-overlay">
       <section className="ref-dialog text-center">
-        <div className="ref-dialog-head"><span className="eyebrow text-gold-deep">MAHGOLD ORDER</span><button className="ref-close" aria-label="بستن" onClick={()=>setOrderResult(null)}><X/></button></div>
+        <div className="ref-dialog-head"><span className="eyebrow text-gold-deep">سفارش مه‌گلد</span><button className="ref-close" aria-label="بستن" onClick={()=>setOrderResult(null)}><X/></button></div>
         <PackageCheck size={46} className="mx-auto text-gold-deep"/>
         <h2 className="my-4 text-xl font-semibold">درخواست سفارش ثبت شد</h2>
         <p className="mb-2 text-sm">شماره سفارش: <b>{money(orderResult.order_number)}</b></p>
