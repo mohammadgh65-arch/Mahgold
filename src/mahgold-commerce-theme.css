@@ -1,0 +1,87 @@
+/* MAHGOLD — unified navy / blush styling for all interactive commerce surfaces */
+:root{
+ --mh-navy:#172f50;--mh-navy-deep:#0c1d35;--mh-navy-mid:#24476c;
+ --mh-blush:#e99bb4;--mh-blush-soft:#f6c5d5;--mh-pink-ink:#a9476d;
+ --mh-paper:#f8f7fb;--mh-white:#fffdfd;--mh-line:#e5d7e0;--mh-muted:#65738a;
+}
+/* Three-line mobile menu: explicitly remove the old green/forest surface */
+.ref-mobile-links{
+ background:linear-gradient(145deg,var(--mh-navy-deep),var(--mh-navy))!important;
+ color:#fff!important;border-top:1px solid var(--mh-blush)!important;
+ box-shadow:0 14px 28px rgba(12,29,53,.18)!important;
+}
+.ref-mobile-links a,.ref-mobile-links button{
+ color:#fff!important;background:transparent!important;
+}
+.ref-mobile-links a:active,.ref-mobile-links button:active,
+.ref-mobile-links a:focus-visible,.ref-mobile-links button:focus-visible{
+ color:var(--mh-blush-soft)!important;outline:2px solid var(--mh-blush)!important;outline-offset:3px;
+}
+/* Account, cart, checkout and order-result overlays */
+.ref-overlay{background:rgba(9,22,41,.68)!important;backdrop-filter:blur(5px)!important}
+.ref-dialog,.ref-drawer,.ref-account-panel,.ref-auth-form,.ref-checkout-form,
+.ref-cart-summary,.ref-empty,.ref-order-list,.ref-cart-line{
+ background:var(--mh-white)!important;color:var(--mh-navy)!important;
+ border-color:var(--mh-line)!important;
+}
+.ref-dialog,.ref-drawer{box-shadow:0 24px 70px rgba(12,29,53,.24)!important}
+.ref-dialog-head,.ref-drawer-head{
+ background:var(--mh-paper)!important;color:var(--mh-navy)!important;
+ border-bottom:1px solid var(--mh-line)!important;
+}
+.ref-dialog h1,.ref-dialog h2,.ref-dialog h3,.ref-drawer h1,.ref-drawer h2,.ref-drawer h3,
+.ref-account-panel h1,.ref-account-panel h2,.ref-account-panel h3,
+.ref-auth-form h1,.ref-auth-form h2,.ref-auth-form h3,
+.ref-checkout-form h1,.ref-checkout-form h2,.ref-checkout-form h3,
+.ref-cart-line h4{color:var(--mh-navy)!important}
+.ref-dialog p,.ref-drawer p,.ref-account-panel p,.ref-auth-form p,
+.ref-checkout-form p,.ref-empty p{color:#52647c}
+.ref-dialog label,.ref-drawer label,.ref-auth-form label,.ref-checkout-form label{
+ display:block;color:var(--mh-navy)!important;font-weight:600;
+}
+.ref-dialog input,.ref-dialog textarea,.ref-dialog select,
+.ref-drawer input,.ref-drawer textarea,.ref-drawer select,
+.ref-auth-form input,.ref-auth-form textarea,.ref-auth-form select,
+.ref-checkout-form input,.ref-checkout-form textarea,.ref-checkout-form select{
+ background:#fff!important;color:var(--mh-navy)!important;
+ border:1px solid #cbd5e1!important;border-radius:10px!important;
+ caret-color:var(--mh-pink-ink)!important;
+}
+.ref-dialog input::placeholder,.ref-drawer input::placeholder,
+.ref-auth-form input::placeholder,.ref-checkout-form input::placeholder,
+.ref-checkout-form textarea::placeholder{color:#8290a4!important;opacity:1}
+.ref-dialog input:focus,.ref-dialog textarea:focus,.ref-drawer input:focus,
+.ref-drawer textarea:focus,.ref-auth-form input:focus,.ref-checkout-form input:focus,
+.ref-checkout-form textarea:focus{
+ outline:2px solid var(--mh-blush)!important;outline-offset:1px;border-color:var(--mh-pink-ink)!important;
+}
+.ref-auth-tabs{background:#f1edf3!important;border:1px solid var(--mh-line)!important;border-radius:12px!important;padding:4px!important}
+.ref-auth-tabs button{color:var(--mh-navy)!important;background:transparent!important;border-radius:9px!important}
+.ref-auth-tabs button.active{background:var(--mh-navy)!important;color:#fff!important;box-shadow:0 2px 8px #172f5022!important}
+.ref-close,.ref-remove,.ref-qty button{
+ background:#f2edf3!important;color:var(--mh-navy)!important;border:1px solid var(--mh-line)!important;
+}
+.ref-close:hover,.ref-remove:hover,.ref-qty button:hover{background:var(--mh-blush-soft)!important;color:var(--mh-navy)!important}
+.ref-cart-line{border-bottom:1px solid var(--mh-line)!important}
+.ref-cart-line strong,.ref-cart-summary b{color:var(--mh-navy)!important}
+.ref-cart-summary{border:1px solid var(--mh-line)!important;border-radius:14px!important;padding:14px!important}
+.ref-empty>svg{color:var(--mh-pink-ink)!important}
+.ref-message{background:#f9eaf0!important;color:#80324f!important;border:1px solid #edbfd0!important;border-radius:10px!important;padding:10px 12px!important}
+.ref-note{color:#64748b!important}
+.ref-full,.ref-dialog button.bg-gold-gradient,.ref-drawer button.bg-gold-gradient,
+.ref-checkout-form button.bg-gold-gradient{
+ background:linear-gradient(115deg,var(--mh-blush),var(--mh-blush-soft))!important;
+ color:var(--mh-navy)!important;border:1px solid #d987a4!important;
+}
+.ref-full:disabled,.ref-checkout-form button:disabled{opacity:.58!important}
+.ref-dialog a,.ref-drawer a,.ref-auth-form a{color:var(--mh-pink-ink)!important}
+.ref-dialog .text-muted-foreground,.ref-drawer .text-muted-foreground,
+.ref-account-panel .text-muted-foreground,.ref-auth-form .text-muted-foreground{color:#64748b!important}
+/* Keep semantic success/error badges distinct and readable */
+.ref-dialog [role="status"],.ref-drawer [role="status"]{color:var(--mh-navy)!important}
+@media(max-width:767px){
+ .ref-mobile-links{padding-top:18px!important;padding-bottom:18px!important;gap:16px!important}
+ .ref-mobile-links a,.ref-mobile-links button{min-height:34px!important;font-size:14px!important}
+ .ref-dialog,.ref-drawer{max-height:calc(100dvh - 24px)!important;overflow-y:auto!important}
+ .ref-checkout-form{padding-bottom:calc(18px + env(safe-area-inset-bottom))!important}
+}
