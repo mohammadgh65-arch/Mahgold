@@ -110,3 +110,34 @@ html body #root .ref-overlay .ref-drawer .mahgold-cart-breakdown{
   html body #root nav.ref-mobile-links.flex.flex-col{padding-inline:16px!important}
   html body #root .ref-overlay .ref-drawer{width:min(440px,94vw)!important;padding:20px 16px!important}
 }
+
+
+/* Emergency readability lock for the expanded mobile navigation.
+   Explicitly set both color and WebKit text fill on every text-bearing node. */
+html body #root .ref-mobile-links,
+html body #root .ref-mobile-links *,
+html body #root nav.ref-mobile-links button,
+html body #root nav.ref-mobile-links a{
+  color:#24364b!important;
+  -webkit-text-fill-color:#24364b!important;
+  opacity:1!important;
+  text-shadow:none!important;
+  filter:none!important;
+}
+html body #root nav.ref-mobile-links button,
+html body #root nav.ref-mobile-links a{
+  background:#fffefa!important;
+  border-bottom:1px solid #e5ded2!important;
+  font-family:"Shabnam",Tahoma,sans-serif!important;
+  font-size:14px!important;
+  font-weight:600!important;
+  line-height:1.8!important;
+}
+html body #root nav.ref-mobile-links button:active,
+html body #root nav.ref-mobile-links a:active,
+html body #root nav.ref-mobile-links button:focus-visible,
+html body #root nav.ref-mobile-links a:focus-visible{
+  color:#75485a!important;
+  -webkit-text-fill-color:#75485a!important;
+  background:#f7f0f2!important;
+}
