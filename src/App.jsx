@@ -88,7 +88,9 @@ const catalogCategoryGroups = [
 ];
 const hiddenProductAttributeKeys = new Set(['has_stone','stone_labor_percent','market_quote_symbol','parent_product_id','variant_model_name','variant_size','variant_sku']);
 const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=900&q=72';
-const money = value => new Intl.NumberFormat('fa-IR').format(Number(value || 0));
+const money = value => new Intl.NumberFormat('fa-IR').format(Math.round(Number(value || 0)));
+const priceBreakdown = (p,q) => {const base=Number(p.weight_grams||0)*Number(q?.price_toman||0)*(Number(p.karat||18)/18);const mode=p.labor_mode||'percent',v=Number(p.labor_value||0);const labor=mode==='per_gram'?Number(p.weight_grams||0)*v:mode==='fixed'?v:base*v/100;const profit=(base+labor)*Number(p.seller_profit_percent??7)/100;const commission=(base+labor+profit)*Number(p.commission_percent||0)/100;const tax=(labor+profit+commission)*0.10;return {base,labor,profit,commission,tax,total:Math.round(base+labor+profit+commission+tax)};};
+const isQuoteFresh = (q,now=Date.now()) => {const observed=q?.observed_at?Date.parse(q.observed_at):NaN;const observedFresh=Number.isFinite(observed)&&now-observed<=300000&&observed<=now+60000;const manual=q?.source==='manual'&&q?.is_live===false;const provider=q?.provider_updated_at?Date.parse(q.provider_updated_at):NaN;const providerFresh=Number.isFinite(provider)&&now-provider<=300000&&provider<=now+60000;return Number(q?.price_toman)>0&&observedFresh&&(manual||(q?.is_live===true&&q?.source!=='manual'&&providerFresh));};
 const gram = value => new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(Number(value || 0)) + ' گرم';
 const toLatinDigits = value => value.replace(/[۰-۹٠-٩]/g, d => {
   const fa='۰۱۲۳۴۵۶۷۸۹', ar='٠١٢٣٤٥٦٧٨٩';
@@ -222,6 +224,7 @@ export default function App() {
   const [sortMode,setSortMode]=useState('newest');
   const [cart,setCart]=useState(()=>{try{return JSON.parse(localStorage.getItem('mahgold_cart')||'[]');}catch{return [];}});
   const [cartOpen,setCartOpen]=useState(false);
+  const [cartRefreshing,setCartRefreshing]=useState(false);
   const [accountOpen,setAccountOpen]=useState(false);
    const [accountNotice,setAccountNotice]=useState('');
   const [checkoutOpen,setCheckoutOpen]=useState(false);
@@ -270,7 +273,7 @@ export default function App() {
     if(!supabase)return;
     let active=true;
     const refreshGoldQuote=async()=>{
-      const {data,error}=await supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
+      const {data,error}=await supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,provider_updated_at,is_live')
         .eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle();
       if(active&&!error)setQuote(data||null);
     };
@@ -373,17 +376,17 @@ export default function App() {
     (async()=>{
       try{
         const [productResult,categoryResult,quoteResult]=await Promise.all([
-          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,created_at,tag,pricing_mode,attributes')
+          supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,created_at,tag,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,attributes')
             .eq('is_active',true).order('created_at',{ascending:false}),
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
             .eq('is_active',true).order('sort_order',{ascending:true}),
-          supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
+          supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,provider_updated_at,is_live')
             .eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle()
         ]);
         if(!active)return;
         if(productResult.error){setDataStatus('error');setProducts([]);setDataMessage('دریافت محصولات ناموفق بود؛ برای جلوگیری از نمایش قیمت نادرست، اطلاعات نمونه نمایش داده نمی‌شود.');}
         else{
-          const rows=(productResult.data||[]).filter(p=>!/شمش|آب\s*شده|آبشده/.test(String(p.category||'')+' '+String(p.name||'').replace(/ي/g,'ی')));
+          const rows=(productResult.data||[]).filter(p=>Number(p.price_toman)>0&&!/شمش|آب\s*شده|آبشده/.test(String(p.category||'')+' '+String(p.name||'').replace(/ي/g,'ی')));
           setProducts(rows);setDataStatus('connected');
           setDataMessage(rows.length?'محصولات و قیمت‌ها مستقیماً از پایگاه داده مه‌گلد دریافت می‌شوند.':'اتصال برقرار است؛ هنوز محصول فعالی برای نمایش ثبت نشده است.');
         }
@@ -424,9 +427,8 @@ export default function App() {
   const showHome=()=>{setCatalogPage(false);setCategory('همه محصولات');window.history.pushState({},'','/');window.scrollTo({top:0,behavior:'smooth'});};
   const cartCount=cart.reduce((sum,item)=>sum+Number(item.qty||0),0);
   const cartTotal=cart.reduce((sum,item)=>sum+Number(item.price_toman||0)*Number(item.qty||0),0);
-  const quoteObservedAt=quote?.observed_at?Date.parse(quote.observed_at):NaN;
-  const quoteIsManual=quote?.source==='manual'&&quote?.is_live===false;
-  const quoteFresh=(quote?.is_live===true||quoteIsManual)&&Number.isFinite(quoteObservedAt)&&quoteObservedAt<=clockNow+60000&&clockNow-quoteObservedAt<=300000;
+  const quoteFresh=isQuoteFresh(quote,clockNow);
+  const cartNeedsFreshQuote=cart.some(item=>item.pricing_mode==='auto')&&!quoteFresh;
 
   const openProduct=product=>{setCatalogPage(false);setSelectedProduct(product);window.history.pushState({mahgoldProduct:true},'', '/product/'+encodeURIComponent(product.id));window.scrollTo({top:0,behavior:'auto'});};
   const closeProduct=()=>{setSelectedProduct(null);if(window.location.pathname.startsWith('/product/'))window.history.pushState({},'', '/category/'+encodeURIComponent(category==='همه محصولات'?'طلای زینتی':category));setCatalogPage(true);window.scrollTo({top:0,behavior:'auto'});};
@@ -450,6 +452,34 @@ export default function App() {
     }
     setCart(old=>old.map(item=>item.id===id?{...item,qty:nextQty}:item).filter(item=>item.qty>0));
     setCheckoutError('');
+  };
+  const refreshCartBeforeCheckout=async()=>{
+    if(!cart.length)return false;
+    setCartRefreshing(true);
+    try{
+      const ids=cart.map(item=>item.id);
+      const [productsResult,quoteResult]=await Promise.all([
+        supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,stock,is_active,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,attributes').in('id',ids),
+        supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,provider_updated_at,is_live').eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle()
+      ]);
+      if(productsResult.error)throw productsResult.error;
+      const byId=new Map((productsResult.data||[]).map(row=>[row.id,row]));
+      for(const item of cart){
+        const latest=byId.get(item.id);
+        if(!latest||!latest.is_active)throw new Error('یکی از محصولات سبد دیگر فعال نیست.');
+        if(Number(latest.price_toman)<=0)throw new Error('قیمت یکی از محصولات معتبر نیست؛ تا ثبت قیمت معتبر امکان ادامه وجود ندارد.');
+        if(Number(latest.stock||0)<Number(item.qty||0))throw new Error('موجودی محصول «'+latest.name+'» برای تعداد انتخاب‌شده کافی نیست.');
+      }
+      const refreshedQuote=quoteResult.data;
+      if(cart.some(item=>byId.get(item.id)?.pricing_mode==='auto')&&(quoteResult.error||!isQuoteFresh(refreshedQuote))){
+        throw new Error('نرخ واقعی طلای ۱۸ عیار تازه نیست؛ قیمت و موجودی تازه‌سازی شد اما ادامه سفارش تا دریافت نرخ معتبر مسدود است.');
+      }
+      setCart(old=>old.map(item=>({...item,...byId.get(item.id),qty:item.qty})));
+      if(refreshedQuote)setQuote(refreshedQuote);
+      setCheckoutError('');
+      return true;
+    }catch(error){setCheckoutError(error?.message||'تازه‌سازی قیمت و موجودی سبد ناموفق بود.');return false;}
+    finally{setCartRefreshing(false);}
   };
   const submitOrder=async event=>{
     event.preventDefault();setCheckoutError('');
@@ -693,14 +723,16 @@ export default function App() {
           <>
             <div>{cart.map(item=><div className="ref-cart-line" key={item.id}>
               <ProductImage product={item}/>
-              <div><h4>{item.name}</h4><strong>{money(item.price_toman)} تومان</strong><div className="ref-qty">
+              <div><h4>{item.name}</h4><strong>{item.pricing_mode==='auto'&&!quoteFresh?'نرخ معتبر نیست':money(item.price_toman)+' تومان'}</strong>
+              {item.pricing_mode==='auto'&&quoteFresh&&(()=>{const b=priceBreakdown(item,quote);return <details className="mahgold-cart-breakdown mt-2 text-[11px] leading-6"><summary>ریز محاسبات قیمت</summary><span>اصل طلا: {money(b.base)} تومان</span><span>اجرت ساخت: {money(b.labor)} تومان</span><span>سود فروشنده: {money(b.profit)} تومان</span><span>کمیسیون: {money(b.commission)} تومان</span><span>مالیات ارزش افزوده: {money(b.tax)} تومان</span><b>جمع هر واحد: {money(b.total)} تومان</b></details>;})()}
+              <div className="ref-qty">
                 <button aria-label="کاهش تعداد" onClick={()=>changeQuantity(item.id,-1)}><Minus size={13}/></button><span className="text-xs">{money(item.qty)}</span><button aria-label="افزایش تعداد" onClick={()=>changeQuantity(item.id,1)}><Plus size={13}/></button>
               </div></div>
               <button className="ref-remove" aria-label="حذف محصول" onClick={()=>setCart(old=>old.filter(p=>p.id!==item.id))}><X size={15}/></button>
             </div>)}</div>
-            <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{money(cartTotal)} تومان</b></div>
+            <div className="ref-cart-summary"><span>جمع سبد خرید</span><b>{cartNeedsFreshQuote?'پس از دریافت نرخ معتبر':money(cartTotal)+' تومان'}</b></div>
             <p className="mb-4 text-[11px] leading-7 text-muted-foreground">مبلغ نهایی و موجودی هنگام ثبت سفارش در سرور دوباره بررسی می‌شود.</p>
-            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" onClick={async()=>{const {data}=await supabase.auth.getSession();if(!data.session?.user){setAccountNotice('برای ثبت سفارش ابتدا حساب کاربری بسازید یا وارد شوید.');setAccountOpen(true);setCartOpen(false);}else setCheckoutOpen(true);}}>ادامه و ثبت سفارش <ArrowLeft className="mr-2 inline" size={16}/></button>
+            <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" onClick={async()=>{const ready=await refreshCartBeforeCheckout();if(!ready)return;const {data}=await supabase.auth.getSession();if(!data.session?.user){setAccountNotice('برای ثبت سفارش ابتدا حساب کاربری بسازید یا وارد شوید.');setAccountOpen(true);setCartOpen(false);}else setCheckoutOpen(true);}} disabled={cartRefreshing}>{cartRefreshing?'در حال تازه‌سازی قیمت و موجودی…':'ادامه و ثبت سفارش'} <ArrowLeft className="mr-2 inline" size={16}/></button>
           </>}
       </aside>
     </div>}
@@ -739,7 +771,8 @@ export default function App() {
           <span className="text-xs text-muted-foreground">{selectedProduct.category}</span>
           <h1>{selectedProduct.name}</h1>
           <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
-          <strong className="ref-product-page-price">{money(selectedProduct.price_toman)} <small>تومان</small></strong>
+          <strong className="ref-product-page-price">{selectedProduct.pricing_mode==='auto'&&!quoteFresh?'نرخ معتبر در دسترس نیست':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</strong>
+          {selectedProduct.pricing_mode==='auto'&&quoteFresh&&(()=>{const b=priceBreakdown(selectedProduct,quote);return <div className="mahgold-product-price-breakdown mt-4 rounded-2xl border border-gold/20 bg-card/60 p-4 text-sm"><h3 className="mb-2 font-semibold">ریز محاسبات قیمت</h3><div className="flex justify-between py-1"><span>اصل طلا</span><b>{money(b.base)} تومان</b></div><div className="flex justify-between py-1"><span>اجرت ساخت</span><b>{money(b.labor)} تومان</b></div><div className="flex justify-between py-1"><span>سود فروشنده</span><b>{money(b.profit)} تومان</b></div><div className="flex justify-between py-1"><span>کمیسیون</span><b>{money(b.commission)} تومان</b></div><div className="flex justify-between py-1"><span>مالیات ارزش افزوده</span><b>{money(b.tax)} تومان</b></div><div className="mt-2 flex justify-between border-t border-gold/20 pt-3 font-semibold"><span>قیمت نهایی</span><b>{money(b.total)} تومان</b></div></div>;})()}
           <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1||(selectedProduct.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(selectedProduct)}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
           {checkoutError&&<p className="ref-message">{checkoutError}</p>}
         </div>
