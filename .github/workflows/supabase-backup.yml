@@ -16,7 +16,7 @@ jobs:
       - name: Install PostgreSQL client
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql-client-17 gnupg
+          sudo apt-get install -y gnupg
 
       - name: Create encrypted database dump
         env:
@@ -31,7 +31,7 @@ jobs:
           DB_PORT="5432"
           DB_USER="postgres"
           DB_NAME="postgres"
-          pg_dump --host="$DB_HOST" --port="$DB_PORT" --username="$DB_USER" --dbname="$DB_NAME" --format=custom --no-owner --no-acl --verbose --file=mahgold.dump
+          docker run --rm -e PGPASSWORD -v "$PWD:/backup" postgres:17 pg_dump --host="$DB_HOST" --port="$DB_PORT" --username="$DB_USER" --dbname="$DB_NAME" --format=custom --no-owner --no-acl --verbose --file=/backup/mahgold.dump
           gpg --batch --yes --pinentry-mode loopback --passphrase "$BACKUP_PASSPHRASE" --symmetric --cipher-algo AES256 --output "mahgold-$(date -u +%Y-%m-%d).dump.gpg" mahgold.dump
           shred -u mahgold.dump || rm -f mahgold.dump
 
