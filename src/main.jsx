@@ -9,6 +9,7 @@ import './mahgold-commerce-theme.css';
 import './mahgold-editorial-design.css';
 import './mahgold-readable-gold.css';
 import './mahgold-component-unification.css';
+import './mahgold-neutral-announcement-footer.css';
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(registration=>registration.update()).catch(() => {}));
 }
