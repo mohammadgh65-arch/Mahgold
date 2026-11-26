@@ -133,3 +133,95 @@ html body #root .ref-overlay .ref-dialog button.ref-full{
  background:linear-gradient(115deg,#e99bb4,#f6c5d5)!important;
  color:#172f50!important;-webkit-text-fill-color:#172f50!important;
 }
+
+/* Final unified Mahgold styling: product detail, cart, account, order history */
+html body #root .ref-product-page{
+ background:linear-gradient(155deg,#0c1d35 0%,#172f50 58%,#213e61 100%)!important;
+ color:#f8f7fb!important;
+}
+html body #root .ref-product-page-top{border-bottom:1px solid #405b7a!important}
+html body #root .ref-product-page-top>.eyebrow{color:#f6c5d5!important}
+html body #root .ref-product-back{
+ background:#24476c!important;color:#fff!important;border:1px solid #e99bb4!important;
+}
+html body #root .ref-product-page-image{
+ background:#f8f7fb!important;border:1px solid #e99bb4!important;
+ border-radius:20px!important;box-shadow:0 18px 48px #050e1c55!important;
+}
+html body #root .ref-product-specs-wrap{
+ background:#122744!important;border:1px solid #e99bb4!important;border-radius:16px!important;
+}
+html body #root .ref-product-specs-title{
+ background:#e99bb4!important;color:#172f50!important;
+}
+html body #root .ref-product-specs>div{
+ background:#1c3859!important;border:1px solid #405b7a!important;
+ color:#e8edf5!important;border-radius:12px!important;
+}
+html body #root .ref-product-specs span{color:#c6d1df!important}
+html body #root .ref-product-specs b{color:#f6c5d5!important}
+html body #root .ref-product-page-copy h1{color:#f6c5d5!important}
+html body #root .ref-product-page-copy>p{color:#e4e9f1!important}
+html body #root .ref-product-page-copy .text-muted-foreground{color:#c6d1df!important}
+html body #root .ref-product-page-price{color:#f6c5d5!important}
+html body #root .ref-product-page-price small{color:#e4e9f1!important}
+html body #root .mahgold-product-price-breakdown,
+html body #root .mahgold-cart-breakdown{
+ background:#1b3657!important;border:1px solid #e99bb4!important;
+ color:#f8f7fb!important;border-radius:14px!important;
+}
+html body #root .mahgold-product-price-breakdown h3,
+html body #root .mahgold-product-price-breakdown span,
+html body #root .mahgold-cart-breakdown span{color:#e4e9f1!important}
+html body #root .mahgold-product-price-breakdown b,
+html body #root .mahgold-cart-breakdown b{color:#f6c5d5!important}
+html body #root .mahgold-product-price-breakdown .border-t{border-color:#405b7a!important}
+html body #root .ref-overlay .ref-drawer{
+ background:#fffdfd!important;color:#172f50!important;border-left:3px solid #e99bb4!important;
+}
+html body #root .ref-overlay .ref-cart-line{
+ background:#fffdfd!important;border-bottom:1px solid #e5d7e0!important;
+ color:#172f50!important;border-radius:12px;padding:12px!important;margin-bottom:8px;
+}
+html body #root .ref-cart-line img{background:#f8f7fb!important;border:1px solid #e5d7e0!important}
+html body #root .ref-cart-line h4{color:#172f50!important}
+html body #root .ref-cart-line strong{color:#a9476d!important}
+html body #root .ref-qty span{color:#172f50!important}
+html body #root .ref-cart-summary{background:#f8f7fb!important;color:#172f50!important;border:1px solid #e5d7e0!important}
+html body #root .ref-cart-summary span{color:#52647c!important}
+html body #root .ref-cart-summary b{color:#172f50!important}
+html body #root .ref-empty{background:#fffdfd!important;color:#52647c!important}
+html body #root .ref-empty h3{color:#172f50!important}
+html body #root .ref-empty p{color:#64748b!important}
+html body #root .ref-account-panel{background:#fffdfd!important;color:#172f50!important}
+html body #root .ref-account-panel h3,
+html body #root .ref-account-panel b{color:#172f50!important}
+html body #root .ref-account-panel p{color:#52647c!important}
+html body #root .ref-order-item{
+ background:#f8f7fb!important;border:1px solid #e5d7e0!important;color:#172f50!important;
+}
+html body #root .ref-order-item small{color:#64748b!important}
+html body #root .ref-order-item details summary{color:#a9476d!important}
+html body #root .ref-order-item details>div{border-color:#e99bb4!important}
+html body #root .ref-cart-toast{
+ background:#172f50!important;color:#fff!important;border:1px solid #e99bb4!important;
+ box-shadow:0 14px 40px #0c1d3540!important;
+}
+html body #root .ref-cart-toast-check{background:#f6c5d5!important;color:#172f50!important}
+html body #root .ref-cart-toast button{color:#f6c5d5!important}
+html body #root .ref-product-zoom{background:#08172a!important}
+html body #root .ref-product-zoom-tools button{background:#172f50!important;color:#f6c5d5!important;border-color:#e99bb4!important}
+html body #root .ref-product-zoom-tools span{color:#fff!important}
+html body #root .ref-zoom-hint{color:#e4e9f1!important}
+html body #root .ref-overlay .ref-dialog{background:#fffdfd!important;color:#172f50!important}
+html body #root .ref-overlay .ref-dialog>p{color:#52647c!important}
+html body #root .ref-overlay .ref-dialog h2{color:#172f50!important}
+@media(max-width:767px){
+ html body #root .ref-product-page{padding:14px!important}
+ html body #root .ref-product-page-grid{gap:16px!important}
+ html body #root .ref-product-page-image,html body #root .ref-product-page-image img{border-radius:16px!important}
+ html body #root .ref-product-specs>div{padding:11px!important}
+ html body #root .ref-overlay .ref-drawer{padding:18px 15px!important}
+ html body #root .ref-cart-line{grid-template-columns:70px minmax(0,1fr) auto!important;gap:9px!important}
+ html body #root .ref-cart-line img{width:70px!important;height:82px!important}
+}
