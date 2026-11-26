@@ -10,3 +10,38 @@ html body #root .ref-category-initial{color:var(--mh-gold-readable-soft)!importa
 /* Preserve readable text on gold action surfaces. */
 html body #root .bg-gold-gradient,
 html body #root button.bg-gold-gradient{color:#17283d!important;}
+
+
+/* Final header contrast correction: the older, more-specific velvet-header
+   selectors were keeping pale gold text on the newer light header surface. */
+html body #root .ref-site-header .ref-primary-nav a,
+html body #root .ref-site-header .ref-primary-nav button {
+  color:#24364b!important;
+  -webkit-text-fill-color:#24364b!important;
+  font-weight:650!important;
+  text-shadow:none!important;
+}
+html body #root .ref-site-header .ref-primary-nav a:hover,
+html body #root .ref-site-header .ref-primary-nav a.active {
+  color:#76551f!important;
+  -webkit-text-fill-color:#76551f!important;
+  border-bottom-color:#b99552!important;
+}
+html body #root .ref-site-header .ref-header-actions button,
+html body #root .ref-site-header .ref-mobile-menu {
+  color:#24364b!important;
+  -webkit-text-fill-color:#24364b!important;
+}
+html body #root .ref-site-header .ref-header-search {
+  background:#f5f1e8!important;
+  border-color:#d8cdbb!important;
+  color:#24364b!important;
+}
+html body #root .ref-site-header .ref-header-search input {
+  color:#24364b!important;
+  -webkit-text-fill-color:#24364b!important;
+}
+html body #root .ref-site-header .ref-header-search input::placeholder {
+  color:#6d7480!important;
+  opacity:1!important;
+}
