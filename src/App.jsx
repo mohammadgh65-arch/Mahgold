@@ -483,6 +483,15 @@ export default function App() {
         <div className="ref-offers-footer"><span>حرکت خودکار · هر ۳ ثانیه</span><span className="ref-offers-dots">{offerItems.map((item,index)=><i key={index} className={activeOffer%offerItems.length===index?'active':''}/>)}</span></div>
       </section>}
 
+      {!catalogPage&&<section className="ref-home-new-arrivals mx-auto max-w-7xl px-4 py-8 md:px-7 md:py-12" aria-label="جدیدترین محصولات">
+        <div className="ref-home-shelf-heading"><div><span className="eyebrow text-gold-deep">JUST ARRIVED · MAHGOLD</span><h2>جدیدترین محصولات</h2><p>تازه‌ترین انتخاب‌های ثبت‌شده در فروشگاه</p></div><button type="button" onClick={()=>openCatalog('همه محصولات')}>مشاهده همه <ArrowLeft size={15}/></button></div>
+        {(()=>{const arrivals=products.filter(p=>Number(p.price_toman)>0).slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,4);return arrivals.length?<div className="ref-home-arrivals-grid">{arrivals.map(product=><article className="ref-product-card ref-home-arrival-card" key={product.id}>
+          <button type="button" className="ref-home-arrival-image" onClick={()=>openProduct(product)} aria-label={'مشاهده '+product.name}><ProductImage product={product}/></button>
+          <div className="ref-product-body"><span className="ref-home-arrival-category">{product.category}</span><button type="button" className="ref-product-name" onClick={()=>openProduct(product)}>{product.name}</button><div className="ref-home-arrival-meta">{product.weight_grams?gram(product.weight_grams):'طلای منتخب مه‌گلد'}{product.karat?' · '+money(product.karat)+' عیار':''}</div>
+            <div className="ref-product-bottom"><strong>{money(product.price_toman)} <small>تومان</small></strong><button type="button" aria-label={'افزودن '+product.name+' به سبد'} className="ref-add-button" disabled={Number(product.stock||0)<1||dataStatus!=='connected'||(product.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(product)}><Plus size={17}/></button></div><div className={Number(product.stock||0)>0?'ref-home-stock':'ref-home-stock is-empty'}>{Number(product.stock||0)>0?'موجود برای سفارش':'ناموجود'}</div>
+          </div></article>)}</div>:<div className="ref-home-arrivals-empty">{dataStatus==='loading'?'در حال دریافت محصولات…':'محصول جدیدی برای نمایش ثبت نشده است.'}</div>})()}
+      </section>}
+
       {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">MAHGOLD CATALOG</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div><img className="ref-catalog-category-image" src={editorialImageFor(category)||displayTiles.find(t=>t.name===category)?.image||tiles[0].image} alt={'تصویر دسته '+category} loading="eager" decoding="async"/></div></section>}
 
                 {!catalogPage&&<div className="ref-quote-strip">
