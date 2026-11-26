@@ -51,7 +51,15 @@ const storyImage = 'https://images.unsplash.com/photo-1617038220319-276d3cfab638
 const money = value => new Intl.NumberFormat('fa-IR').format(Math.round(Number(value || 0)));
 const isJewelryCategory = category => ['طلای زینتی','انگشتر','گردنبند','دستبند','النگو','گوشواره','آویز و پلاک','زنجیر','پابند','سرویس طلا','سایر زیورآلات'].includes(category);
 const priceBreakdown = (p,q) => {const base=Number(p.weight_grams||0)*Number(q?.price_toman||0)*(Number(p.karat||18)/18);const mode=p.labor_mode||'percent',v=Number(p.labor_value||0);const labor=mode==='per_gram'?Number(p.weight_grams||0)*v:mode==='fixed'?v:base*v/100;const profit=(base+labor)*Number(p.seller_profit_percent??7)/100;const commission=(base+labor+profit)*Number(p.commission_percent||0)/100;const tax=(labor+profit+commission)*0.10;return {base,labor,profit,commission,tax,total:Math.round(base+labor+profit+commission+tax)};};
-const isFreshLiveQuote = q => {const t=q?.observed_at?Date.parse(q.observed_at):NaN;return q?.is_live===true&&Number.isFinite(t)&&Date.now()-t<=5*60*1000&&t<=Date.now()+60*1000&&Number(q?.price_toman)>0;};
+const isFreshLiveQuote = q => {
+  const now=Date.now(), observed=q?.observed_at?Date.parse(q.observed_at):NaN;
+  const observedFresh=Number.isFinite(observed)&&now-observed<=5*60*1000&&observed<=now+60*1000;
+  const manual=q?.source==='manual'&&q?.is_live===false;
+  const provider=q?.provider_updated_at?Date.parse(q.provider_updated_at):NaN;
+  const providerFresh=Number.isFinite(provider)&&now-provider<=5*60*1000&&provider<=now+60*1000;
+  const live=q?.is_live===true&&q?.source!=='manual'&&providerFresh;
+  return (manual||live)&&observedFresh&&Number(q?.price_toman)>0;
+};
 const gram = value => new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(Number(value || 0)) + ' گرم';
 const toLatinDigits = value => value.replace(/[۰-۹٠-٩]/g, d => {
   const fa='۰۱۲۳۴۵۶۷۸۹', ar='٠١٢٣٤٥٦٧٨٩';
@@ -274,7 +282,7 @@ export default function App() {
             .eq('is_active',true).order('created_at',{ascending:false}),
           supabase.from('categories').select('id,name,slug,sort_order,is_active')
             .eq('is_active',true).order('sort_order',{ascending:true}),
-          supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
+          supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,provider_updated_at,is_live')
             .in('symbol',['gold_18k','coin_emami','coin_bahar','coin_nim','coin_rob','coin_gerami'])
             .order('observed_at',{ascending:false})
         ]);
@@ -282,7 +290,7 @@ export default function App() {
         if(productResult.error){setDataStatus('error');setProducts([]);setDataMessage('دریافت محصولات ناموفق بود؛ برای جلوگیری از نمایش قیمت نادرست، اطلاعات نمونه نمایش داده نمی‌شود.');}
         else{
           const rows=productResult.data||[];
-          setProducts(rows);setDataStatus('connected');
+          setProducts(rows.filter(row=>Number(row.price_toman)>0));setDataStatus('connected');
           setDataMessage(rows.length?'محصولات مه‌گلد آماده مشاهده و خرید هستند.':'در حال حاضر محصولی برای نمایش وجود ندارد.');
         }
         if(!categoryResult.error)setDbCategories(categoryResult.data||[]);
@@ -303,7 +311,7 @@ export default function App() {
     let active=true;
     const refreshMarketData=async()=>{
       const [quoteResult,productResult]=await Promise.all([
-        supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live')
+        supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,provider_updated_at,is_live')
           .in('symbol',['gold_18k','coin_emami','coin_bahar','coin_nim','coin_rob','coin_gerami']).order('observed_at',{ascending:false}),
         supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active,created_at,tag,attributes')
           .eq('is_active',true).order('created_at',{ascending:false})
@@ -312,7 +320,7 @@ export default function App() {
       const marketRows=quoteResult.error?[]:quoteResult.data||[];
       setQuote(marketRows.find(row=>row.symbol==='gold_18k')||null);
       setCoinQuotes(marketRows.filter(row=>row.symbol!=='gold_18k'));
-      if(!productResult.error)setProducts(productResult.data||[]);
+      if(!productResult.error)setProducts((productResult.data||[]).filter(row=>Number(row.price_toman)>0));
     };
     const timer=setInterval(refreshMarketData,60000);
     return()=>{active=false;clearInterval(timer);};
@@ -349,7 +357,7 @@ export default function App() {
       const ids=cart.map(item=>item.id);
       const [productResult,quoteResult]=await Promise.all([
         supabase.from('products').select('id,name,category,description,image_url,weight_grams,karat,price_toman,pricing_mode,labor_mode,labor_value,seller_profit_percent,commission_percent,vat_percent,stock,is_active,attributes').in('id',ids),
-        supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,is_live').eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle()
+        supabase.from('market_quotes').select('symbol,title,price_toman,source,observed_at,provider_updated_at,is_live').eq('symbol','gold_18k').order('observed_at',{ascending:false}).limit(1).maybeSingle()
       ]);
       if(productResult.error)throw productResult.error;
       const rows=productResult.data||[];
@@ -362,8 +370,7 @@ export default function App() {
       }
       if(cart.some(item=>byId.get(item.id)?.pricing_mode==='auto')){
         const quote=quoteResult.data;
-        const observedAt=quote?.observed_at?Date.parse(quote.observed_at):NaN;
-        if(quoteResult.error||!quote||quote.is_live!==true||!Number.isFinite(observedAt)||Date.now()-observedAt>5*60*1000||observedAt>Date.now()+60*1000){
+        if(quoteResult.error||!isFreshLiveQuote(quote)){
           throw new Error('نرخ زنده و تازه طلای ۱۸ عیار در دسترس نیست؛ تا دریافت نرخ معتبر، سفارش طلای قیمت‌گذاری خودکار پذیرفته نمی‌شود.');
         }
       }
@@ -645,7 +652,9 @@ export default function App() {
           <>
             <div>{cart.map(item=><div className="ref-cart-line" key={item.id}>
               <ProductImage product={item}/>
-              <div><h4>{item.name}</h4><strong>{item.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'نیازمند نرخ معتبر':<>{money(item.price_toman)} تومان</>}</strong><div className="ref-qty">
+              <div><h4>{item.name}</h4><strong>{item.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'نیازمند نرخ معتبر':<>{money(item.price_toman)} تومان</>}</strong>
+              {item.pricing_mode==='auto'&&isFreshLiveQuote(quote)&&(()=>{const b=priceBreakdown(item,quote);return <details className="mahgold-cart-breakdown"><summary>ریز محاسبات قیمت</summary><span>اصل طلا: {money(b.base)} تومان</span><span>اجرت: {money(b.labor)} تومان</span><span>سود فروشنده: {money(b.profit)} تومان</span><span>کمیسیون: {money(b.commission)} تومان</span><span>مالیات ارزش افزوده: {money(b.tax)} تومان</span><b>جمع هر واحد: {money(b.total)} تومان</b></details>;})()}
+              <div className="ref-qty">
                 <button aria-label="کاهش تعداد" onClick={()=>changeQuantity(item.id,-1)}><Minus size={13}/></button><span className="text-xs">{money(item.qty)}</span><button aria-label="افزایش تعداد" onClick={()=>changeQuantity(item.id,1)}><Plus size={13}/></button>
               </div></div>
               <button className="ref-remove" aria-label="حذف محصول" onClick={()=>setCart(old=>old.filter(p=>p.id!==item.id))}><X size={15}/></button>
@@ -697,6 +706,7 @@ export default function App() {
             <strong>{selectedProduct.pricing_mode==='auto'&&!isFreshLiveQuote(quote)?'قیمت روز در حال به‌روزرسانی است':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</strong>
             <span>قیمت نهایی پیش از ثبت سفارش بررسی می‌شود.</span>
           </div>
+          {selectedProduct.pricing_mode==='auto'&&isFreshLiveQuote(quote)&&(()=>{const b=priceBreakdown(selectedProduct,quote);return <div className="mahgold-product-price-breakdown"><h3>ریز محاسبات قیمت</h3><div><span>اصل طلا</span><b>{money(b.base)} تومان</b></div><div><span>اجرت ساخت</span><b>{money(b.labor)} تومان</b></div><div><span>سود فروشنده</span><b>{money(b.profit)} تومان</b></div><div><span>کمیسیون</span><b>{money(b.commission)} تومان</b></div><div><span>مالیات ارزش افزوده</span><b>{money(b.tax)} تومان</b></div><div className="total"><span>قیمت نهایی</span><b>{money(b.total)} تومان</b></div></div>;})()}
           <div className="mahgold-product-spec-panel">
             <div className="mahgold-spec-heading"><h2>مشخصات محصول</h2><span>جزئیات همین کالا</span></div>
             <table className="mahgold-product-spec-table"><tbody>
