@@ -85,7 +85,7 @@ export default function AdminPanel(){
    const {data}=supabase.storage.from('product-images').getPublicUrl(storagePath);
    if(!data?.publicUrl)throw new Error('نشانی عمومی تصویر ساخته نشد.');
    const originalKB=(originalSize/1024).toFixed(0),finalKB=(optimizedFile.size/1024).toFixed(0);
-   setNotice('بارگذاری موفق · حجم اولیه '+originalKB+' کیلوبایت · حجم نهایی '+finalKB+' کیلوبایت · '+reduction+'٪ کاهش حجم'+(optimizedFile.size>TARGET_BYTES?' · تصویر به سقف ۲ مگابایت رسید':''));
+   setNotice('بارگذاری موفق · حجم اولیه '+originalKB+' کیلوبایت · حجم نهایی '+finalKB+' کیلوبایت · '+reduction+'٪ کاهش حجم'+(optimizedFile.size>TARGET_BYTES?' · حجم بیشتر از هدف ۸۰۰ کیلوبایت است، اما زیر سقف ۲ مگابایت قرار دارد':''));
    return data.publicUrl;
   }catch(error){
    setNotice('بارگذاری تصویر انجام نشد: '+(error?.message||'خطای ناشناخته'));return '';
