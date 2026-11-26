@@ -223,7 +223,7 @@ export default function App() {
   const [siteContent,setSiteContent]=useState(null);
   const [dataStatus,setDataStatus]=useState(isSupabaseConfigured?'loading':'error');
   const [dataMessage,setDataMessage]=useState('در حال دریافت اطلاعات فروشگاه…');
-  const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||window.location.pathname==='/admin'||window.location.pathname==='/admin/'||window.location.hash==='#mahgold-control'||new URLSearchParams(window.location.search).get('mahgold-admin')==='1');
+  const [isAdminPage,setIsAdminPage]=useState(()=>forceAdminPreview||window.location.pathname==='/admin'||window.location.pathname==='/admin/');
 
   const displayTiles=useMemo(()=>displayTileDefaults.map(tile=>({...tile,...((siteContent?.tiles||[]).find(item=>item.name===tile.name)||{})})).filter(Boolean),[siteContent]);
   const categoryImageFor=name=>(siteContent?.tiles||[]).find(item=>item.name===name)?.image||products.find(item=>item.category===name)?.image_url||(name==='طلای زینتی'?products.find(item=>jewelryProductCategories.has(item.category))?.image_url:null)||'';
@@ -250,7 +250,7 @@ export default function App() {
     const syncAdminRoute=()=>{
       if(forceAdminPreview){setIsAdminPage(true);return;}
       const path=window.location.pathname;
-      setIsAdminPage(path==='/admin'||path==='/admin/'||window.location.hash==='#mahgold-control'||new URLSearchParams(window.location.search).get('mahgold-admin')==='1');
+      setIsAdminPage(path==='/admin'||path==='/admin/');
       const categoryMatch=path.match(/^\/category\/([^/]+)\/?$/);
       const productMatch=path.match(/^\/product\/([^/]+)\/?$/);
       if(categoryMatch){
