@@ -8,6 +8,7 @@ import './simgallery-improvements.css';
 import './mahgold-final-palette.css';
 import './mahgold-header-footer-fix.css';
 import './mahgold-logo-refinement.css';
+import './mahgold-theme-unification.css';
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
 }
