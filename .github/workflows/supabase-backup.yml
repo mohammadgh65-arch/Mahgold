@@ -30,7 +30,7 @@ jobs:
             postgres://*|postgresql://*) ;;
             *) echo "Secret format invalid: expected a PostgreSQL connection URI beginning postgres:// or postgresql://"; exit 1 ;;
           esac
-          docker run --rm -e SUPABASE_DB_URL -v "$PWD:/backup" postgres:17 sh -ec 'pg_dump --dbname="$SUPABASE_DB_URL" --format=custom --no-owner --no-acl --verbose --file=/backup/mahgold.dump'
+          docker run --rm -e SUPABASE_DB_URL -v "$PWD:/backup" postgres:17 sh -ec 'pg_dump --dbname="$SUPABASE_DB_URL" --username="postgres.nzvvvpbwavaodhxrnkdr" --format=custom --no-owner --no-acl --verbose --file=/backup/mahgold.dump'
           gpg --batch --yes --pinentry-mode loopback --passphrase "$BACKUP_PASSPHRASE" --symmetric --cipher-algo AES256 --output "mahgold-$(date -u +%Y-%m-%d).dump.gpg" mahgold.dump
           shred -u mahgold.dump || rm -f mahgold.dump
 
