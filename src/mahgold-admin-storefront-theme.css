@@ -1,0 +1,66 @@
+/* Mahgold admin — storefront-aligned editorial identity */
+:root{
+ --admin-bg:#f7f3ec;--admin-card:#fffdf9;--admin-ink:#26364a;--admin-muted:#7a7e86;
+ --admin-green:#26364a;--admin-gold:#b99a62;--admin-line:#e8e0d6;
+ --admin-shadow:0 10px 28px rgba(38,54,74,.055);
+}
+.admin-shell{background:var(--admin-bg);color:var(--admin-ink);font-family:"Shabnam",Tahoma,sans-serif}
+.admin-side{background:#25364b;color:#f6f0e6;border-left:1px solid #c9ad7b;box-shadow:5px 0 24px rgba(38,54,74,.07)}
+.admin-side>img{background:#fffaf2;border-color:#c9ad7b;box-shadow:none}
+.admin-side>small{color:#d8c9b1}
+.admin-side>small:before{color:#f1d5a0}
+.admin-side nav button{color:#e3e5e8}
+.admin-side nav button.active{background:rgba(219,190,147,.13);border-color:rgba(219,190,147,.25);color:#f3d9ad;box-shadow:inset -3px 0 #d7b67f}
+.admin-logout{border-color:#617188;color:#f4e8d6}
+.admin-main h1,.admin-panel h2{color:#26364a}
+.admin-main header span{color:#a88a58}
+.admin-stats article,.admin-panel{background:#fffdf9;border-color:#e8e0d6;box-shadow:var(--admin-shadow)}
+.admin-stats b{color:#9b7b48}
+.admin-stats article:after{background:radial-gradient(circle,rgba(196,157,117,.14),transparent 68%)}
+.admin-connection-state{background:#f9f6f0;border-color:#e8e0d6}
+.admin-connection-state b{color:#26364a}
+.admin-table-wrap th{background:#f1e9df;color:#5f6470}
+.admin-table-wrap td{border-color:#eee7df}
+.admin-table-wrap tbody tr:hover td{background:#fcf8f3}
+.admin-table-wrap td button{background:#f7f3ed;color:#33465d;border-color:#e4d8c8}
+.admin-table-wrap td button:hover{background:#f2e8df;border-color:#cbb38e}
+.admin-status-pill{background:#f0e9df;color:#43546a}
+.admin-status-pill.status-paid,.admin-status-pill.status-completed{background:#e9f1e9;color:#356448}
+.admin-status-pill.status-cancelled,.admin-status-pill.status-payment_failed{background:#f7e8e7;color:#a33e39}
+.admin-status-pill.status-awaiting_payment{background:#f8eddb;color:#8d672e}
+.admin-toolbar input,.admin-form input,.admin-form select,.admin-form textarea,.admin-modal input,.admin-modal select,.admin-modal textarea{background:#fffdf9;border-color:#e4dcd2;color:#29394e}
+.admin-toolbar input:focus,.admin-form input:focus,.admin-form select:focus,.admin-form textarea:focus,.admin-modal input:focus,.admin-modal select:focus,.admin-modal textarea:focus{border-color:#c4a77b;box-shadow:0 0 0 3px rgba(196,167,123,.13)}
+.admin-user button,.admin-toolbar button,.admin-form>button,.admin-modal button:not(.secondary),.admin-login button{border-color:#25364b;background:linear-gradient(135deg,#31445d,#25364b);color:#fff7e9;box-shadow:0 5px 13px rgba(38,54,74,.12)}
+.admin-gate{background:radial-gradient(circle at 20% 10%,#d9c5ac 0%,transparent 42%),linear-gradient(135deg,#f7f3ec,#eae2d7 55%,#f7f3ec)}
+.admin-login{background:#fffdf9;border-color:#d9c7a8;box-shadow:0 22px 65px rgba(38,54,74,.13)}
+.admin-login h1{color:#26364a}
+.admin-login input{border-color:#e4dcd2;color:#29394e}
+.admin-login input:focus{border-color:#c4a77b;box-shadow:0 0 0 3px rgba(196,167,123,.13)}
+.admin-login a{color:#8d6d45}
+.admin-notice{background:#f8eddb;border-color:#e7d4b0;color:#72572e}
+.admin-modal-backdrop{background:rgba(27,39,54,.65)}
+.admin-modal{background:#fffdf9;border-color:#e0d1b7}
+.admin-modal h2{color:#26364a}
+.modal-actions .secondary,.admin-modal button.secondary,.admin-content-card button.secondary{background:#f7f3ed;color:#33465d;border-color:#e4d8c8}
+.admin-content-card{background:#fcfaf6;border-color:#e8e0d6}
+.admin-content-card h3,.admin-content-heading{color:#33465d}
+.admin-content-heading button{background:#f7f3ed;color:#33465d;border-color:#e4d8c8}
+.admin-product-core,.admin-optional-fields{gap:12px}
+.admin-price-preview{border-color:#e3d1ae;background:linear-gradient(135deg,#fff8ed,#f4eadb);color:#29394e}
+.admin-price-preview>strong{color:#9b7b48}
+.admin-optional-fields{border-color:#e8e0d6}
+.admin-optional-fields summary{color:#33465d}
+.admin-hint{border-color:#e7d4b0;background:#f8eddb;color:#72572e}
+.admin-attributes-editor{border-color:#e8e0d6;background:#fcfaf6}
+.admin-attributes-heading{color:#33465d}
+.admin-attribute-row input{border-color:#e4dcd2;background:#fffdf9;color:#29394e}
+@media(max-width:640px){
+ .admin-side{background:#25364b;border-bottom:1px solid #c9ad7b}
+ .admin-side nav button.active{box-shadow:inset 0 -3px #d7b67f}
+ .admin-main{padding-top:16px}
+ .admin-main header{gap:12px}
+ .admin-user{color:#6d7580}
+ .admin-stats article{background:#fffdf9}
+ .admin-toolbar button{min-height:44px}
+ .admin-modal-backdrop{background:rgba(27,39,54,.72)}
+}
