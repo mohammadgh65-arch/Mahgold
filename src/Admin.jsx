@@ -125,7 +125,7 @@ export default function AdminPanel(){
  async function uploadTileImage(index,file){const url=await uploadImage(file,'tiles');if(url)changeSiteContent(next=>{const rows=[...(next.tiles||[])];rows[index]={...(rows[index]||{}),image:url};next.tiles=rows;});}
  const tileDefaults=[{name:'طلای زینتی',desc:'زیورآلات برای هر روز و هر occasion',image:'https://growth-and-advancement-garden.lovable.app/assets/jewelry-CwLx7kUY.jpg'},{name:'طلای آب‌شده',desc:'انتخابی برای نگاه سرمایه‌ای',image:'https://growth-and-advancement-garden.lovable.app/assets/melted-nOWRYhbE.jpg'},{name:'سکه',desc:'ارزش آشنا، انتخاب مطمئن',image:'https://growth-and-advancement-garden.lovable.app/assets/coin-CsyrnHPB.jpg'},{name:'شمش',desc:'خلوص در ساده‌ترین شکل',image:'https://growth-and-advancement-garden.lovable.app/assets/bar-B0yyIRPP.jpg'}];
  const tileRows=tileDefaults.map(tile=>({...tile,...((contentObject.tiles||[]).find(item=>item.name===tile.name)||{})}));
- const filtered=(data[section]||[]).filter(x=>section!=='customers'||x.role==='customer').filter(x=>JSON.stringify(x).toLowerCase().includes(search.toLowerCase()));
+ const sectionRows=Array.isArray(data[section])?data[section]:[];const filtered=sectionRows.filter(x=>section!=='customers'||x.role==='customer').filter(x=>JSON.stringify(x).toLowerCase().includes(search.toLowerCase()));
  const activeGoldQuote=data.quotes.find(q=>q.symbol==='gold_18k');
  const previewWeight=Number(product.weight_grams||0),previewKarat=Number(product.karat||18),previewLaborValue=Number(product.labor_value||0);
  const previewBase=previewWeight*Number(activeGoldQuote?.price_toman||0)*(previewKarat/18);
