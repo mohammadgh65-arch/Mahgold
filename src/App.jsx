@@ -592,33 +592,20 @@ export default function App() {
       </section>}
     </main>
 
-    <footer className="ref-lux-footer" style={{background:"#101a2b",color:"#f5eaf0",borderTop:"1px solid #d7a9bf"}}>
+    <footer className="ref-lux-footer" aria-label="پاورقی مه‌گلد">
       <div className="ref-footer-frame">
-        <a className="ref-footer-brand ref-footer-brand-current" href="#home" aria-label="مه‌گلد - صفحه اصلی"><img src={MAHGOLD_LOGO} alt="لوگوی مه‌گلد" style={{display:"block",width:"min(260px,72vw)",height:"auto",objectFit:"contain"}}/></a>
-        <div className="ref-footer-tagline">طلایی به زیباییِ لحظه‌های تو</div>
-        <div className="ref-footer-links">
-          <a href="#home">صفحه اصلی</a><a href="#categories">دسته‌بندی‌ها</a><a href="#shop">فروشگاه</a><a href="#story">درباره مه‌گلد</a>
-        </div>
+        <nav className="ref-footer-links" aria-label="پیوندهای سایت">
+          <a href="#home">خانه</a><a href="#categories">دسته‌بندی‌ها</a><a href="#shop">فروشگاه</a><a href="#story">درباره ما</a>
+        </nav>
         <div className="ref-footer-contact">
-          <span><Phone size={15}/> شماره تماس: به‌زودی</span>
-          <span><MapPin size={15}/> نشانی: به‌زودی اعلام می‌شود</span>
-        </div>
-        <section className="ref-social-contact" aria-label="راه‌های ارتباط با مه‌گلد">
-          <div className="ref-social-heading"><span className="ref-social-kicker">STAY IN TOUCH</span><strong>همراه مه‌گلد باشید</strong><small>پشتیبانی و پاسخ‌گویی از مسیرهای رسمی مه‌گلد</small></div>
-          <div className="ref-social-grid">
-            <div className="ref-social-card ref-social-whatsapp" aria-disabled="true">
-              <span className="ref-social-icon" aria-label="WhatsApp"><svg viewBox="0 0 32 32" width="25" height="25" role="img"><path fill="currentColor" d="M16 3.2A12.6 12.6 0 0 0 5.2 23.9L3.5 29l5.3-1.7A12.6 12.6 0 1 0 16 3.2Zm0 22.8a10.1 10.1 0 0 1-5.1-1.4l-.4-.2-3.1 1 1-3-.3-.4A10.1 10.1 0 1 1 16 26Zm5.6-7.6c-.3-.2-1.8-.9-2.1-1s-.5-.2-.7.2-.8 1-1 1.1-.4.2-.7 0a8.3 8.3 0 0 1-2.5-1.5 9.3 9.3 0 0 1-1.7-2.1c-.2-.4 0-.5.2-.7l.5-.6.2-.5a.6.6 0 0 0 0-.5c0-.2-.7-1.7-.9-2.3s-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.7 3.7 0 0 0-1.2 2.8 6.4 6.4 0 0 0 1.3 3.4 14.6 14.6 0 0 0 5.6 4.9c.7.3 1.3.5 1.8.6.8.3 1.5.2 2.1.1.7-.1 1.8-.7 2-1.4s.3-1.3.2-1.4-.3-.2-.6-.4Z"/></svg></span>
-              <span className="ref-social-copy"><b>واتس‌اپ</b><small>گفت‌وگوی مستقیم با پشتیبانی</small></span>
-              <span className="ref-social-status">به‌زودی</span>
-            </div>
-            <div className="ref-social-card ref-social-bale" aria-disabled="true">
-              <span className="ref-social-icon" aria-label="پیام‌رسان بله"><svg viewBox="0 0 32 32" width="25" height="25" role="img"><circle cx="16" cy="16" r="15" fill="#168de2"/><path d="M7.5 15.2 23.8 8.8c.8-.3 1.5.2 1.2 1.2l-2.8 13.1c-.2 1-.8 1.2-1.6.7l-4.4-3.2-2.2 2.1c-.3.3-.6.5-1 .4l.4-4.8 8.7-7.8-10.7 6.7-4.5-1.4c-1-.3-1-1 .6-1.6Z" fill="#fff"/></svg></span>
-              <span className="ref-social-copy"><b>بله</b><small>ارتباط در پیام‌رسان بله</small></span>
-              <span className="ref-social-status">به‌زودی</span>
-            </div>
+          <span><Phone size={14}/> پشتیبانی مه‌گلد</span>
+          <span className="ref-footer-social-label">شبکه‌های ارتباطی</span>
+          <div className="ref-footer-social-icons">
+            <span title="واتس‌اپ" aria-label="واتس‌اپ" className="ref-footer-wa"><svg viewBox="0 0 32 32" width="21" height="21" role="img"><path fill="currentColor" d="M16 3.2A12.6 12.6 0 0 0 5.2 23.9L3.5 29l5.3-1.7A12.6 12.6 0 1 0 16 3.2Zm0 22.8a10.1 10.1 0 0 1-5.1-1.4l-.4-.2-3.1 1 1-3-.3-.4A10.1 10.1 0 1 1 16 26Zm5.6-7.6c-.3-.2-1.8-.9-2.1-1s-.5-.2-.7.2-.8 1-1 1.1-.4.2-.7 0a8.3 8.3 0 0 1-2.5-1.5 9.3 9.3 0 0 1-1.7-2.1c-.2-.4 0-.5.2-.7l.5-.6.2-.5a.6.6 0 0 0 0-.5c0-.2-.7-1.7-.9-2.3s-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.7 3.7 0 0 0-1.2 2.8 6.4 6.4 0 0 0 1.3 3.4 14.6 14.6 0 0 0 5.6 4.9c.7.3 1.3.5 1.8.6.8.3 1.5.2 2.1.1.7-.1 1.8-.7 2-1.4s.3-1.3.2-1.4-.3-.2-.6-.4Z"/></svg></span>
+            <span title="بله" aria-label="بله" className="ref-footer-bale"><svg viewBox="0 0 32 32" width="21" height="21" role="img"><circle cx="16" cy="16" r="15" fill="#168de2"/><path d="M7.5 15.2 23.8 8.8c.8-.3 1.5.2 1.2 1.2l-2.8 13.1c-.2 1-.8 1.2-1.6.7l-4.4-3.2-2.2 2.1c-.3.3-.6.5-1 .4l.4-4.8 8.7-7.8-10.7 6.7-4.5-1.4c-1-.3-1-1 .6-1.6Z" fill="#fff"/></svg></span>
           </div>
-        </section>
-        <div className="ref-footer-copy">© ۱۴۰۵ فروشگاه آنلاین مه‌گلد · زیورآلات طلا</div>
+        </div>
+        <div className="ref-footer-copy">© ۱۴۰۵ مه‌گلد · زیورآلات طلا</div>
       </div>
     </footer>
 
