@@ -587,7 +587,7 @@ export default function App() {
           ].map(tile=>{
             const product=products.find(item=>tile.name==='طلای زینتی'?jewelryProductCategories.has(item.category):item.category===tile.name);
             const configured=displayTiles.find(item=>item.name===tile.name);
-            const image=configured?.image||product?.image_url||editorialImageFor(tile.name);
+            const image=product?.image_url||configured?.image||editorialImageFor(tile.name);
             return <button key={tile.name} className="ref-category-card" onClick={()=>openCatalog(tile.name)} aria-label={'مشاهده مجموعه '+tile.name}>
               <img src={image} alt={'تصویر '+tile.name} loading="lazy" decoding="async"/>
               <span className="ref-category-shade"/>
