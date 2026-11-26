@@ -473,7 +473,7 @@ export default function App() {
   if(isAdminPage)return <Suspense fallback={<div className="min-h-screen grid place-items-center" dir="rtl">در حال بارگذاری پنل مدیریت…</div>}><AdminPanel/></Suspense>;
 
   return <div dir="rtl" className="min-h-screen bg-background text-foreground">
-    {siteContent?.announcement?.active!==false&&<div className="ref-announcement">{siteContent?.announcement?.text||"ارسال امن و بسته‌بندی ویژه ✦ پشتیبانی مه‌گلد ✦ همراه انتخاب شما"}</div>}
+    {siteContent?.announcement?.active!==false&&<div className="ref-announcement">{siteContent?.announcement?.text||"مه‌گلد | ویترین طلای زینتی و سکه"}</div>}
     <header className="ref-site-header sticky top-0 z-40">
       <div className="ref-main-header mx-auto max-w-[1440px] px-4 md:px-6">
         <button aria-label="منو" className="ref-mobile-menu md:hidden" onClick={()=>setMenuOpen(v=>!v)}><Menu size={20}/></button>
@@ -534,7 +534,7 @@ export default function App() {
           </div></article>)}</div>:<div className="ref-home-arrivals-empty">{dataStatus==='loading'?'در حال دریافت محصولات…':'محصول جدیدی برای نمایش ثبت نشده است.'}</div>})()}
       </section>}
 
-      {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">MAHGOLD CATALOG</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div><img className="ref-catalog-category-image" src={optimizeUnsplashImage(editorialImageFor(category)||displayTiles.find(t=>t.name===category)?.image||tiles[0].image,640)} srcSet={unsplashResponsiveSrcSet(editorialImageFor(category)||displayTiles.find(t=>t.name===category)?.image||tiles[0].image)} sizes="(max-width: 767px) 90vw, 420px" alt={'تصویر دسته '+category} loading="eager" decoding="async" fetchPriority="high"/></div></section>}
+      {catalogPage&&<section className="ref-catalog-heading mx-auto max-w-7xl px-4 py-6 md:px-7"><button onClick={showHome} className="ref-catalog-back">← بازگشت به صفحه اصلی</button><div className="ref-catalog-heading-layout"><div><span className="eyebrow text-gold-deep">MAHGOLD CATALOG</span><h1>{category==='همه محصولات'?'همه محصولات مه‌گلد':'محصولات '+category}</h1><p>مجموعه کامل محصولات این بخش، همراه با جست‌وجو و مرتب‌سازی</p></div><img className="ref-catalog-category-image" src={optimizeUnsplashImage((siteContent?.tiles||[]).find(t=>t.name===category)?.image||products.find(p=>p.category===category)?.image_url||editorialImageFor(category)||tiles[0].image,640)} srcSet={unsplashResponsiveSrcSet((siteContent?.tiles||[]).find(t=>t.name===category)?.image||products.find(p=>p.category===category)?.image_url||editorialImageFor(category)||tiles[0].image)} sizes="(max-width: 767px) 90vw, 420px" alt={'تصویر دسته '+category} loading="eager" decoding="async" fetchPriority="high"/></div></section>}
 
                 {!catalogPage&&<div className="ref-quote-strip">
           <div className="ref-quote-title"><span className="ref-quote-bars">▥</span><div><b>قیمت لحظه‌ای طلای ۱۸ عیار</b><small>{quoteFresh?(quoteIsManual?'نرخ دستی معتبر':'به‌روزرسانی لحظه‌ای'):quoteIsManual?'نرخ دستی منقضی‌شده':quote?.is_live?'نرخ قدیمی · قیمت‌گذاری خودکار متوقف':'در انتظار نرخ معتبر'}</small></div></div>
@@ -717,7 +717,7 @@ export default function App() {
         <div className="ref-product-page-copy">
           <span className="text-xs text-muted-foreground">{selectedProduct.category}</span>
           <h1>{selectedProduct.name}</h1>
-          <p>{selectedProduct.description||'جزئیاتی ظریف و انتخابی ماندگار از مجموعه مه‌گلد.'}</p>
+          <p>{selectedProduct.description||'مشخصات ثبت‌شده این محصول در جدول زیر قابل مشاهده است.'}</p>
           <strong className="ref-product-page-price">{selectedProduct.pricing_mode==='auto'&&!quoteFresh?'نرخ معتبر در دسترس نیست':<>{money(selectedProduct.price_toman)} <small>تومان</small></>}</strong>
           {selectedProduct.pricing_mode==='auto'&&quoteFresh&&(()=>{const b=priceBreakdown(selectedProduct,quote);return <div className="mahgold-product-price-breakdown mt-4 rounded-2xl border border-gold/20 bg-card/60 p-4 text-sm"><h3 className="mb-2 font-semibold">ریز محاسبات قیمت</h3><div className="flex justify-between py-1"><span>اصل طلا</span><b>{money(b.base)} تومان</b></div><div className="flex justify-between py-1"><span>اجرت ساخت</span><b>{money(b.labor)} تومان</b></div><div className="flex justify-between py-1"><span>سود فروشنده</span><b>{money(b.profit)} تومان</b></div><div className="flex justify-between py-1"><span>کمیسیون</span><b>{money(b.commission)} تومان</b></div><div className="flex justify-between py-1"><span>مالیات ارزش افزوده</span><b>{money(b.tax)} تومان</b></div><div className="mt-2 flex justify-between border-t border-gold/20 pt-3 font-semibold"><span>قیمت نهایی</span><b>{money(b.total)} تومان</b></div></div>;})()}
           <button className="h-12 rounded-lg bg-gold-gradient text-sm font-bold text-ink ref-full" disabled={Number(selectedProduct.stock||0)<1||(selectedProduct.pricing_mode==='auto'&&!quoteFresh)} onClick={()=>addToCart(selectedProduct)}>افزودن به سبد خرید <ShoppingBag className="mr-2 inline" size={16}/></button>
