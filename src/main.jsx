@@ -5,6 +5,7 @@ import './reference-template.css';
 import './mahgold-redesign.css';
 import './mahgold-navy-white-pink.css';
 import './simgallery-improvements.css';
+import './mahgold-final-palette.css';
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
 }
