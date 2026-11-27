@@ -1,4 +1,4 @@
-name: Independent storefront build and private preview artifact
+name: Independent storefront build and private preview
 
 on:
   push:
@@ -21,8 +21,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Install project dependencies
-        run: npm install --no-audit --no-fund
+      - name: Install locked project dependencies
+        run: npm ci --no-audit --no-fund
       - name: Build React application
         env:
           VITE_SUPABASE_URL: https://nzvvvpbwavaodhxrnkdr.supabase.co
