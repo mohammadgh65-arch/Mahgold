@@ -1,6 +1,28 @@
 -- Require a verified AAL2 session for every admin-only data path.
+-- Preserve the existing dual authorization check: profiles.role = 'admin' AND store_admins membership.
 -- Customer-owned order reads remain available to customers at AAL1.
 -- This migration is committed for review only; it is not applied to the live database.
+
+CREATE OR REPLACE FUNCTION public.zarin_is_admin()
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SET search_path TO ''
+AS $function$
+  SELECT
+    COALESCE((SELECT auth.jwt() ->> 'aal') = 'aal2', false)
+    AND EXISTS (
+      SELECT 1
+      FROM public.profiles p
+      WHERE p.id = (SELECT auth.uid())
+        AND p.role = 'admin'
+    )
+    AND EXISTS (
+      SELECT 1
+      FROM public.store_admins a
+      WHERE a.user_id = (SELECT auth.uid())
+    );
+$function$;
 
 ALTER POLICY "Admins delete products"
   ON public.products
