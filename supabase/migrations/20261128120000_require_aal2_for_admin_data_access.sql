@@ -68,3 +68,26 @@ ALTER POLICY "Customers can read own order items"
         AND (o.customer_id = (SELECT auth.uid()) OR public.zarin_is_admin())
     )
   );
+
+ALTER POLICY "Basic admins upload product images"
+  ON storage.objects
+  WITH CHECK (
+    bucket_id = 'product-images'
+    AND public.zarin_is_admin()
+  );
+ALTER POLICY "Basic admins update product images"
+  ON storage.objects
+  USING (
+    bucket_id = 'product-images'
+    AND public.zarin_is_admin()
+  )
+  WITH CHECK (
+    bucket_id = 'product-images'
+    AND public.zarin_is_admin()
+  );
+ALTER POLICY "Basic admins delete product images"
+  ON storage.objects
+  USING (
+    bucket_id = 'product-images'
+    AND public.zarin_is_admin()
+  );
