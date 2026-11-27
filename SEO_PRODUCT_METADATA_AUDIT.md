@@ -10,6 +10,13 @@ Audit of the current `index.html` blob on branch `seo-product-metadata-preview` 
 - The storefront loads active products from Supabase (`products`) and categories separately. Product records include fields such as `id`, `name`, `category`, `description`, `image_url`, `weight_grams`, `karat`, `price_toman`, `stock`, and `tag`.
 - The audited file is a bundled React single-page application. There is no confirmed server-rendered, crawlable individual product URL pattern in this source inspection. Therefore product-specific meta tags cannot safely be implemented by simply adding a single static meta block to the shared HTML head.
 
+## Follow-up route inspection (branch comparison)
+Reviewed `src/App.jsx`, `index.html`, `public/_redirects`, and `wrangler.jsonc` on branch `feature/product-pages-dynamic-attributes-cart-toast` (commit `b61b3b203d9644a2f990d85c364b20e994bf487b`).
+- Product detail route currently matches `/product/:id`, using the Supabase product ID as the route segment.
+- Product navigation uses client-side `history.pushState`; the React app resolves the product from the already-loaded product collection. Direct refresh is routed to `index.html` by the catch-all `public/_redirects`, and Cloudflare assets use SPA fallback.
+- The checked `index.html` contains only the shared title and description. No route-specific Open Graph or Product JSON-LD is present in that HTML.
+- This is evidence of client-side route behavior only; it does not prove that search crawlers or social preview bots receive product-specific metadata from the initial HTML response.
+
 ## Safe implementation sequence
 1. Establish a canonical, stable product URL pattern and verify that each product route loads directly and survives refresh.
 2. Add route-aware title, description, canonical URL, Open Graph tags, and Product JSON-LD using actual product data (escaping JSON safely).
