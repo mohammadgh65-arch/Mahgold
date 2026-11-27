@@ -21,8 +21,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Install project dependencies
-        run: npm install --no-audit --no-fund
+      - name: Install locked project dependencies
+        run: npm ci --no-audit --no-fund
       - name: Build admin-only React application
         env:
           VITE_ADMIN_PREVIEW: "true"
@@ -34,11 +34,11 @@ jobs:
       - name: Verify admin-only standalone output
         run: |
           test -s dist/index.html
-          ! grep -Eq '<script[^>]+src=.*assets/|<link[^>]+href=.*assets/.*\\.css' dist/index.html
+          ! grep -Eq '<script[^>]+src=.*assets/|<link[^>]+href=.*\.css' dist/index.html
           grep -q 'ورود مدیر' dist/index.html
           grep -q 'نمای کلی' dist/index.html
           echo "Admin preview verified: $(wc -c < dist/index.html) bytes"
-      - name: Upload private admin preview artifact
+      - name: Upload private admin-only preview artifact
         uses: actions/upload-artifact@v4
         with:
           name: mahgold-admin-only-preview
