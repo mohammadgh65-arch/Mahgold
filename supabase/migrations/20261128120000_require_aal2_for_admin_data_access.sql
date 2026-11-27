@@ -7,6 +7,7 @@ CREATE OR REPLACE FUNCTION public.zarin_is_admin()
 RETURNS boolean
 LANGUAGE sql
 STABLE
+SECURITY DEFINER
 SET search_path TO ''
 AS $function$
   SELECT
