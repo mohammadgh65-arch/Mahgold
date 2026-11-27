@@ -1,4 +1,4 @@
-const CACHE='mahgold-shell-v6-dedicated-admin-entry';
+const CACHE='mahgold-shell-v7-admin-html-entry';
 const SHELL=['/','/manifest.webmanifest','/mahgold-app-icon.svg'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('mahgold-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));});
