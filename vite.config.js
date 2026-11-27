@@ -11,8 +11,8 @@ function dedicatedAdminEntry() {
       const outputDir = resolve(process.cwd(), 'dist');
       const storefrontHtml = await readFile(resolve(outputDir, 'index.html'), 'utf8');
       const adminHtml = storefrontHtml
-        .replace(/<title>[^<]*<\\/title>/, '<title>مدیریت فروشگاه | مه‌گلد</title>')
-        .replace('</head>', '<script>window.__MAHGOLD_ADMIN_ROUTE__=true;</script>\\n</head>');
+        .replace(/<title>[^<]*<\/title>/, '<title>مدیریت فروشگاه | مه‌گلد</title>')
+        .replace('</head>', '<script>window.__MAHGOLD_ADMIN_ROUTE__=true;</script>\n</head>');
       await writeFile(resolve(outputDir, 'admin.html'), adminHtml, 'utf8');
     }
   };
