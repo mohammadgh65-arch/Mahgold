@@ -67,4 +67,12 @@ The review branch contains the current storefront migrations and the restored hi
 
 This is a repository/source-history gap, not proof that the live database is missing those changes. Recover remaining canonical SQL from original source or a verified backup, then reconcile metadata and replay-test on a disposable database before any production change.
 
-## Additional read-only RLS review (2026-11-28)\n\nA policy catalog scan found admin-only market quote and inventory reservation policies, plus store-settings insert/update policies, that still referenced the legacy admin predicate. The proposed review migration now switches these policy paths to the hardened AAL2 predicate and the static contract test lists each target. This is a source-level correction only; PostgreSQL execution and role-matrix testing remain outstanding.\n\n**Production status:** Read-only catalog/ledger queries only. No live SQL migration or schema change was executed.
+## Additional read-only RLS review (2026-11-28)
+
+A policy catalog scan found admin-only market quote and inventory reservation policies, plus store-settings insert/update policies, that still referenced the legacy admin predicate. The proposed review migration now switches these policy paths to the hardened AAL2 predicate and the static contract test lists each target. This is a source-level correction only; PostgreSQL execution and role-matrix testing remain outstanding.
+
+**Additional ownership check (2026-11-28):** The proposed policy keeps customer access to their own profiles, orders, order items, and order-status events while routing the administrator branch through the strengthened AAL2 predicate. The static contract now explicitly asserts parent-order ownership for order-status event reads. The linked live policy catalog was re-read to confirm the exact policy names and current predicates; no policy or data was changed.
+
+**Validation status:** Static contract and Cloudflare Pages checks passed for commit `af4f4920e7bf3fd65564ab56aa7f029d080742bd`. This is not a PostgreSQL execution test or a browser MFA test.
+
+**Production status:** Read-only catalog/ledger queries only. No live SQL migration or schema change was executed.
