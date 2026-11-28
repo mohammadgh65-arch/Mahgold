@@ -1,0 +1,31 @@
+name: Admin MFA migration static contract
+
+on:
+  pull_request:
+    branches:
+      - fix/admin-direct-route-20261127
+    paths:
+      - 'supabase/migrations/20261128120000_require_aal2_for_admin_data_access.sql'
+      - 'scripts/check-admin-mfa-migration.mjs'
+      - 'package.json'
+  push:
+    branches:
+      - fix/latest-storefront-admin-mfa-20261128
+    paths:
+      - 'supabase/migrations/20261128120000_require_aal2_for_admin_data_access.sql'
+      - 'scripts/check-admin-mfa-migration.mjs'
+      - 'package.json'
+
+permissions:
+  contents: read
+
+jobs:
+  static-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check migration contract (static; not a PostgreSQL execution test)
+        run: node scripts/check-admin-mfa-migration.mjs
