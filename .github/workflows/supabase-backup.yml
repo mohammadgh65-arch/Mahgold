@@ -18,18 +18,48 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gnupg
 
+      - name: Validate Supabase Session Pooler URI
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_SESSION_POOLER_URL }}
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_DB_URL" || { echo "Missing SUPABASE_SESSION_POOLER_URL secret"; exit 1; }
+          python3 - <<'PY'
+          import os
+          from urllib.parse import urlsplit
+
+          value = os.environ["SUPABASE_DB_URL"]
+          try:
+              parsed = urlsplit(value)
+              valid = (
+                  parsed.scheme in ("postgres", "postgresql")
+                  and parsed.hostname is not None
+                  and parsed.hostname.endswith(".pooler.supabase.com")
+                  and parsed.port == 5432
+                  and parsed.username == "postgres.nzvvvpbwavaodhxrnkdr"
+                  and parsed.password is not None
+                  and parsed.path == "/postgres"
+              )
+          except ValueError:
+              valid = False
+
+          if not valid:
+              raise SystemExit(
+                  "Invalid Supabase Session Pooler URI. Copy the Session Pooler URI "
+                  "from Supabase Dashboard > Connect; verify project username, "
+                  "session port 5432, database path /postgres, and password. "
+                  "The secret value is intentionally not printed."
+              )
+          print("Session Pooler URI format validated; credential value not displayed.")
+          PY
+
       - name: Create encrypted database dump
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_SESSION_POOLER_URL }}
           BACKUP_PASSPHRASE: ${{ secrets.BACKUP_ENCRYPTION_PASSPHRASE }}
         run: |
           set -euo pipefail
-          test -n "$SUPABASE_DB_URL" || { echo "Missing SUPABASE_SESSION_POOLER_URL secret"; exit 1; }
           test -n "$BACKUP_PASSPHRASE" || { echo "Missing BACKUP_ENCRYPTION_PASSPHRASE secret"; exit 1; }
-          case "$SUPABASE_DB_URL" in
-            postgres://*|postgresql://*) ;;
-            *) echo "Secret format invalid: expected a PostgreSQL connection URI beginning postgres:// or postgresql://"; exit 1 ;;
-          esac
           docker run --rm -e SUPABASE_DB_URL -v "$PWD:/backup" postgres:17 sh -ec 'pg_dump --dbname="$SUPABASE_DB_URL" --format=custom --no-owner --no-acl --verbose --file=/backup/mahgold.dump'
           gpg --batch --yes --pinentry-mode loopback --passphrase "$BACKUP_PASSPHRASE" --symmetric --cipher-algo AES256 --output "mahgold-$(date -u +%Y-%m-%d).dump.gpg" mahgold.dump
           shred -u mahgold.dump || rm -f mahgold.dump
