@@ -17,26 +17,37 @@ const requiredPolicies = [
 
 assert.match(sql, /SECURITY DEFINER/i, 'admin predicate must run as SECURITY DEFINER');
 assert.match(sql, /SET search_path TO ''/i, 'admin predicate must use an empty search_path');
-assert.match(sql, /auth\.jwt\(\)\s*->>\s*'aal'\)\s*=\s*'aal2'/i, 'AAL2 claim must be required');
-assert.match(sql, /p\.role\s*=\s*'admin'/i, 'profiles admin role check must remain');
-assert.match(sql, /public\.store_admins/i, 'store_admins membership check must remain');
+assert.match(sql, /auth\\.jwt\\(\\)\\s*->>\\s*'aal'\\)\\s*=\\s*'aal2'/i, 'AAL2 claim must be required');
+assert.match(sql, /p\\.role\\s*=\\s*'admin'/i, 'profiles admin role check must remain');
+assert.match(sql, /public\\.store_admins/i, 'store_admins membership check must remain');
+
 for (const policy of requiredPolicies) {
-  assert.ok(sql.includes(`ALTER POLICY "${policy}"`), `missing target policy: ${policy}`);
+  const start = sql.indexOf(`ALTER POLICY "${policy}"`);
+  assert.notEqual(start, -1, `missing target policy: ${policy}`);
+  const next = sql.indexOf('ALTER POLICY "', start + 1);
+  const block = sql.slice(start, next === -1 ? sql.length : next);
+  assert.match(block, /public\\.zarin_is_admin\\(\\)/i,
+    `policy must use the hardened admin predicate: ${policy}`);
 }
-assert.match(sql, /Customers can read own orders"[\s\S]*?auth\.uid\(\)[\s\S]*?customer_id[\s\S]*?OR public\.zarin_is_admin\(\)/i,
+
+assert.match(sql, /Customers can read own orders"[\\s\\S]*?auth\\.uid\\(\\)[\\s\\S]*?customer_id[\\s\\S]*?OR public\\.zarin_is_admin\\(\\)/i,
   'customer order SELECT must retain owner access as well as admin access');
-assert.match(sql, /is_active\s*=\s*true\)\s*OR public\.zarin_is_admin\(\)/i,
+assert.match(sql, /is_active\\s*=\\s*true\\)\\s*OR public\\.zarin_is_admin\\(\\)/i,
   'authenticated active-product visibility must remain public to signed-in customers');
+assert.match(sql, /Admins can manage archived state of paid orders"[\\s\\S]*?status = 'paid'/i,
+  'paid-order archive policy must remain restricted to paid rows');
+assert.match(sql, /Admins can update orders"[\\s\\S]*?status <> 'paid'/i,
+  'ordinary admin order update policy must exclude paid rows');
 assert.doesNotMatch(sql, /DROP POLICY|DROP TABLE|TRUNCATE|DELETE FROM/i, 'migration must not contain destructive DML/DDL');
 assert.doesNotMatch(sql, /enforce_product_pricing_mfa/i, 'pricing MFA trigger must not be modified by this migration');
 
 // Frontend fail-closed checks: MFA must be verified before admin role reads,
 // and admin-only table loading must be gated by the combined admin state.
-assert.match(admin, /aalData\?\.currentLevel===['\"]aal2['\"]/, 'frontend must check current AAL2 level');
-assert.match(admin, /supabase\.auth\.mfa\.verify\(/, 'frontend must verify the authenticator challenge');
-assert.match(admin, /if\(!session\|\|!aal2Ready\)/, 'profile/admin membership lookup must wait for session and AAL2');
-assert.match(admin, /profileResult\.data\?\.role===['"]admin['"]&&!!adminResult\.data/, 'frontend must require profile admin role and store_admins membership');
-assert.match(admin, /if\(!supabase\|\|!adminOk\)return/, 'admin data loader must fail closed');
-assert.match(admin, /if\(mfaMode!==['"]complete['"]\|\|!aal2Ready\)/, 'UI must block panel until MFA is complete');
+assert.match(admin, /aalData\\?\\.currentLevel===['"]aal2['"]/, 'frontend must check current AAL2 level');
+assert.match(admin, /supabase\\.auth\\.mfa\\.verify\\(/, 'frontend must verify the authenticator challenge');
+assert.match(admin, /if\\(!session\\|\\|!aal2Ready\\)/, 'profile/admin membership lookup must wait for session and AAL2');
+assert.match(admin, /profileResult\\.data\\?\\.role===['"]admin['"]&&!!adminResult\\.data/, 'frontend must require profile admin role and store_admins membership');
+assert.match(admin, /if\\(!supabase\\|\\|!adminOk\\)return/, 'admin data loader must fail closed');
+assert.match(admin, /if\\(mfaMode!==['"]complete['"]\\|\\|!aal2Ready\\)/, 'UI must block panel until MFA is complete');
 
-console.log(`Admin MFA static contract passed: ${requiredPolicies.length} RLS policy targets + frontend fail-closed checks.`);
+console.log(`Admin MFA static contract passed: ${requiredPolicies.length} RLS policy targets + policy predicate and frontend fail-closed checks.`);
