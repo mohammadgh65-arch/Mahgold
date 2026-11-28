@@ -108,7 +108,7 @@ export function validateNerkhSanjPayload(
 
   const currentMinute = parseClock(current.time)!;
   const ageMinutes = currentMinute - marketMinute;
-  if (ageMinutes < -1) {
+  if (ageMinutes < 0) {
     return { ok: false, reason: "market_time_in_future" };
   }
   if (ageMinutes > MAX_MARKET_AGE_MINUTES) {
