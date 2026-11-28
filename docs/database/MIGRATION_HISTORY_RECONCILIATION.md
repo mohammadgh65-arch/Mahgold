@@ -73,6 +73,8 @@ A policy catalog scan found admin-only market quote and inventory reservation po
 
 **Additional ownership check (2026-11-28):** The proposed policy keeps customer access to their own profiles, orders, order items, and order-status events while routing the administrator branch through the strengthened AAL2 predicate. The static contract now explicitly asserts parent-order ownership for order-status event reads. The linked live policy catalog was re-read to confirm the exact policy names and current predicates; no policy or data was changed.
 
+**Profile role-escalation safeguard (read-only live check):** The linked production catalog contains a `BEFORE INSERT OR UPDATE OF role` trigger on `public.profiles` named `mahgold_profiles_guard_role`, invoking `mahgold_enforce_profile_role()`. Its function forces self-created profiles to `customer` and prevents non-privileged callers from changing their own role. The exact historical migration source for this guard was not found among the review-branch migration files. Therefore this live safeguard is confirmed for the current database, but its presence in a clean migration replay is **not yet proven**. Keep the migration-history/replay blocker open; do not infer that the policy migration alone installs this trigger.
+
 **Validation status:** Static contract and Cloudflare Pages checks passed for commit `af4f4920e7bf3fd65564ab56aa7f029d080742bd`. This is not a PostgreSQL execution test or a browser MFA test.
 
 **Production status:** Read-only catalog/ledger queries only. No live SQL migration or schema change was executed.
