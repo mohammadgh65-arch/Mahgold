@@ -67,4 +67,4 @@ The review branch contains the current storefront migrations and the restored hi
 
 This is a repository/source-history gap, not proof that the live database is missing those changes. Recover remaining canonical SQL from original source or a verified backup, then reconcile metadata and replay-test on a disposable database before any production change.
 
-**Production status:** Read-only catalog/ledger queries only. No live SQL migration or schema change was executed.
+## Additional read-only RLS review (2026-11-28)\n\nA policy catalog scan found admin-only market quote and inventory reservation policies, plus store-settings insert/update policies, that still referenced the legacy admin predicate. The proposed review migration now switches these policy paths to the hardened AAL2 predicate and the static contract test lists each target. This is a source-level correction only; PostgreSQL execution and role-matrix testing remain outstanding.\n\n**Production status:** Read-only catalog/ledger queries only. No live SQL migration or schema change was executed.
