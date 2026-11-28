@@ -47,6 +47,11 @@ for (const policy of requiredPolicies) {
 
 assert.match(sql, /Customers can read own orders"[\s\S]*?auth\.uid\(\)[\s\S]*?customer_id[\s\S]*?OR public\.zarin_is_admin\(\)/i,
   'customer order SELECT must retain owner access as well as admin access');
+
+assert.match(sql, /profiles_update_own_or_admin"[\s\S]*?\(\(SELECT auth\.uid\(\)\) = id\)[\s\S]*?OR public\.zarin_is_admin\(\)/i,
+  'profile update policy must retain self-service access without removing the admin branch');
+assert.doesNotMatch(sql, /DROP TRIGGER|DROP FUNCTION[^;]*mahgold_enforce_profile_role|CREATE OR REPLACE FUNCTION public\.mahgold_enforce_profile_role/i,
+  'this review migration must not remove or silently replace the separate profile-role guard');
 assert.match(sql, /Customers can read own order status events"[\s\S]*?o\.customer_id\s*=\s*\(SELECT auth\.uid\(\)\)[\s\S]*?OR public\.zarin_is_admin\(\)/i,
   'customer order-status event access must remain parent-order owner scoped');
 assert.match(sql, /Customers can read own order items"[\s\S]*?o\.customer_id\s*=\s*\(SELECT auth\.uid\(\)\)[\s\S]*?OR public\.zarin_is_admin\(\)/i,
