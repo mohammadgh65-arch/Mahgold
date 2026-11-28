@@ -94,3 +94,24 @@ A policy catalog scan found admin-only market quote and inventory reservation po
 **Validation status (2026-11-28):** On current PR head `7143c6c53ad851ca2f33af8a9d94d3713f9e638c`, GitHub Actions `static-contract` passed (run `46141631437`) and Cloudflare Pages preview deployment passed (check `140968682825`; preview `https://5fb48ba6.mahgold-production.pages.dev`). The static job explicitly identifies itself as static, not a PostgreSQL execution test. No local PostgreSQL server, `psql`, `initdb`, or Docker runtime was available in the execution environment; browser-based MFA/admin smoke testing also remains outstanding.
 
 **Production status:** Read-only catalog/ledger queries only. No live SQL migration or schema change was executed; no production deployment was initiated.
+
+
+## Exact review-branch migration inventory (read-only, 2026-11-28)
+
+A fresh GitHub directory listing of `supabase/migrations/` at PR head `7cb4a753fd44fa8dbcd39d55ad6e06cc970b008a` returned exactly **9 SQL files**:
+
+- `20261120130000_allow_fresh_manual_gold_quotes.sql`
+- `20261120140000_support_manual_quote_auto_price_refresh.sql`
+- `20261120150000_block_unverified_paid_orders.sql`
+- `20261120170000_customer_order_tracking.sql`
+- `20261122090000_connect_automatic_product_pricing_triggers.sql`
+- `20261123142051_mahgold_require_aal2_for_admin_rls.sql`
+- `20261126092530_mahgold_require_expected_price_and_secure_quote_expiry.sql`
+- `20261127100000_admin_order_archive_recoverable_delete.sql`
+- `20261128120000_require_aal2_for_admin_data_access.sql`
+
+This inventory confirms that the review branch is **not a complete migration archive** for the 43-entry live ledger. In particular, the exact source for live version `20261114212315` is absent, as are many earlier migration files. Several later live ledger versions are represented only by differently timestamped/name-mismatched files, so do not treat filename similarity as proof of equivalence.
+
+A fresh search of the repository's branches for `20261114`, code search for `require_aal2_for_mahgold_admin_access`, and commit search for the same identifier returned no matches. The linked Supabase project currently has **no development branches**. No branch was created because development branches may incur charges and the project must remain free.
+
+**Next safe step:** obtain the original migration archive or a verified database/source backup containing the missing SQL, then compare exact contents and checksums against the live ledger. Until then, do not attempt a clean replay, mark missing migrations as resolved, or apply the proposed `20261128120000` migration to production.
