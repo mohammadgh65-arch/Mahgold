@@ -61,7 +61,8 @@ jobs:
           set -euo pipefail
           test -n "$BACKUP_PASSPHRASE" || { echo "Missing BACKUP_ENCRYPTION_PASSPHRASE secret"; exit 1; }
           docker run --rm -e SUPABASE_DB_URL -v "$PWD:/backup" postgres:17 sh -ec 'pg_dump --dbname="$SUPABASE_DB_URL" --format=custom --no-owner --no-acl --verbose --file=/backup/mahgold.dump'
-          gpg --batch --yes --pinentry-mode loopback --passphrase "$BACKUP_PASSPHRASE" --symmetric --cipher-algo AES256 --output "mahgold-$(date -u +%Y-%m-%d).dump.gpg" mahgold.dump
+          printf '%s' "$BACKUP_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 --output "mahgold-$(date -u +%Y-%m-%d).dump.gpg" mahgold.dump
+          unset BACKUP_PASSPHRASE
           shred -u mahgold.dump || rm -f mahgold.dump
 
       - name: Store encrypted backup artifact
