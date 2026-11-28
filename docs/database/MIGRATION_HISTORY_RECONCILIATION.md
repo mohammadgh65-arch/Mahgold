@@ -124,3 +124,18 @@ An additional review of earlier repository PRs found PR #14/#15, titled "Separat
 This is useful historical evidence for the tiered-admin design, but it is **not** the missing `20261114212315_require_aal2_for_mahgold_admin_access.sql`: its version, filename, and purpose differ. It must not be renamed or substituted for the missing migration. PR #14 remains open with a different source branch; PR #15 was merged at `0cf544663f1a1c3d6d7d885503b603b17301ddae`.
 
 The exact-source recovery blocker for `20261114212315` therefore remains open. This cross-check was read-only; no migration was applied or changed.
+
+
+## Encrypted backup workflow audit (2026-11-28)
+
+The repository's `.github/workflows/supabase-backup.yml` was inspected. It is designed to create a custom-format `pg_dump`, encrypt it with AES-256 using `BACKUP_ENCRYPTION_PASSPHRASE`, and upload a 7-day GitHub Actions artifact. No artifact was produced in the two most recent scheduled runs:
+
+- Run `46108592679` (2026-11-28): failed in `Create encrypted database dump`.
+- Run `45941435788` (2026-11-27): failed at the same step.
+- Both logs show PostgreSQL reached the Supabase session pooler at `aws-0-ap-southeast-1.pooler.supabase.com:5432`, then rejected authentication for user `postgres` with `password authentication failed`.
+- The logs mask secret values; this audit does not reveal or infer them. The failure is consistent with an invalid/stale database password or a mismatched connection string/credential. It does not prove which secret is wrong.
+- The artifact-upload step was skipped, and the latest run has no artifacts. Therefore these runs cannot supply the missing historical SQL archive or a database dump.
+
+Security/operational consequence: there is currently no successful backup artifact evidenced by these two runs. The GitHub Actions secrets `SUPABASE_SESSION_POOLER_URL` and `BACKUP_ENCRYPTION_PASSPHRASE` require owner-side verification/update before a future backup run. Do not print secrets, add credentials to repository files, or attempt password resets from this review.
+
+This is a read-only audit. No secrets, database credentials, workflow definitions, or production database settings were changed.
