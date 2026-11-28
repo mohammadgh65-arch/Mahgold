@@ -116,7 +116,7 @@ Deno.serve(async (req: Request) => {
     full_name: customerName,
     phone: customerPhone,
     preferred_auth_method: authMethod,
-  }, { onConflict: "id" });
+  }, { onConflict: "id", ignoreDuplicates: true });
   if (profileError) return response(500, { error: "Customer profile could not be prepared. Please try again later." });
 
   const { data, error } = await admin.rpc("mahgold_create_order_idempotent", {
