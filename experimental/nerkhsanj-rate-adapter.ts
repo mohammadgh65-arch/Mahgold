@@ -178,3 +178,28 @@ export async function fetchNerkhSanjCandidate(
 
   return validateNerkhSanjPayload(payload, now);
 }
+
+
+/**
+ * Advisory comparison only; the reference feed may share an upstream source.
+ * A pass does not establish source independence or authorize production use.
+ */
+export function compareReferencePrice(
+  candidatePrice: number,
+  referencePrice: number,
+  maxDeviation = 0.005,
+): { ok: true; deviation: number } | { ok: false; reason: string; deviation?: number } {
+  if (
+    !Number.isFinite(candidatePrice) || candidatePrice <= 0 ||
+    !Number.isFinite(referencePrice) || referencePrice <= 0 ||
+    !Number.isFinite(maxDeviation) || maxDeviation < 0 || maxDeviation > 0.1
+  ) {
+    return { ok: false, reason: "invalid_comparison_input" };
+  }
+
+  const deviation = Math.abs(candidatePrice - referencePrice) / referencePrice;
+  if (deviation > maxDeviation) {
+    return { ok: false, reason: "reference_price_deviation_exceeded", deviation };
+  }
+  return { ok: true, deviation };
+}
