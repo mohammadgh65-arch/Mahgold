@@ -14,7 +14,9 @@ const requiredPolicies = [
   'Customers can read own orders','Customers can read own order items',
   'Basic admins upload product images','Basic admins update product images','Basic admins delete product images',
   'Admins delete market quotes','Admins insert market quotes','Admins update market quotes',
-  'Admins inspect reservations','Admins release reservations'
+  'Admins inspect reservations','Admins release reservations',
+  'profiles_select_own_or_admin','profiles_update_own_or_admin',
+  'Customers can read own order status events'
 ];
 
 assert.match(sql, /SECURITY DEFINER/i, 'admin predicate must run as SECURITY DEFINER');
