@@ -56,12 +56,18 @@ This document records observed metadata only. It does **not** certify the comple
 
 ## Live Supabase advisor snapshot (read-only, 2026-11-28)
 
-- **Security warning:** Supabase Auth leaked-password protection is disabled. This is an Auth configuration item, not something the proposed RLS migration changes. Enable it through the Supabase Auth password-security settings after review: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
+- **Security warning:** Supabase Auth leaked-password protection is disabled. This is an Auth configuration item, not something the proposed RLS migration changes.
 - **Performance info:** `public.orders.deleted_by` foreign key has no covering index. The advisor also reports seven currently unused indexes; do not remove them based only on this snapshot, since low/seasonal traffic can make valid indexes appear unused.
 - **Performance warning:** `public.orders` has multiple permissive UPDATE policies for authenticated users (`Admins can manage archived state of paid orders` and `Admins can update orders`). This appears intentional to separate paid-order archival from ordinary order updates; retain the distinct safeguards unless a tested policy consolidation proves equivalent.
 - **Health advisor:** no findings at the time of this snapshot.
 
 These are advisory findings only. No Auth configuration, index, policy, or production data was changed.
+
+### Leaked-password protection plan requirement
+
+The linked Supabase organization was checked on 2026-11-28 and is currently on the **Free** plan. Supabase documentation states that leaked-password protection (HaveIBeenPwned/Pwned Passwords checks) is available on **Pro and above**. Migration alone cannot enable this Auth feature. Keep it as a post-migration Auth hardening item, conditional on a Pro-or-higher plan; do not upgrade or incur costs automatically. If the project remains Free, retain the available password-strength controls and document that they are not equivalent to breached-password screening.
+
+Official documentation: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
 
 ## Recovered historical source
 
@@ -85,6 +91,6 @@ A policy catalog scan found admin-only market quote and inventory reservation po
 
 **Profile role-escalation safeguard (read-only live check):** The linked production catalog contains a `BEFORE INSERT OR UPDATE OF role` trigger on `public.profiles` named `mahgold_profiles_guard_role`, invoking `mahgold_enforce_profile_role()`. Its function forces self-created profiles to `customer` and prevents non-privileged callers from changing their own role. The exact historical migration source for this guard was not found among the review-branch migration files. Therefore this live safeguard is confirmed for the current database, but its presence in a clean migration replay is **not yet proven**. Keep the migration-history/replay blocker open; do not infer that the policy migration alone installs this trigger.
 
-**Validation status:** Static contract passed for commit `16981abdb9b23f7d2db5f68aaeaddf60c5ceb4b1` after adding profile self-service and role-guard preservation assertions. The subsequent documentation-only head is being rechecked. These checks are not a PostgreSQL execution test or a browser MFA test.
+**Validation status (2026-11-28):** On current PR head `7143c6c53ad851ca2f33af8a9d94d3713f9e638c`, GitHub Actions `static-contract` passed (run `46141631437`) and Cloudflare Pages preview deployment passed (check `140968682825`; preview `https://5fb48ba6.mahgold-production.pages.dev`). The static job explicitly identifies itself as static, not a PostgreSQL execution test. No local PostgreSQL server, `psql`, `initdb`, or Docker runtime was available in the execution environment; browser-based MFA/admin smoke testing also remains outstanding.
 
-**Production status:** Read-only catalog/ledger queries only. No live SQL migration or schema change was executed.
+**Production status:** Read-only catalog/ledger queries only. No live SQL migration or schema change was executed; no production deployment was initiated.
