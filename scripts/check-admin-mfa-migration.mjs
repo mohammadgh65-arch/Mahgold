@@ -32,7 +32,7 @@ assert.doesNotMatch(sql, /enforce_product_pricing_mfa/i, 'pricing MFA trigger mu
 
 // Frontend fail-closed checks: MFA must be verified before admin role reads,
 // and admin-only table loading must be gated by the combined admin state.
-assert.match(admin, /aalData\\?\\.currentLevel===['\"]aal2['\"]/, 'frontend must check current AAL2 level');
+assert.match(admin, /aalData\?\.currentLevel===['\"]aal2['\"]/, 'frontend must check current AAL2 level');
 assert.match(admin, /supabase\.auth\.mfa\.verify\(/, 'frontend must verify the authenticator challenge');
 assert.match(admin, /if\(!session\|\|!aal2Ready\)/, 'profile/admin membership lookup must wait for session and AAL2');
 assert.match(admin, /profileResult\.data\?\.role===['"]admin['"]&&!!adminResult\.data/, 'frontend must require profile admin role and store_admins membership');
