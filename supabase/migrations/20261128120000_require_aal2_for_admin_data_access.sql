@@ -129,9 +129,3 @@ ALTER POLICY "Admins inspect reservations"
 ALTER POLICY "Admins release reservations"
   ON public.inventory_reservations USING (public.zarin_is_admin())
   WITH CHECK (public.zarin_is_admin());
-
-ALTER POLICY "Admins insert store settings"
-  ON public.store_settings WITH CHECK (public.zarin_is_admin());
-ALTER POLICY "Admins update store settings"
-  ON public.store_settings USING (public.zarin_is_admin())
-  WITH CHECK (public.zarin_is_admin());
