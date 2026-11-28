@@ -115,3 +115,12 @@ This inventory confirms that the review branch is **not a complete migration arc
 A fresh search of the repository's branches for `20261114`, code search for `require_aal2_for_mahgold_admin_access`, and commit search for the same identifier returned no matches. The linked Supabase project currently has **no development branches**. No branch was created because development branches may incur charges and the project must remain free.
 
 **Next safe step:** obtain the original migration archive or a verified database/source backup containing the missing SQL, then compare exact contents and checksums against the live ledger. Until then, do not attempt a clean replay, mark missing migrations as resolved, or apply the proposed `20261128120000` migration to production.
+
+
+## Historical admin-access PR cross-check (2026-11-28)
+
+An additional review of earlier repository PRs found PR #14/#15, titled "Separate basic admin access from MFA-protected operations". PR #15 is merged and its body states that its matching migration was applied and the RLS policies verified. The exact SQL available on its source branch is `20261123190000_mahgold_tiered_admin_access.sql` (blob `b3f138cba686dd4d78caa7ee05ede8b774cb4989`). It creates `zarin_is_admin_basic()` and moves only category, site-content, and product-image policies to that basic-admin predicate while retaining AAL2 for sensitive operations.
+
+This is useful historical evidence for the tiered-admin design, but it is **not** the missing `20261114212315_require_aal2_for_mahgold_admin_access.sql`: its version, filename, and purpose differ. It must not be renamed or substituted for the missing migration. PR #14 remains open with a different source branch; PR #15 was merged at `0cf544663f1a1c3d6d7d885503b603b17301ddae`.
+
+The exact-source recovery blocker for `20261114212315` therefore remains open. This cross-check was read-only; no migration was applied or changed.
