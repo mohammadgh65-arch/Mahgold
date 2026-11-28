@@ -139,3 +139,19 @@ The repository's `.github/workflows/supabase-backup.yml` was inspected. It is de
 Security/operational consequence: there is currently no successful backup artifact evidenced by these two runs. The GitHub Actions secrets `SUPABASE_SESSION_POOLER_URL` and `BACKUP_ENCRYPTION_PASSPHRASE` require owner-side verification/update before a future backup run. Do not print secrets, add credentials to repository files, or attempt password resets from this review.
 
 This is a read-only audit. No secrets, database credentials, workflow definitions, or production database settings were changed.
+
+
+## Supavisor credential-format diagnosis (read-only, 2026-11-28)
+
+The two failed backup job logs show the connection reached the Shared Pooler (Supavisor) session endpoint on port 5432, but PostgreSQL reported the attempted role as `postgres`. The current Supabase connection guide documents the session-pooler username format as `postgres.<project-ref>`, not plain `postgres`:
+
+- Official guide: https://supabase.com/docs/guides/database/connecting-to-postgres
+- Mahgold project ref: `nzvvvpbwavaodhxrnkdr`
+- Expected pooler username shape: `postgres.nzvvvpbwavaodhxrnkdr`
+- The password must be the current database password; reserved URI characters must be percent-encoded.
+
+This makes a malformed/stale `SUPABASE_SESSION_POOLER_URL` a concrete likely cause of the backup failure. The Actions log masks the actual secret, so its full value was not inspected and the diagnosis is not treated as proven. The repository workflow and GitHub secret were not modified.
+
+Owner-side corrective action: in GitHub repository Settings → Secrets and variables → Actions, replace `SUPABASE_SESSION_POOLER_URL` with the exact Session pooler URI copied from the Mahgold Supabase dashboard (Connect → Session pooler), checking the username format above and using the current database password. Do not paste the URI or password into chat, issues, commits, or workflow logs. Then manually run the encrypted backup workflow and verify that the dump and encrypted artifact upload both succeed. No password reset is necessary unless the current database password is unknown or invalid.
+
+This conclusion follows the official Supabase connection guide and the masked failure logs. No credentials or production settings were changed.
