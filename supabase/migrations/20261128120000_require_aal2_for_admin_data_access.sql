@@ -114,3 +114,24 @@ ALTER POLICY "Basic admins delete product images"
     bucket_id = 'product-images'
     AND public.zarin_is_admin()
   );
+
+-- Close admin-only policy paths that still called the legacy AAL1 predicate.
+ALTER POLICY "Admins delete market quotes"
+  ON public.market_quotes USING (public.zarin_is_admin());
+ALTER POLICY "Admins insert market quotes"
+  ON public.market_quotes WITH CHECK (public.zarin_is_admin());
+ALTER POLICY "Admins update market quotes"
+  ON public.market_quotes USING (public.zarin_is_admin())
+  WITH CHECK (public.zarin_is_admin());
+
+ALTER POLICY "Admins inspect reservations"
+  ON public.inventory_reservations USING (public.zarin_is_admin());
+ALTER POLICY "Admins release reservations"
+  ON public.inventory_reservations USING (public.zarin_is_admin())
+  WITH CHECK (public.zarin_is_admin());
+
+ALTER POLICY "Admins insert store settings"
+  ON public.store_settings WITH CHECK (public.zarin_is_admin());
+ALTER POLICY "Admins update store settings"
+  ON public.store_settings USING (public.zarin_is_admin())
+  WITH CHECK (public.zarin_is_admin());
