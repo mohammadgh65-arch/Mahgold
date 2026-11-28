@@ -12,7 +12,9 @@ const requiredPolicies = [
   'Admins insert store settings','Admins update store settings',
   'Admins can manage archived state of paid orders','Admins can update orders',
   'Customers can read own orders','Customers can read own order items',
-  'Basic admins upload product images','Basic admins update product images','Basic admins delete product images'
+  'Basic admins upload product images','Basic admins update product images','Basic admins delete product images',
+  'Admins delete market quotes','Admins insert market quotes','Admins update market quotes',
+  'Admins inspect reservations','Admins release reservations'
 ];
 
 assert.match(sql, /SECURITY DEFINER/i, 'admin predicate must run as SECURITY DEFINER');
