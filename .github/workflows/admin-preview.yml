@@ -3,7 +3,7 @@ name: Mahgold admin-only private preview
 on:
   push:
     branches:
-      - mahgold-independent-react
+      - fix/admin-mfa-preview-ready-20261128
   workflow_dispatch:
 
 permissions:
