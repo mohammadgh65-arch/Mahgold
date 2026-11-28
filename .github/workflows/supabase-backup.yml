@@ -1,0 +1,74 @@
+name: Encrypted Supabase Database Backup
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "41 3 * * *" # daily 03:41 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnupg
+
+      - name: Validate Supabase Session Pooler URI
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_SESSION_POOLER_URL }}
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_DB_URL" || { echo "Missing SUPABASE_SESSION_POOLER_URL secret"; exit 1; }
+          python3 - <<'PY'
+          import os
+          from urllib.parse import urlsplit
+
+          value = os.environ["SUPABASE_DB_URL"]
+          try:
+              parsed = urlsplit(value)
+              valid = (
+                  parsed.scheme in ("postgres", "postgresql")
+                  and parsed.hostname is not None
+                  and parsed.hostname.endswith(".pooler.supabase.com")
+                  and parsed.port == 5432
+                  and parsed.username == "postgres.nzvvvpbwavaodhxrnkdr"
+                  and parsed.password is not None
+                  and parsed.path == "/postgres"
+              )
+          except ValueError:
+              valid = False
+
+          if not valid:
+              raise SystemExit(
+                  "Invalid Supabase Session Pooler URI. Copy the Session Pooler URI "
+                  "from Supabase Dashboard > Connect; verify project username, "
+                  "session port 5432, database path /postgres, and password. "
+                  "The secret value is intentionally not printed."
+              )
+          print("Session Pooler URI format validated; credential value not displayed.")
+          PY
+
+      - name: Create encrypted database dump
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_SESSION_POOLER_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_ENCRYPTION_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          test -n "$BACKUP_PASSPHRASE" || { echo "Missing BACKUP_ENCRYPTION_PASSPHRASE secret"; exit 1; }
+          docker run --rm -e SUPABASE_DB_URL -v "$PWD:/backup" postgres:17 sh -ec 'pg_dump --dbname="$SUPABASE_DB_URL" --format=custom --no-owner --no-acl --verbose --file=/backup/mahgold.dump'
+          printf '%s' "$BACKUP_PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 --output "mahgold-$(date -u +%Y-%m-%d).dump.gpg" mahgold.dump
+          unset BACKUP_PASSPHRASE
+          shred -u mahgold.dump || rm -f mahgold.dump
+
+      - name: Store encrypted backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mahgold-encrypted-db-backup-${{ github.run_id }}
+          path: mahgold-*.dump.gpg
+          retention-days: 7
+          if-no-files-found: error
