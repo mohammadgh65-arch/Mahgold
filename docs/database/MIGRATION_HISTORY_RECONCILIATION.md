@@ -3,7 +3,7 @@
 **Snapshot date:** 2026-11-28  
 **Scope:** Read-only comparison of the linked project's `supabase_migrations.schema_migrations` ledger for versions `20261101...` through `20261128...` against the migration files tracked in the review branch `fix/latest-storefront-admin-mfa-20261128`.
 
-This document records observed metadata only. It does **not** recreate, replace, or certify historical SQL. Do not apply migrations or use this branch as a complete clean-install/replay baseline until the canonical migration source is recovered and reconciled.
+This document records observed metadata only. It does **not** certify the complete historical migration chain. Do not apply migrations or use this branch as a complete clean-install/replay baseline until canonical source is reconciled.
 
 ## Live ledger entries in scope
 
@@ -53,22 +53,18 @@ This document records observed metadata only. It does **not** recreate, replace,
 | 20261126203620 | allow_admin_soft_archive_paid_orders |
 | 20261126203802 | grant_admin_order_archive_update_columns |
 
-## Files currently tracked in this review branch
+## Recovered historical source
 
-- `20261120130000_allow_fresh_manual_gold_quotes.sql`
-- `20261120140000_support_manual_quote_auto_price_refresh.sql`
-- `20261120150000_block_unverified_paid_orders.sql`
-- `20261120170000_customer_order_tracking.sql`
-- `20261122090000_connect_automatic_product_pricing_triggers.sql`
-- `20261126092530_mahgold_require_expected_price_and_secure_quote_expiry.sql`
-- `20261127100000_admin_order_archive_recoverable_delete.sql`
-- `20261128120000_require_aal2_for_admin_data_access.sql`
+- **Recovered exactly:** `20261123142051_mahgold_require_aal2_for_admin_rls.sql`
+  - Found on branch `mahgold-production-hardening-20261123`.
+  - Restored verbatim to this review branch in commit `ca596b1cee8c950997ef09b187af53b7b9a5c85d`.
+  - This is a historical source file already represented in the live migration ledger; do not reapply it to production.
+- **Still missing:** `20261114212315_require_aal2_for_mahgold_admin_access.sql`. Its exact source has not yet been recovered.
 
-## Known discrepancies and required resolution
+## Branch files and remaining gaps
 
-- The live ledger records the two earlier AAL2/admin migrations at versions `20261114212315` and `20261123142051`; their exact source files are not tracked in the reviewed branch and were not found by path-specific GitHub history lookup.
-- Several tracked migration filenames do not have the same timestamp as the corresponding ledger entry. For example, the manual quote and customer order tracking migrations have ledger versions `20261120082159`, `20261120082437`, and `20261120165100`, while the repository filenames use different timestamps.
-- Numerous other live ledger entries in this November window have no exact-version file in the reviewed branch. This is a migration-source/history gap, not proof that the live database is missing those changes.
-- Recover exact canonical SQL from the original source repository or a verified backup. Then reconcile version/name metadata and validate replay on a disposable database before any production change.
+The review branch contains the current storefront migrations and the restored historical AAL2 migration. Other November ledger entries still do not all map to exact-version files in this branch. Some tracked migration filenames differ from live ledger versions/names (e.g. manual quote and order tracking migrations).
 
-**Production status:** This investigation was read-only. No live SQL migration or schema change was executed.
+This is a repository/source-history gap, not proof that the live database is missing those changes. Recover remaining canonical SQL from original source or a verified backup, then reconcile metadata and replay-test on a disposable database before any production change.
+
+**Production status:** Read-only catalog/ledger queries only. No live SQL migration or schema change was executed.
