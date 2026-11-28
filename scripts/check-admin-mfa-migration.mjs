@@ -47,6 +47,8 @@ for (const policy of requiredPolicies) {
 
 assert.match(sql, /Customers can read own orders"[\s\S]*?auth\.uid\(\)[\s\S]*?customer_id[\s\S]*?OR public\.zarin_is_admin\(\)/i,
   'customer order SELECT must retain owner access as well as admin access');
+assert.match(sql, /Customers can read own order status events"[\\s\\S]*?o\\.customer_id\\s*=\\s*\\(SELECT auth\\.uid\\(\\)\\)[\\s\\S]*?OR public\\.zarin_is_admin\\(\\)/i,
+  'customer order-status event access must remain parent-order owner scoped');
 assert.match(sql, /Customers can read own order items"[\s\S]*?o\.customer_id\s*=\s*\(SELECT auth\.uid\(\)\)[\s\S]*?OR public\.zarin_is_admin\(\)/i,
   'customer order-item access must remain parent-order owner scoped');
 assert.match(sql, /is_active\s*=\s*true\)\s*OR public\.zarin_is_admin\(\)/i,
