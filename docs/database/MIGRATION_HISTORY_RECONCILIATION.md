@@ -172,3 +172,27 @@ The proposed `20261128120000_require_aal2_for_admin_data_access.sql` changes the
 **Operational implication:** an administrator's profile role must be provisioned by a trusted server/database operator; the browser's self-service profile update cannot promote a customer to admin. The proposed migration does not remove or replace the role guard. Keep exact historical source recovery and clean replay validation as blockers; do not apply the proposed migration to production yet.
 
 This verification used read-only catalog queries only. No function, trigger, policy, role, grant, or production data was changed.
+
+
+## Order lifecycle, paid-order immutability, and soft-archive audit (read-only, 2026-11-28)
+
+A fresh read-only inspection covered live triggers, trigger functions, RLS policies, constraints, indexes, function grants, and status counts for `orders`, `order_items`, `order_status_events`, and `inventory_reservations`.
+
+### Confirmed safeguards
+- `mahgold_block_unverified_paid_status()` rejects every attempt to set an order's status to `paid`. This is a fail-closed safeguard until a real payment gateway verification flow is implemented; the database currently does not allow the admin UI or service role to mark an order paid through an ordinary status update.
+- `mahgold_enforce_order_status_transition()` is `SECURITY DEFINER`, uses an empty search path, and restricts status transitions to the documented lifecycle. It permits authenticated AAL2 admins or the service role, and releases active inventory reservations on `cancelled` or `payment_failed`.
+- `mahgold_record_order_status()` records initial and changed statuses in `order_status_events` using a `SECURITY DEFINER` trigger.
+- `guard_paid_order_archive_only()` blocks changes to paid-order fields other than the explicit archive/soft-delete metadata and `updated_at`, for basic admins. This is an independent row-level guard; preserve it when changing admin RLS policies.
+- The private `private.set_order_archived(uuid, boolean)` routine is `SECURITY DEFINER`, requires a non-null authenticated user and `zarin_is_admin()`, locks the target order, and only archives/restores orders whose status is `completed` and whose `paid_at` is non-null.
+- The public `mahgold_set_order_archived(uuid, boolean)` wrapper is invoker-security and delegates to that private routine. Authenticated users can execute the private routine; anon cannot.
+- Order-item snapshots have line-total arithmetic checks and positive quantity/price checks. Reservation rows have positive-quantity, valid-status, expiry, uniqueness, and foreign-key constraints. Order-status history and reservations are indexed by their order identifiers.
+
+### Findings requiring attention before future changes
+- The wrapper currently has an EXECUTE grant for `service_role`, but the private routine is not executable by `service_role` and independently rejects calls where `auth.uid()` is null. Therefore the service-role grant on the public wrapper does not provide a working service-role archive path. The current design effectively requires an authenticated AAL2 admin. Do not broaden this path without an explicit server-side authorization design.
+- The paid-order archive trigger still calls `zarin_is_admin_basic()`. If the proposed MFA migration is applied, verify this trigger under the final admin predicate and test the paid-order field-difference allowlist; do not remove the trigger.
+- The order status CHECK constraint includes `paid`, but the dedicated trigger intentionally blocks setting that status until gateway verification exists. A future payment integration must implement a verified, server-only transition rather than weakening the trigger.
+- The live order table currently contains only **2 rows**, both `cancelled`; there are no live `paid` or `completed` orders at this snapshot. Consequently, the paid-order immutability and archive/restore paths have not been exercised against live paid records.
+- Foreign keys from `order_items` and `order_status_events` to `orders` use `ON DELETE CASCADE`. Keep hard deletion inaccessible to ordinary users and retain soft archive/delete as the normal administrative workflow.
+
+### Validation limits
+This was catalog/source inspection only. No test order was created, no row was updated or deleted, no payment was simulated, and no trigger/function/policy/grant/index was changed. A disposable PostgreSQL role-matrix test is still required for: ordinary customer, admin at AAL1, admin at AAL2, service role, paid-order archive/restore, attempted paid-status assignment, and cancellation reservation release.
