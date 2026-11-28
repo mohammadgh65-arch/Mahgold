@@ -155,3 +155,20 @@ This makes a malformed/stale `SUPABASE_SESSION_POOLER_URL` a concrete likely cau
 Owner-side corrective action: in GitHub repository Settings → Secrets and variables → Actions, replace `SUPABASE_SESSION_POOLER_URL` with the exact Session pooler URI copied from the Mahgold Supabase dashboard (Connect → Session pooler), checking the username format above and using the current database password. Do not paste the URI or password into chat, issues, commits, or workflow logs. Then manually run the encrypted backup workflow and verify that the dump and encrypted artifact upload both succeed. No password reset is necessary unless the current database password is unknown or invalid.
 
 This conclusion follows the official Supabase connection guide and the masked failure logs. No credentials or production settings were changed.
+
+
+## Live administrator predicate and profile-role trigger verification (read-only, 2026-11-28)
+
+A fresh read-only catalog query against the linked production database confirmed:
+
+- Current `public.zarin_is_admin()` is **not** `SECURITY DEFINER`; it is owned by `postgres`, uses an empty search path, and currently requires AAL2 plus membership in `public.store_admins`. It does not currently check `profiles.role = 'admin'`.
+- Current `public.zarin_is_admin_basic()` is also not `SECURITY DEFINER`; it checks both `profiles.role = 'admin'` and `store_admins` membership but does not require AAL2.
+- Authenticated users can execute both predicates; anon cannot. The profile-role trigger function is not executable by authenticated or anon directly.
+- `mahgold_profiles_guard_role` is confirmed as a `BEFORE INSERT OR UPDATE OF role` trigger on `public.profiles`. Its function `mahgold_enforce_profile_role()` forces newly inserted profiles to `customer`; only database operators with current_user in `postgres`, `service_role`, or `supabase_admin` may assign privileged roles directly. Other callers cannot change their own role unless already authorized by `public.zarin_is_admin()`.
+- All ten reviewed public tables have RLS enabled (not forced). This is the current state; the review did not change it.
+
+The proposed `20261128120000_require_aal2_for_admin_data_access.sql` changes the administrator predicate to `SECURITY DEFINER`, requires AAL2, `profiles.role = 'admin'`, and `store_admins` membership, then redirects the legacy basic-admin RLS policy paths to that predicate. A fresh catalog comparison found 16 live policy expressions using `zarin_is_admin_basic()`; the proposed migration includes those policy targets (including the order, order-item, product, category, site-content, store-settings, and product-image paths). Existing policies already using `zarin_is_admin()` inherit the hardened predicate when the function is replaced.
+
+**Operational implication:** an administrator's profile role must be provisioned by a trusted server/database operator; the browser's self-service profile update cannot promote a customer to admin. The proposed migration does not remove or replace the role guard. Keep exact historical source recovery and clean replay validation as blockers; do not apply the proposed migration to production yet.
+
+This verification used read-only catalog queries only. No function, trigger, policy, role, grant, or production data was changed.
