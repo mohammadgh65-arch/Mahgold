@@ -8,13 +8,6 @@ on:
       - 'supabase/migrations/20261128120000_require_aal2_for_admin_data_access.sql'
       - 'scripts/check-admin-mfa-migration.mjs'
       - 'package.json'
-  push:
-    branches:
-      - fix/latest-storefront-admin-mfa-20261128
-    paths:
-      - 'supabase/migrations/20261128120000_require_aal2_for_admin_data_access.sql'
-      - 'scripts/check-admin-mfa-migration.mjs'
-      - 'package.json'
 
 permissions:
   contents: read
