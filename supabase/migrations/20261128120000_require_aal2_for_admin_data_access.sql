@@ -129,3 +129,24 @@ ALTER POLICY "Admins inspect reservations"
 ALTER POLICY "Admins release reservations"
   ON public.inventory_reservations USING (public.zarin_is_admin())
   WITH CHECK (public.zarin_is_admin());
+
+-- Apply the strengthened predicate to profile/admin visibility and order event access.
+-- Self-service profile access remains available to the row owner at AAL1.
+ALTER POLICY "profiles_select_own_or_admin"
+  ON public.profiles
+  USING (((SELECT auth.uid()) = id) OR public.zarin_is_admin());
+ALTER POLICY "profiles_update_own_or_admin"
+  ON public.profiles
+  USING (((SELECT auth.uid()) = id) OR public.zarin_is_admin())
+  WITH CHECK (((SELECT auth.uid()) = id) OR public.zarin_is_admin());
+
+ALTER POLICY "Customers can read own order status events"
+  ON public.order_status_events
+  USING (
+    EXISTS (
+      SELECT 1
+      FROM public.orders o
+      WHERE o.id = order_status_events.order_id
+        AND (o.customer_id = (SELECT auth.uid()) OR public.zarin_is_admin())
+    )
+  );
